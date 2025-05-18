@@ -26,34 +26,10 @@ public class Dodge : MonoBehaviour
     [Tooltip("Invulnerability frames during dodge (in seconds)")]
     public float dodgeInvulnerabilityTime = 0.15f;
 
-    [Header("Gravity Settings")]
-    [Tooltip("The character uses its own gravity value. The engine default is -9.81f")]
-    public float Gravity = -15.0f;
-
-    [Space(10)]
-    [Tooltip("Time required to pass before being able to jump again. Set to 0f to instantly jump again")]
-    public float JumpTimeout = 0.50f;
-
-    [Tooltip("Time required to pass before entering the fall state. Useful for walking down stairs")]
-    public float FallTimeout = 0.15f;
-
-    [Header("Player Grounded")]
-    [Tooltip("If the character is grounded or not. Not part of the CharacterController built in grounded check")]
-    public bool Grounded = true;
-
-    [Tooltip("Useful for rough ground")]
-    public float GroundedOffset = -0.14f;
-
-    [Tooltip("The radius of the grounded check. Should match the radius of the CharacterController")]
-    public float GroundedRadius = 0.28f;
-
-    [Tooltip("What layers the character uses as ground")]
-    public LayerMask GroundLayers;
-
     private Animator _animator;
     private GameObject _mainCamera;
     private CharacterController _controller;
-
+    private CustomThridPersonController _customThridPersonController;
     private bool _hasAnimator;
     // dodge variables
     public bool isDodging = false;
@@ -84,6 +60,7 @@ public class Dodge : MonoBehaviour
     {
         _controller = GetComponent<CharacterController>();
         _hasAnimator = TryGetComponent(out _animator);
+        _customThridPersonController = GetComponent<CustomThridPersonController>();
         _input = GetComponent<CustomStarterAssetsInputs>();
 
     // Initialize animation IDs
@@ -100,7 +77,7 @@ public class Dodge : MonoBehaviour
         }
 
         // Check if we can dodge
-        if (_input.jump && !isDodging && dodgeCooldownTimer <= 0f && Grounded)
+        if (_input.jump && !isDodging && dodgeCooldownTimer <= 0f && _customThridPersonController.Grounded)
         {
             // Set cooldown timer immediately to prevent multiple dodges
             dodgeCooldownTimer = dodgeCooldown;
