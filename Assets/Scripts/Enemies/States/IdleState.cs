@@ -4,19 +4,19 @@ public class IdleState : IEnemyStates
 {
     private float _waypointTimer;
 
-    public void EnterState(Enemy enemy)
+    public void EnterState(IEnemy enemy)
     {
-        enemy.animator.Play("Walk");
-        enemy.navMeshAgent.speed = enemy.moveSpeed;
+        enemy.Animator.SetBool("IsMoving", true);
+        enemy.NavMeshAgent.speed = enemy.MoveSpeed;
         _waypointTimer = 0;
 
-        if (enemy.waypoints.Count > 0)
+        if (enemy.Waypoints != null && enemy.Waypoints.Count > 0)
         {
-            enemy.navMeshAgent.SetDestination(enemy.waypoints[enemy._currentWaypointIndex].position);
+            enemy.NavMeshAgent.SetDestination(enemy.Waypoints[enemy.CurrentWaypointIndex].position);
         }
     }
 
-    public void UpdateState(Enemy enemy)
+    public void UpdateState(IEnemy enemy)
     {
         // Check for player entering detection range
         if (enemy.IsPlayerInDetectionRange)
@@ -26,19 +26,24 @@ public class IdleState : IEnemyStates
         }
 
         // Patrol logic
-        if (enemy.waypoints.Count > 0 &&
-            enemy.navMeshAgent.remainingDistance <= 0.5f)
+        if (enemy.Waypoints != null &&
+            enemy.Waypoints.Count > 0 &&
+            !enemy.NavMeshAgent.pathPending &&
+            enemy.NavMeshAgent.remainingDistance <= enemy.NavMeshAgent.stoppingDistance)
         {
             _waypointTimer += Time.deltaTime;
 
-            if (_waypointTimer >= enemy.waypointStopTime)
+            if (_waypointTimer >= enemy.WaypointStopTime)
             {
-                enemy._currentWaypointIndex = (enemy._currentWaypointIndex + 1) % enemy.waypoints.Count;
-                enemy.navMeshAgent.SetDestination(enemy.waypoints[enemy._currentWaypointIndex].position);
+                enemy.CurrentWaypointIndex = (enemy.CurrentWaypointIndex + 1) % enemy.Waypoints.Count;
+                enemy.NavMeshAgent.SetDestination(enemy.Waypoints[enemy.CurrentWaypointIndex].position);
                 _waypointTimer = 0;
             }
         }
     }
 
-    public void ExitState(Enemy enemy) { }
+    public void ExitState(IEnemy enemy)
+    {
+        enemy.Animator.SetBool("IsMoving", false);
+    }
 }

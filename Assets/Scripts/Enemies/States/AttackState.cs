@@ -2,33 +2,50 @@ using UnityEngine;
 
 public class AttackState : IEnemyStates
 {
-    public void EnterState(Enemy enemy)
+    public void EnterState(IEnemy enemy)
     {
-        enemy.navMeshAgent.isStopped = true;
-        enemy.transform.LookAt(enemy.Player.transform);
+        enemy.NavMeshAgent.isStopped = true;
+        if (enemy.Player != null)
+        {
+            enemy.transform.LookAt(enemy.Player.transform);
+        }
     }
 
-    public void UpdateState(Enemy enemy)
+    public void UpdateState(IEnemy enemy)
     {
+        if (enemy.Player == null) return;
+
         if (!enemy.IsPlayerInAttackRange && enemy.IsPlayerInDetectionRange)
         {
-            enemy.ChangeState(new DetectionState()); 
+            enemy.ChangeState(new DetectionState());
             return;
         }
 
         if (!enemy.IsPlayerInDetectionRange)
         {
-            enemy.ChangeState(new IdleState()); 
+            enemy.ChangeState(new IdleState());
             return;
         }
 
         if (enemy.CanAttack())
         {
-            enemy.animator.Play("Attack");
+            enemy.Animator.SetTrigger("Attack");
+
+            // Handle ranged attack if it's a RangedEnemy
+            if (enemy is RangedEnemy rangedEnemy)
+            {
+                rangedEnemy.ShootProjectile();
+            }
+            // Melee attack would be handled via animation events
+            if (enemy is Enemy meleeEnemy)
+            {
+                meleeEnemy.animator.Play("Attack");
+            }
         }
     }
-    public void ExitState(Enemy enemy) 
+
+    public void ExitState(IEnemy enemy)
     {
-        enemy.navMeshAgent.isStopped = false;
+        enemy.NavMeshAgent.isStopped = false;
     }
 }

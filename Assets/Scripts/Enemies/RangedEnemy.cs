@@ -1,63 +1,56 @@
-using System.Collections.Generic;
-using Unity.IO.LowLevel.Unsafe;
-using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine;
+using System.Collections.Generic;
 
-public class Enemy : MonoBehaviour, IEnemy
+public class RangedEnemy : MonoBehaviour, IEnemy
 {
     [Header("Stats")]
-    [SerializeField] private int health = 100;
-    [SerializeField] public float moveSpeed = 3.5f;
-    [SerializeField] private float attackDamage = 15f;
-    [SerializeField] public float detectionRange = 8f;
-    [SerializeField] public float StartAttakingRange = 2f;
-    [SerializeField] private float attackCooldown = 2f;
+    public int health = 100;
+    public float moveSpeed = 2.5f;
+    public float attackDamage = 10f;
+    public float detectionRange = 12f;
+    public float attackRange = 8f;
+    public float attackCooldown = 1.5f;
+    public float startAttakingRange = 6f;
+
+    [Header("Patrol Settings")]
+    public List<Transform> waypoints;
+    public float waypointStopTime = 2f;
+    private int currentWaypointIndex = 0;
+    private float waitTimer = 0;
+    private bool isWaiting = false;
 
     [Header("References")]
     public GameObject player;
     public NavMeshAgent navMeshAgent;
     public Animator animator;
+    public GameObject projectilePrefab;
+
+    private IEnemyStates currentState;
+    private float lastAttackTime;
 
     // IEnemy implementation
     public int Health { get => health; set => health = value; }
     public float MoveSpeed { get => moveSpeed; set => moveSpeed = value; }
     public Transform transform => base.transform;
-    public float DetectionRange
-    {
-        get => detectionRange; set => detectionRange = value;
-    }
-    public List<Transform> Waypoints { get => waypoints; set => waypoints = value; }
-    public float WaypointStopTime { get => waypointStopTime; set => waypointStopTime = value; }
-    public int CurrentWaypointIndex
-    {
-        get => _currentWaypointIndex;
-        set => _currentWaypointIndex = value;
-    }
+    public float DetectionRange { get => detectionRange; set => detectionRange = value; }
+    public float AttackRange { get => attackRange; set => attackRange = value; }
+    public float AttackCooldown { get => attackCooldown; set => attackCooldown = value; }
     public GameObject Player => player;
     public NavMeshAgent NavMeshAgent => navMeshAgent;
     public Animator Animator => animator;
     public bool IsDead => health <= 0;
+    public List<Transform> Waypoints { get => waypoints; set => waypoints = value; }
+    public float WaypointStopTime { get => waypointStopTime; set => waypointStopTime = value; }
+    public int CurrentWaypointIndex { get => currentWaypointIndex; set => currentWaypointIndex = value; }
 
-    [Header("Patrol Settings")]
-    public List<Transform> waypoints;  // Assign in Inspector
-    public float waypointStopTime = 2f;
-    public int _currentWaypointIndex = 0;
-    private float _waitTimer = 0;
-    private bool _isWaiting = false;
+    public bool IsPlayerInDetectionRange => player != null &&
+        Vector3.Distance(transform.position, player.transform.position) <= detectionRange;
 
-    [Header("Combat")]
-    public float attackRange = 1.5f;
-    [SerializeField] private float startAttakingRange = 2f;
+    public bool IsPlayerInAttackRange => player != null &&
+        Vector3.Distance(transform.position, player.transform.position) <= attackRange;
 
-    //Properties
-
-    private float _lastAttackTime;
-
-    public float AttackRange { get => attackRange; set => attackRange = value; }
-    public float AttackCooldown { get => attackCooldown; set => attackCooldown = value; }
-
-    private IEnemyStates _currentState;
-
+    public bool CanAttack() => Time.time > lastAttackTime + attackCooldown;
 
     private void Start()
     {
@@ -65,49 +58,47 @@ public class Enemy : MonoBehaviour, IEnemy
         navMeshAgent.speed = moveSpeed;
         animator = GetComponent<Animator>();
         ChangeState(new IdleState());
-
     }
-
 
     void Update()
     {
         if (!IsDead)
         {
-            _currentState?.UpdateState(this);
+            currentState?.UpdateState(this);
         }
     }
 
+    public void ShootProjectile()
+    {
+        if (!CanAttack() || projectilePrefab == null || player == null) return;
 
+        Vector3 direction = (player.transform.position - transform.position).normalized;
+        GameObject projectile = Instantiate(
+            projectilePrefab,
+            transform.position + Vector3.up * 0.5f,
+            Quaternion.LookRotation(direction)
+        );
+
+        if (projectile.TryGetComponent<Rigidbody>(out var rb))
+        {
+            rb.linearVelocity = direction * 20f;
+        }
+
+        lastAttackTime = Time.time;
+    }
+
+    public void MoveToNextWaypoint()
+    {
+        if (waypoints.Count == 0) return;
+        currentWaypointIndex = (currentWaypointIndex + 1) % waypoints.Count;
+        navMeshAgent.SetDestination(waypoints[currentWaypointIndex].position);
+    }
 
     public void ChangeState(IEnemyStates newState)
     {
-        _currentState?.ExitState(this);
-        _currentState = newState;
-        _currentState?.EnterState(this);
-    }
-
-
-    public bool IsPlayerInDetectionRange
-    {
-        get
-        {
-            if (Player == null) return false;
-            return Vector3.Distance(transform.position, Player.transform.position) <= detectionRange;
-        }
-    }
-
-    public bool IsPlayerInAttackRange
-    {
-        get
-        {
-            if (Player == null) return false;
-            return Vector3.Distance(transform.position, Player.transform.position) <= attackRange;
-        }
-    }
-
-    public bool CanAttack()
-    {
-        return Time.time > _lastAttackTime + attackCooldown;
+        currentState?.ExitState(this);
+        currentState = newState;
+        currentState?.EnterState(this);
     }
 
     public void TakeDamage(int damage)
@@ -116,14 +107,9 @@ public class Enemy : MonoBehaviour, IEnemy
         if (IsDead) Die();
     }
 
-    public void DealDamage()
-    {
-        
-    }
-
     public void Die()
     {
-        animator.Play("Die");
+        animator.SetTrigger("Die");
         navMeshAgent.isStopped = true;
         Destroy(gameObject, 2f);
     }
@@ -179,7 +165,7 @@ public class Enemy : MonoBehaviour, IEnemy
         // 5. Current State Indicator
         if (Application.isPlaying)
         {
-            string stateName = _currentState?.GetType().Name ?? "Null";
+            string stateName = currentState?.GetType().Name ?? "Null";
             GUIStyle style = new GUIStyle();
             style.normal.textColor = Color.white;
             style.fontSize = 12;
@@ -197,12 +183,5 @@ public class Enemy : MonoBehaviour, IEnemy
         Gizmos.DrawRay(pos + direction * length, right * length * 0.5f);
         Gizmos.DrawRay(pos + direction * length, left * length * 0.5f);
     }
-
-
 #endif
-
 }
-
-
-
-

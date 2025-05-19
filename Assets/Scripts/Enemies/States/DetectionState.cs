@@ -2,28 +2,32 @@ using UnityEngine;
 
 public class DetectionState : IEnemyStates
 {
-    public void EnterState(Enemy enemy)
+    public void EnterState(IEnemy enemy)
     {
-        enemy.animator.Play("Move");
-        enemy.navMeshAgent.speed = enemy.moveSpeed * 1.5f;
+        enemy.Animator.SetBool("IsMoving", true);
+        enemy.NavMeshAgent.speed = enemy.MoveSpeed * 1.5f;
     }
 
-    public void UpdateState(Enemy enemy)
+    public void UpdateState(IEnemy enemy)
     {
-        if (Vector3.Distance(enemy.transform.position, enemy.Player.transform.position) > enemy.detectionRange)
+        if (enemy.Player == null) return;
+
+        if (Vector3.Distance(enemy.transform.position, enemy.Player.transform.position) > enemy.DetectionRange)
         {
             enemy.ChangeState(new IdleState());
             return;
         }
 
-        // Continue chasing if player is still in range
-        enemy.navMeshAgent.SetDestination(enemy.Player.transform.position);
+        enemy.NavMeshAgent.SetDestination(enemy.Player.transform.position);
 
-        // Switch to attack if close enough
-        if (Vector3.Distance(enemy.transform.position, enemy.Player.transform.position) < enemy.StartAttakingRange)
+        if (Vector3.Distance(enemy.transform.position, enemy.Player.transform.position) < enemy.AttackRange)
         {
             enemy.ChangeState(new AttackState());
         }
     }
-    public void ExitState(Enemy enemy) { }
+
+    public void ExitState(IEnemy enemy)
+    {
+        enemy.Animator.SetBool("IsMoving", false);
+    }
 }
