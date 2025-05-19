@@ -57,38 +57,6 @@ public class PlayerCamera : MonoBehaviour
 
         currentlyVisible = visibleThisFrame;
     }
-    // Update is called once per frame
-    // void Update()
-    // {
-
-    //     HashSet<GameObject> currentHits = new HashSet<GameObject>();
-    //     // Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-    //     ray = new(transform.position, transform.forward);
-
-    //     RaycastHit[] hits = Physics.BoxCastAll(ray.origin, boxHalfExtents, ray.direction, Quaternion.identity, maxDistance);
-
-
-
-    //     foreach (RaycastHit hit in hits)
-    //     {
-    //         if (hit.transform.gameObject.CompareTag("MovingObject"))
-    //             currentHits.Add(hit.collider.gameObject);
-    //         // You can do "OnHitStay"-like logic here
-    //     }
-
-    //     // Detect objects that exited
-    //     foreach (GameObject obj in previousHits)
-    //     {
-    //         if (!currentHits.Contains(obj))
-    //         {
-    //             Debug.Log("Object exited sphere cast: " + obj.name);
-    //             obj.GetComponent<MovingObject>().MoveToNewPosition();
-    //         }
-    //     }
-
-    //     previousHits = currentHits; // Update for next frame
-
-    // }
     bool IsVisibleToCamera(Transform target)
     {
         Vector3 viewportPoint = Camera.main.WorldToViewportPoint(target.position);
