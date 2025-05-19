@@ -11,16 +11,21 @@ public class AutoLookAtNearestEnemy : MonoBehaviour
     [Header("Tracking Settings")]
     public float trackingRange = 15f;
     public float horizontalFieldOfView = 90f;
-    public float verticalFieldOfView = 60f;  // Added vertical FOV limitation
-    public float detectionInterval = 0.2f;   // Performance optimization: interval between detection checks
+    public float verticalFieldOfView = 60f;
+    public float detectionInterval = 0.2f;
 
     [Header("Enemy Layer")]
     public LayerMask enemyLayer;
 
     [Header("Lock-On Settings")]
     public KeyCode toggleLockOnKey = KeyCode.E;
-    public KeyCode nextTargetKey = KeyCode.Q;  // Added key for switching to next target
-    public KeyCode previousTargetKey = KeyCode.Z;  // Added key for switching to previous target
+    public KeyCode nextTargetKey = KeyCode.Q;
+    public KeyCode previousTargetKey = KeyCode.Z;
+
+    // Improved camera transition settings
+    [Header("Camera Transition")]
+    [SerializeField] private float blendTime = 0.5f; // Time to blend between cameras
+    [SerializeField] private CinemachineBlendDefinition.Style blendStyle = CinemachineBlendDefinition.Style.EaseInOut;
 
     [Header("Cinemachine Group Camera")]
     public CinemachineVirtualCamera cinemachineGroupCamera;
@@ -35,15 +40,15 @@ public class AutoLookAtNearestEnemy : MonoBehaviour
     [SerializeField] private int inactivePriority = 0;
 
     [Header("Look At Target")]
-    public Transform lookAtTarget; // The transform at head/eye level
+    public Transform lookAtTarget;
 
     private Transform targetEnemy;
     private GameObject activeTargetIndicator;
     private bool _isLockedOn = false;
     private CustomStarterAssetsInputs inputHandler;
-    private float nextDetectionTime = 0f;  // For detection timing
-    private List<Transform> potentialTargets = new List<Transform>();  // Store all valid targets
-    private int currentTargetIndex = -1;  // Track current target in the list
+    private float nextDetectionTime = 0f;
+    private List<Transform> potentialTargets = new List<Transform>();
+    private int currentTargetIndex = -1;
 
     // Store initial camera settings
     private Vector3 initialCameraPosition;
@@ -55,6 +60,7 @@ public class AutoLookAtNearestEnemy : MonoBehaviour
     private CinemachineTransposer transposer;
     private Vector3 initialCameraOffset;
     private bool initialCameraInitialized = false;
+    private CinemachineBrain cinemachineBrain;
 
     public Transform currentTarget => targetEnemy;
     public bool isLockedOn => _isLockedOn && targetEnemy != null;
@@ -63,6 +69,13 @@ public class AutoLookAtNearestEnemy : MonoBehaviour
     {
         playerTransform = transform;
         inputHandler = GetComponent<CustomStarterAssetsInputs>();
+
+        // Find the CinemachineBrain for managing blends
+        cinemachineBrain = FindObjectOfType<CinemachineBrain>();
+        if (cinemachineBrain == null)
+        {
+            Debug.LogWarning("CinemachineBrain not found. Camera transitions may not blend properly.");
+        }
     }
 
     void Start()
@@ -89,6 +102,9 @@ public class AutoLookAtNearestEnemy : MonoBehaviour
                 Debug.Log("Found main camera to use for targeting.");
             }
         }
+
+        // Ensure proper camera setup at start
+        SwitchToPlayerCamera();
     }
 
     void StoreInitialCameraSettings()
@@ -158,6 +174,16 @@ public class AutoLookAtNearestEnemy : MonoBehaviour
             cinemachineGroupCamera.Follow = targetGroup.transform;
             cinemachineGroupCamera.LookAt = targetGroup.transform;
             cinemachineGroupCamera.Priority = inactivePriority;
+
+            // Set blend definition for smoother transitions
+            if (cinemachineBrain != null)
+            {
+                CinemachineBlendDefinition blend = new CinemachineBlendDefinition(
+                    blendStyle, blendTime);
+
+                // This might require a custom transition setup in your CinemachineBrain
+                // depending on your project configuration
+            }
         }
 
         // Setup Cinemachine Main Camera
@@ -190,30 +216,87 @@ public class AutoLookAtNearestEnemy : MonoBehaviour
 
             if (_isLockedOn)
             {
-                // Existing lock-on enabling code...
+                // Find all potential targets
+                FindAllPotentialTargets();
+
+                // If no targets found, don't enable lock-on
+                if (potentialTargets.Count == 0)
+                {
+                    _isLockedOn = false;
+                    Debug.Log("No valid targets found - lock-on not enabled");
+                    return;
+                }
+
+                // Select closest target and create indicator
+                SelectClosestTarget();
+                CreateTargetIndicator();
+
+                // Setup group targets and switch to lock-on camera
+                SetGroupTargets(playerTransform, targetEnemy);
+                SwitchToLockOnCamera();
+
+                Debug.Log($"Lock-on mode enabled, targeting: {targetEnemy.name}");
             }
             else
             {
+                // Clear target and reset to normal camera
                 ClearTargetIndicator();
                 targetEnemy = null;
                 currentTargetIndex = -1;
                 potentialTargets.Clear();
-                ResetGroupToPlayerOnly();
 
-                // Switch to player camera
-                cinemachineCamera.Priority = activePriority;
-                cinemachineGroupCamera.Priority = inactivePriority;
-
-                // Explicitly set Follow and LookAt to current targets
-                if (cinemachineCamera != null)
-                {
-                    cinemachineCamera.Follow = lookAtTarget;
-                    cinemachineCamera.LookAt = lookAtTarget != null ? lookAtTarget : playerTransform;
-                }
+                // Reset camera to normal view - THIS IS THE KEY PART FOR LOCK-OFF
+                SwitchToPlayerCamera();
 
                 Debug.Log("Lock-on mode disabled");
             }
         }
+    }
+
+    // Improved method for switching to lock-on camera
+    void SwitchToLockOnCamera()
+    {
+        // Store current camera settings before switching if not already stored
+        if (!initialCameraInitialized)
+        {
+            StoreInitialCameraSettings();
+        }
+
+        // Set appropriate camera priorities to activate group camera
+        cinemachineCamera.Priority = inactivePriority;
+        cinemachineGroupCamera.Priority = activePriority;
+
+        // Force Cinemachine to update immediately for smoother transition
+        if (cinemachineBrain != null)
+        {
+            cinemachineBrain.m_DefaultBlend = new CinemachineBlendDefinition(blendStyle, blendTime);
+            cinemachineBrain.ManualUpdate();
+        }
+
+        Debug.Log("Switched to lock-on group camera");
+    }
+
+    // Improved method for switching back to player camera
+    void SwitchToPlayerCamera()
+    {
+        // Set appropriate camera priorities
+        cinemachineGroupCamera.Priority = inactivePriority;
+        cinemachineCamera.Priority = activePriority;
+
+        // Reset group to only include player
+        ResetGroupToPlayerOnly();
+
+        // Restore original camera settings
+        RestoreInitialCameraSettings();
+
+        // Force Cinemachine to update immediately for smoother transition
+        if (cinemachineBrain != null)
+        {
+            cinemachineBrain.m_DefaultBlend = new CinemachineBlendDefinition(blendStyle, blendTime);
+            cinemachineBrain.ManualUpdate();
+        }
+
+        Debug.Log("Switched back to player camera");
     }
 
     void RestoreInitialCameraSettings()
@@ -239,27 +322,8 @@ public class AutoLookAtNearestEnemy : MonoBehaviour
                 transposer.m_FollowOffset = initialCameraOffset;
             }
 
-            // Force camera to update immediately to apply the settings
-            if (cinemachineCamera.VirtualCameraGameObject != null)
-            {
-                cinemachineCamera.OnTargetObjectWarped(initialFollowTarget, Vector3.zero);
-
-                // Reset the camera brain to ensure position update
-                var brain = FindObjectOfType<CinemachineBrain>();
-                if (brain != null)
-                {
-                    brain.ManualUpdate();
-                }
-            }
-        }
-
-        // If we need to force the physical camera position
-        if (cameraTransform != null && Camera.main != null && Camera.main.transform == cameraTransform)
-        {
-            Debug.Log("Performing additional camera positioning reset...");
-
-            // We may need to wait a frame for Cinemachine to update
-            StartCoroutine(ResetCameraAfterDelay());
+            // Force update the virtual camera
+            cinemachineCamera.PreviousStateIsValid = false;
         }
     }
 
@@ -269,7 +333,7 @@ public class AutoLookAtNearestEnemy : MonoBehaviour
         yield return new WaitForEndOfFrame();
 
         // If camera is still not at the right position, force it
-        if (Vector3.Distance(cameraTransform.position, initialCameraPosition) > 0.1f)
+        if (cameraTransform != null && Vector3.Distance(cameraTransform.position, initialCameraPosition) > 0.1f)
         {
             Debug.Log($"Force resetting camera position from {cameraTransform.position} to {initialCameraPosition}");
 
@@ -283,277 +347,170 @@ public class AutoLookAtNearestEnemy : MonoBehaviour
         }
     }
 
+    // Get all potential targets in range
+    void FindAllPotentialTargets()
+    {
+        potentialTargets.Clear();
+        currentTargetIndex = -1;
+
+        if (Time.time < nextDetectionTime) return;
+        nextDetectionTime = Time.time + detectionInterval;
+
+        // Get all colliders in range
+        Collider[] hitColliders = Physics.OverlapSphere(transform.position, trackingRange, enemyLayer);
+
+        foreach (var hitCollider in hitColliders)
+        {
+            Transform enemyTransform = hitCollider.transform;
+
+            // Check if enemy is in field of view
+            if (IsInFieldOfView(enemyTransform))
+            {
+                potentialTargets.Add(enemyTransform);
+            }
+        }
+
+        // Sort enemies by distance
+        potentialTargets.Sort((a, b) =>
+            Vector3.Distance(transform.position, a.position)
+            .CompareTo(Vector3.Distance(transform.position, b.position)));
+
+        Debug.Log($"Found {potentialTargets.Count} potential targets in range");
+    }
+
+    // Check if a target is within the field of view
+    bool IsInFieldOfView(Transform target)
+    {
+        if (target == null || cameraTransform == null) return false;
+
+        Vector3 directionToTarget = target.position - cameraTransform.position;
+        float distance = directionToTarget.magnitude;
+        if (distance > trackingRange) return false;
+
+        directionToTarget.Normalize();
+
+        // Convert direction to camera's local space
+        Vector3 localDir = cameraTransform.InverseTransformDirection(directionToTarget);
+
+        // Check if the target is in front of the camera
+        if (localDir.z <= 0)
+        {
+            // Target is behind the camera
+            return false;
+        }
+
+        // Calculate horizontal and vertical angles in degrees
+        float horizontalAngle = Mathf.Atan2(localDir.x, localDir.z) * Mathf.Rad2Deg;
+        float verticalAngle = Mathf.Atan2(localDir.y, localDir.z) * Mathf.Rad2Deg;
+
+        // Check if angles are within FOV
+        bool isInHorizontalFOV = Mathf.Abs(horizontalAngle) <= horizontalFieldOfView * 0.5f;
+        bool isInVerticalFOV = Mathf.Abs(verticalAngle) <= verticalFieldOfView * 0.5f;
+
+        return isInHorizontalFOV && isInVerticalFOV;
+    }
+
+    //bool IsInFieldOfView(Transform target)
+    //{
+    //    if (target == null || cameraTransform == null) return false;
+
+    //    Vector3 directionToTarget = (target.position - cameraTransform.position).normalized;
+
+    //    // Calculate horizontal and vertical angles
+    //    float horizontalAngle = Vector3.Angle(cameraTransform.right,
+    //        new Vector3(directionToTarget.x, 0, directionToTarget.z).normalized);
+
+    //    if (Vector3.Dot(cameraTransform.forward, directionToTarget) < 0)
+    //        horizontalAngle = 180f;
+
+    //    float verticalAngle = Vector3.Angle(cameraTransform.up,
+    //        new Vector3(0, directionToTarget.y, 0).normalized);
+
+    //    // Check if target is within FOV
+    //    bool isInHorizontalFOV = horizontalAngle <= horizontalFieldOfView * 0.5f;
+    //    bool isInVerticalFOV = verticalAngle <= verticalFieldOfView * 0.5f;
+
+    //    return isInHorizontalFOV && isInVerticalFOV;
+    //}
+
+    // Select the closest target from potential targets
+    void SelectClosestTarget()
+    {
+        if (potentialTargets.Count == 0)
+        {
+            targetEnemy = null;
+            currentTargetIndex = -1;
+            return;
+        }
+
+        // Default to closest target (index 0 after sorting)
+        currentTargetIndex = 0;
+        targetEnemy = potentialTargets[currentTargetIndex];
+    }
+
+    // Handle switching between targets
     void HandleTargetSwitching()
     {
         if (potentialTargets.Count <= 1) return;
 
         bool targetSwitched = false;
 
-        // Next target
+        // Switch to next target
         if (Input.GetKeyDown(nextTargetKey))
         {
             currentTargetIndex = (currentTargetIndex + 1) % potentialTargets.Count;
             targetSwitched = true;
         }
-
-        // Previous target
-        if (Input.GetKeyDown(previousTargetKey))
+        // Switch to previous target
+        else if (Input.GetKeyDown(previousTargetKey))
         {
             currentTargetIndex--;
             if (currentTargetIndex < 0) currentTargetIndex = potentialTargets.Count - 1;
             targetSwitched = true;
         }
 
-        if (targetSwitched)
+        if (targetSwitched && currentTargetIndex >= 0 && currentTargetIndex < potentialTargets.Count)
         {
+            // Update target and indicator
             targetEnemy = potentialTargets[currentTargetIndex];
-            ClearTargetIndicator();
-            CreateTargetIndicator();
+            UpdateTargetIndicator();
+
+            // Update the target group
             SetGroupTargets(playerTransform, targetEnemy);
+
+            Debug.Log($"Switched target to: {targetEnemy.name}");
         }
     }
 
-    void ManageCurrentTarget()
-    {
-        // Check if we need to update targets based on time interval
-        if (Time.time >= nextDetectionTime)
-        {
-            nextDetectionTime = Time.time + detectionInterval;
-
-            // Store the current target before refreshing
-            Transform previousTarget = targetEnemy;
-
-            // Refresh potential targets
-            FindAllPotentialTargets();
-
-            // If no targets found, exit lock-on mode
-            if (potentialTargets.Count == 0)
-            {
-                _isLockedOn = false;
-                ClearTargetIndicator();
-                ResetToNormalCamera();
-                return;
-            }
-
-            // Try to find previous target in the new list
-            if (previousTarget != null)
-            {
-                int indexInNewList = potentialTargets.IndexOf(previousTarget);
-                if (indexInNewList >= 0)
-                {
-                    // Previous target is still valid
-                    currentTargetIndex = indexInNewList;
-                    targetEnemy = previousTarget;
-                }
-                else
-                {
-                    // Previous target is no longer valid, select closest
-                    SelectClosestTarget();
-                    ClearTargetIndicator();
-                    CreateTargetIndicator();
-                }
-            }
-            else
-            {
-                // No previous target, select closest
-                SelectClosestTarget();
-                ClearTargetIndicator();
-                CreateTargetIndicator();
-            }
-
-            // Update group targets with current enemy
-            SetGroupTargets(playerTransform, targetEnemy);
-        }
-
-        // Update indicator position even if we're not refreshing targets
-        UpdateTargetIndicator();
-    }
-
-    void FindAllPotentialTargets()
-    {
-        // Debug.Log($"Looking for enemies on layer: {LayerMask.LayerToName(Mathf.RoundToInt(Mathf.Log(enemyLayer.value, 2)))}");
-        Collider[] hits = Physics.OverlapSphere(playerTransform.position, trackingRange, enemyLayer);
-        Debug.Log($"Found {hits.Length} colliders in range within enemyLayer mask");
-
-        potentialTargets.Clear();
-
-        // If no camera transform is assigned, try to find main camera
-        if (cameraTransform == null)
-        {
-            if (Camera.main != null)
-            {
-                cameraTransform = Camera.main.transform;
-                Debug.Log("Found main camera as fallback");
-            }
-            else
-            {
-                Debug.LogError("No camera reference found - can't determine field of view for targeting");
-                return;
-            }
-        }
-
-        foreach (Collider hit in hits)
-        {
-            // Skip trigger colliders unless you specifically want to target them
-            if (hit.isTrigger)
-            {
-                // Debug.Log($"Skipping trigger: {hit.name}");
-                continue;
-            }
-
-            Vector3 directionToEnemy = hit.transform.position - playerTransform.position;
-            float distanceToEnemy = directionToEnemy.magnitude;
-
-            // Skip if too close or too far (safety check)
-            if (distanceToEnemy < 0.1f || distanceToEnemy > trackingRange * 1.1f)
-            {
-                // Debug.Log($"Enemy {hit.name} distance invalid: {distanceToEnemy}");
-                continue;
-            }
-
-            // Check horizontal angle
-            Vector3 horizontalDirection = directionToEnemy;
-            horizontalDirection.y = 0;
-
-            // Safety check for zero vector
-            if (horizontalDirection.sqrMagnitude < 0.001f)
-            {
-                // Enemy is directly above or below, count as in FOV
-                horizontalDirection = cameraTransform.forward;
-                horizontalDirection.y = 0;
-                if (horizontalDirection.sqrMagnitude < 0.001f)
-                {
-                    horizontalDirection = Vector3.forward; // Fallback if camera is looking straight up/down
-                }
-            }
-
-            horizontalDirection.Normalize();
-            Vector3 cameraForwardHorizontal = cameraTransform.forward;
-            cameraForwardHorizontal.y = 0;
-
-            // Safety check for zero vector
-            if (cameraForwardHorizontal.sqrMagnitude < 0.001f)
-            {
-                cameraForwardHorizontal = Vector3.forward; // Fallback if camera is looking straight up/down
-            }
-
-            cameraForwardHorizontal.Normalize();
-
-            float horizontalAngle = Vector3.Angle(cameraForwardHorizontal, horizontalDirection);
-
-            // Temporarily skip vertical FOV check for debugging
-            // This will only use horizontal FOV to see if that's the issue
-            bool isInFOV = horizontalAngle <= horizontalFieldOfView / 2f;
-
-            /*
-            // Check vertical angle - comment out for now to debug the horizontal check first
-            float verticalAngle = 0;
-            try
-            {
-                Vector3 perpendicularToCameraForward = Vector3.Cross(cameraForwardHorizontal, Vector3.up).normalized;
-                Vector3 projectionPlaneNormal = Vector3.Cross(perpendicularToCameraForward, cameraForwardHorizontal).normalized;
-                
-                Vector3 dirToEnemyProjected = Vector3.ProjectOnPlane(directionToEnemy.normalized, perpendicularToCameraForward);
-                Vector3 cameraForwardProjected = Vector3.ProjectOnPlane(cameraTransform.forward, perpendicularToCameraForward);
-                
-                if (dirToEnemyProjected.sqrMagnitude > 0.001f && cameraForwardProjected.sqrMagnitude > 0.001f)
-                {
-                    verticalAngle = Vector3.Angle(dirToEnemyProjected, cameraForwardProjected);
-                    isInFOV = horizontalAngle <= horizontalFieldOfView / 2f && verticalAngle <= verticalFieldOfView / 2f;
-                }
-            }
-            catch (System.Exception e)
-            {
-                Debug.LogWarning($"Error calculating vertical angle: {e.Message}");
-                // Fall back to horizontal only if there's an error
-                isInFOV = horizontalAngle <= horizontalFieldOfView / 2f;
-            }
-            */
-
-            if (isInFOV)
-            {
-                // Debug.Log($"Enemy {hit.name} is in FOV, checking line of sight");
-                if (HasLineOfSight(hit.transform))
-                {
-                    Debug.Log($"Adding target: {hit.name} at distance {distanceToEnemy:F2}, angle {horizontalAngle:F1}°");
-                    potentialTargets.Add(hit.transform);
-                }
-                else
-                {
-                    // Debug.Log($"No line of sight to {hit.name}");
-                }
-            }
-            else
-            {
-                // Debug.Log($"Enemy {hit.name} outside FOV: horizontal angle {horizontalAngle:F1}° (limit: {horizontalFieldOfView/2f:F1}°)");
-            }
-        }
-
-        Debug.Log($"Found {potentialTargets.Count} valid targets after FOV and line-of-sight checks");
-
-        // Sort targets by distance from player
-        potentialTargets.Sort((a, b) =>
-            Vector3.Distance(playerTransform.position, a.position)
-            .CompareTo(Vector3.Distance(playerTransform.position, b.position))
-        );
-    }
-
-    void SelectClosestTarget()
-    {
-        if (potentialTargets.Count > 0)
-        {
-            targetEnemy = potentialTargets[0];
-            currentTargetIndex = 0;
-        }
-        else
-        {
-            targetEnemy = null;
-            currentTargetIndex = -1;
-        }
-    }
-
-    bool HasLineOfSight(Transform target)
-    {
-        if (target == null) return false;
-
-        Vector3 direction = target.position - playerTransform.position;
-        float distance = direction.magnitude;
-
-        // Ignore collision between player layer and enemy layer
-        int layerMask = ~(1 << gameObject.layer | enemyLayer.value);
-
-        // Start ray slightly above player to avoid hitting ground or own colliders
-        Vector3 rayStart = playerTransform.position + Vector3.up * 0.5f;
-
-        bool hasLineOfSight = !Physics.Raycast(rayStart, direction.normalized, distance, layerMask);
-
-        // Debug rays are only visible in Scene view
-        Debug.DrawRay(rayStart, direction.normalized * distance, hasLineOfSight ? Color.green : Color.red, 0.2f);
-
-        // Debug.Log($"Line of sight check to {target.name}: {hasLineOfSight}");
-
-        return hasLineOfSight;
-    }
-
+    // Create target indicator UI
     void CreateTargetIndicator()
     {
-        if (targetIndicatorPrefab != null && targetEnemy != null)
+        ClearTargetIndicator();
+
+        if (targetEnemy != null && targetIndicatorPrefab != null)
         {
-            ClearTargetIndicator();
             activeTargetIndicator = Instantiate(targetIndicatorPrefab,
                 targetEnemy.position + Vector3.up * 2f, Quaternion.identity);
+
+            // Parent to the target for auto-following
             activeTargetIndicator.transform.SetParent(targetEnemy);
         }
     }
 
+    // Update target indicator position
     void UpdateTargetIndicator()
     {
-        if (activeTargetIndicator == null && targetIndicatorPrefab != null && targetEnemy != null)
+        if (activeTargetIndicator != null && targetEnemy != null)
         {
+            // Destroy old indicator and create a new one attached to the new target
+            ClearTargetIndicator();
             CreateTargetIndicator();
         }
     }
 
+    
+
+    // Clear the target indicator
     void ClearTargetIndicator()
     {
         if (activeTargetIndicator != null)
@@ -563,249 +520,133 @@ public class AutoLookAtNearestEnemy : MonoBehaviour
         }
     }
 
-    public void SetTarget(Transform newTarget)
+    // Set the target group to include both player and enemy
+    void SetGroupTargets(Transform player, Transform enemy)
     {
-        if (newTarget != null)
+        if (targetGroup != null && player != null && enemy != null)
         {
-            // First refresh the target list to ensure we're up to date
-            FindAllPotentialTargets();
-
-            // Check if the requested target is in our potential list
-            int index = potentialTargets.IndexOf(newTarget);
-            if (index >= 0)
+            targetGroup.m_Targets = new CinemachineTargetGroup.Target[]
             {
-                targetEnemy = newTarget;
-                currentTargetIndex = index;
-                _isLockedOn = true;
-                CreateTargetIndicator();
-                SetGroupTargets(playerTransform, targetEnemy);
-                ResetToLockOnCamera();
-            }
-            else if (IsValidTarget(newTarget))
-            {
-                // If target is valid but not in list (maybe just appeared)
-                potentialTargets.Add(newTarget);
-                targetEnemy = newTarget;
-                currentTargetIndex = potentialTargets.Count - 1;
-                _isLockedOn = true;
-                CreateTargetIndicator();
-                SetGroupTargets(playerTransform, targetEnemy);
-                ResetToLockOnCamera();
-            }
+                new CinemachineTargetGroup.Target { target = player, weight = 1.5f, radius = 0.5f },
+                new CinemachineTargetGroup.Target { target = enemy, weight = 1f, radius = 0.3f }
+            };
         }
     }
 
-    bool IsValidTarget(Transform target)
+    // Reset target group to only include player
+    void ResetGroupToPlayerOnly()
+    {
+        if (targetGroup != null && playerTransform != null)
+        {
+            targetGroup.m_Targets = new CinemachineTargetGroup.Target[]
+            {
+                new CinemachineTargetGroup.Target { target = playerTransform, weight = 1f, radius = 0.5f }
+            };
+        }
+    }
+
+    // Manage the current target - check validity and update as needed
+    void ManageCurrentTarget()
+    {
+        if (targetEnemy == null || !IsTargetValid(targetEnemy))
+        {
+            // Find new target if current is invalid
+            RefreshTargets();
+            return;
+        }
+
+        // Periodically refresh target list to check for new enemies
+        if (Time.time >= nextDetectionTime)
+        {
+            RefreshTargets();
+        }
+    }
+
+    // Check if a target is still valid
+    bool IsTargetValid(Transform target)
     {
         if (target == null) return false;
 
-        // Check if enemy is on the right layer
-        if (((1 << target.gameObject.layer) & enemyLayer.value) == 0) return false;
+        // Check if target is active, in range and in view
+        bool isActive = target.gameObject.activeSelf;
+        bool isInRange = Vector3.Distance(transform.position, target.position) <= trackingRange;
 
-        // Check distance
-        float distance = Vector3.Distance(playerTransform.position, target.position);
-        if (distance > trackingRange) return false;
-
-        // Check line of sight
-        if (!HasLineOfSight(target)) return false;
-
-        return true;
+        return isActive && isInRange;
     }
 
-    void SetGroupTargets(Transform player, Transform enemy)
+    // Refresh the target list and update current target if needed
+    void RefreshTargets()
     {
-        if (targetGroup != null && enemy != null)
+        // Store current target for comparison
+        Transform previousTarget = targetEnemy;
+
+        // Find all potential targets
+        FindAllPotentialTargets();
+
+        // If no targets, disable lock-on
+        if (potentialTargets.Count == 0)
         {
-            // Get the height offset for the player (to aim at upper body/head)
-            float playerHeight = 1.8f; // Default human height estimation
-            CharacterController playerController = player.GetComponent<CharacterController>();
-            if (playerController != null)
+            _isLockedOn = false;
+            ClearTargetIndicator();
+            targetEnemy = null;
+            SwitchToPlayerCamera();
+            Debug.Log("No valid targets - lock-on disabled");
+            return;
+        }
+
+        // Try to keep targeting the same enemy if possible
+        if (previousTarget != null)
+        {
+            int prevIndex = potentialTargets.IndexOf(previousTarget);
+            if (prevIndex >= 0)
             {
-                playerHeight = playerController.height;
+                currentTargetIndex = prevIndex;
+                targetEnemy = potentialTargets[currentTargetIndex];
+                return;
             }
-            else
-            {
-                Collider playerCollider = player.GetComponent<Collider>();
-                if (playerCollider != null)
-                {
-                    playerHeight = playerCollider.bounds.size.y;
-                }
-            }
-
-            // Get the height offset for the enemy (to aim at upper body/head)
-            float enemyHeight = 1.8f; // Default estimation
-            CharacterController enemyController = enemy.GetComponent<CharacterController>();
-            if (enemyController != null)
-            {
-                enemyHeight = enemyController.height;
-            }
-            else
-            {
-                Collider enemyCollider = enemy.GetComponent<Collider>();
-                if (enemyCollider != null)
-                {
-                    enemyHeight = enemyCollider.bounds.size.y;
-                }
-            }
-
-            // Force camera to target upper bodies rather than feet
-            Vector3 playerTargetPos = player.position + Vector3.up * (playerHeight * 0.7f);
-            Vector3 enemyTargetPos = enemy.position + Vector3.up * (enemyHeight * 0.7f);
-
-            // We need to create empty GameObjects to serve as camera targets at the right heights
-            EnsureTempTarget("PlayerUpperBodyTarget", player, playerTargetPos);
-            EnsureTempTarget("EnemyUpperBodyTarget", enemy, enemyTargetPos);
-
-            Transform playerUpperTarget = GameObject.Find("PlayerUpperBodyTarget").transform;
-            Transform enemyUpperTarget = GameObject.Find("EnemyUpperBodyTarget").transform;
-
-            // Update these targets' positions
-            playerUpperTarget.position = playerTargetPos;
-            enemyUpperTarget.position = enemyTargetPos;
-
-            // Set the target group to use these elevated targets
-            targetGroup.m_Targets = new CinemachineTargetGroup.Target[]
-            {
-                new CinemachineTargetGroup.Target { target = playerUpperTarget, weight = 1.5f, radius = 0.3f },
-                new CinemachineTargetGroup.Target { target = enemyUpperTarget, weight = 1f, radius = 0.3f }
-            };
-
-            Debug.Log($"Set camera to target player at height {playerTargetPos.y:F2} and enemy at height {enemyTargetPos.y:F2}");
         }
-        else
-        {
-            Debug.LogError("Cannot set group targets: " +
-                (targetGroup == null ? "targetGroup is null" : "enemy is null"));
-        }
+
+        // Otherwise select closest
+        SelectClosestTarget();
+        UpdateTargetIndicator();
+
+        // Update group camera targets
+        SetGroupTargets(playerTransform, targetEnemy);
     }
 
-    // Helper method to ensure we have target GameObjects at the correct heights
-    void EnsureTempTarget(string name, Transform parent, Vector3 position)
+    // Add this method to verify camera states for debugging
+    public void DebugCameraStates()
     {
-        GameObject targetObj = GameObject.Find(name);
-        if (targetObj == null)
-        {
-            targetObj = new GameObject(name);
-            targetObj.transform.position = position;
-            targetObj.transform.parent = parent;
-        }
+        Debug.Log($"Player Camera Priority: {cinemachineCamera.Priority}");
+        Debug.Log($"Group Camera Priority: {cinemachineGroupCamera.Priority}");
+        Debug.Log($"Current Active Camera: {(cinemachineCamera.Priority > cinemachineGroupCamera.Priority ? "Player Camera" : "Group Camera")}");
+        Debug.Log($"Lock-on State: {_isLockedOn}");
     }
 
-    void ResetGroupToPlayerOnly()
-    {
-        if (targetGroup != null)
-        {
-            // Get the height offset for the player (to aim at upper body/head)
-            float playerHeight = 1.8f; // Default human height estimation
-            if (playerTransform != null)
-            {
-                CharacterController playerController = playerTransform.GetComponent<CharacterController>();
-                if (playerController != null)
-                {
-                    playerHeight = playerController.height;
-                }
-                else
-                {
-                    Collider playerCollider = playerTransform.GetComponent<Collider>();
-                    if (playerCollider != null)
-                    {
-                        playerHeight = playerCollider.bounds.size.y;
-                    }
-                }
-            }
-
-            // Force camera to target upper body rather than feet
-            Vector3 playerTargetPos = playerTransform.position + Vector3.up * (playerHeight * 0.7f);
-
-            // We need to create an empty GameObject to serve as a camera target at the right height
-            EnsureTempTarget("PlayerUpperBodyTarget", playerTransform, playerTargetPos);
-            Transform playerUpperTarget = GameObject.Find("PlayerUpperBodyTarget").transform;
-
-            // Update the target's position
-            playerUpperTarget.position = playerTargetPos;
-
-            targetGroup.m_Targets = new CinemachineTargetGroup.Target[]
-            {
-                new CinemachineTargetGroup.Target { target = playerUpperTarget, weight = 1f, radius = 0.3f }
-            };
-        }
-    }
-
-    void ResetToNormalCamera()
-    {
-        cinemachineCamera.Priority = activePriority;
-        cinemachineGroupCamera.Priority = inactivePriority;
-        ResetGroupToPlayerOnly();
-
-        // Also restore initial camera settings when resetting to normal camera
-        RestoreInitialCameraSettings();
-    }
-
-    void ResetToLockOnCamera()
-    {
-        cinemachineCamera.Priority = inactivePriority;
-        cinemachineGroupCamera.Priority = activePriority;
-    }
-
-    void OnDestroy()
-    {
-        // When this object is being destroyed, we need to clean up without trying to re-parent objects
-        ClearTargetIndicator();
-
-        // Remove the temporary target objects if they exist
-        CleanupTempTargets();
-
-        // Just reset camera priorities without changing parents
-        if (cinemachineCamera != null)
-        {
-            cinemachineCamera.Priority = activePriority;
-        }
-
-        if (cinemachineGroupCamera != null)
-        {
-            cinemachineGroupCamera.Priority = inactivePriority;
-        }
-    }
-
-    void CleanupTempTargets()
-    {
-        // Find and destroy temporary target objects without re-parenting
-        GameObject playerTarget = GameObject.Find("PlayerUpperBodyTarget");
-        if (playerTarget != null)
-        {
-            Destroy(playerTarget);
-        }
-
-        GameObject enemyTarget = GameObject.Find("EnemyUpperBodyTarget");
-        if (enemyTarget != null)
-        {
-            Destroy(enemyTarget);
-        }
-    }
-
-    // Visualization of detection range and field of view
+    // Optional visualization of detection range in editor
     void OnDrawGizmosSelected()
     {
-        Gizmos.color = Color.red;
+        Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, trackingRange);
 
+        // Visualize field of view if camera is available
         if (cameraTransform != null)
         {
-            // Horizontal FOV visualization
-            Vector3 rightLimit = Quaternion.Euler(0, horizontalFieldOfView / 2f, 0) * cameraTransform.forward;
-            Vector3 leftLimit = Quaternion.Euler(0, -horizontalFieldOfView / 2f, 0) * cameraTransform.forward;
+            Gizmos.color = Color.blue;
+            Vector3 cameraPos = cameraTransform.position;
 
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawLine(transform.position, transform.position + rightLimit * trackingRange);
-            Gizmos.DrawLine(transform.position, transform.position + leftLimit * trackingRange);
+            // Draw simple FOV visualization
+            float halfHorizontalFOV = horizontalFieldOfView * 0.5f * Mathf.Deg2Rad;
+            float viewDistance = trackingRange * 0.75f;
 
-            // Vertical FOV visualization
-            Vector3 upLimit = Quaternion.Euler(verticalFieldOfView / 2f, 0, 0) * cameraTransform.forward;
-            Vector3 downLimit = Quaternion.Euler(-verticalFieldOfView / 2f, 0, 0) * cameraTransform.forward;
+            Vector3 rightDir = cameraTransform.right;
+            Vector3 forwardDir = cameraTransform.forward;
 
-            Gizmos.color = Color.cyan;
-            Gizmos.DrawLine(transform.position, transform.position + upLimit * trackingRange);
-            Gizmos.DrawLine(transform.position, transform.position + downLimit * trackingRange);
+            Vector3 rightEdge = Quaternion.AngleAxis(horizontalFieldOfView * 0.5f, cameraTransform.up) * forwardDir;
+            Vector3 leftEdge = Quaternion.AngleAxis(-horizontalFieldOfView * 0.5f, cameraTransform.up) * forwardDir;
+
+            Gizmos.DrawLine(cameraPos, cameraPos + rightEdge * viewDistance);
+            Gizmos.DrawLine(cameraPos, cameraPos + leftEdge * viewDistance);
         }
     }
 }

@@ -384,7 +384,7 @@ MonoBehaviour:
   m_StreamingVersion: 20170927
   m_Priority: 10
   m_StandbyUpdate: 2
-  m_LookAt: {fileID: 1457425137}
+  m_LookAt: {fileID: 8338988565134001759}
   m_Follow: {fileID: 1457425137}
   m_Lens:
     FieldOfView: 67.92647
@@ -413,7 +413,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 985776227}
   serializedVersion: 2
-  m_LocalRotation: {x: -7.1054274e-15, y: 2.5926816e-23, z: -5.970153e-16, w: 1}
+  m_LocalRotation: {x: -0.07355548, y: 0.012400861, z: 0.0009146999, w: 0.99721366}
   m_LocalPosition: {x: 0, y: 0, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -898,7 +898,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa7155796051b734daa718462081dc5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_BindingMode: 1
+  m_BindingMode: 0
   m_FollowOffset: {x: 0, y: 0, z: -10}
   m_XDamping: 1
   m_YDamping: 1
@@ -3093,14 +3093,16 @@ MonoBehaviour:
   trackingRange: 15
   horizontalFieldOfView: 90
   verticalFieldOfView: 60
-  detectionInterval: 0.2
+  detectionInterval: 1
   enemyLayer:
     serializedVersion: 2
     m_Bits: 64
   toggleLockOnKey: 101
   nextTargetKey: 113
   previousTargetKey: 122
-  cinemachineGroupCamera: {fileID: 2070925442752058860}
+  blendTime: 0.5
+  blendStyle: 1
+  cinemachineGroupCamera: {fileID: 985776228}
   targetGroup: {fileID: 1457425136}
   playerTransform: {fileID: 8338988565134001759}
   targetIndicatorPrefab: {fileID: 0}
