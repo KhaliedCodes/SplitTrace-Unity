@@ -1,4 +1,6 @@
+using System;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerManager : MonoBehaviour
 {
@@ -7,34 +9,40 @@ public class PlayerManager : MonoBehaviour
     RangedWeapon rangedWeapon;
     MeleeWeapon meleeWeapon;
 
+    WeaponsInputSystem weaponInputs;
 
-    void Update()
+
+    private void Awake()
+    {
+        weaponInputs = new WeaponsInputSystem();
+        weaponInputs.Enable();
+        weaponInputs.WeaponsActions.Reload.performed += OnReload;
+        weaponInputs.WeaponsActions.Shoot.performed += OnShoot;
+        weaponInputs.WeaponsActions.SwitchWeapon.performed += OnSwitchWeapon;
+
+    }
+
+    private void OnSwitchWeapon(InputAction.CallbackContext context)
     {
         if (currentWeapon != null && currentWeapon.transform.IsChildOf(weaponHolder))
         {
-
-            if (Input.GetMouseButtonDown(0))
-            {
-                currentWeapon.Use();
-            }
-
-
-            if (Input.GetKeyDown(KeyCode.R) && currentWeapon is RangedWeapon ranged)
-            {
-                currentWeapon.Reload();
-            }
-
-
-
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            SwitchWeapon(rangedWeapon);
+            SwitchWeapon(currentWeapon == rangedWeapon ? meleeWeapon : rangedWeapon);
         }
-        else if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            SwitchWeapon(meleeWeapon);
-        }
+        
+    }
 
+    private void OnReload(InputAction.CallbackContext context)
+    {
+        if (currentWeapon != null && currentWeapon.transform.IsChildOf(weaponHolder))
+        {
+            currentWeapon.Reload();
+        }
+    }
+    private void OnShoot(InputAction.CallbackContext context)
+    {
+        if (currentWeapon != null && currentWeapon.transform.IsChildOf(weaponHolder))
+        {   
+            currentWeapon.Use();
         }
     }
 

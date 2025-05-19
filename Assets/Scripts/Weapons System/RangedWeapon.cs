@@ -9,6 +9,7 @@ public class RangedWeapon : Weapon
     [SerializeField] int totalAmmo = 120;
     [SerializeField] float fireRate = 0.5f;
     [SerializeField] Bullet bulletPrefab;
+    float lastFireTime = -999f;
 
     private void Awake()
     {
@@ -16,12 +17,13 @@ public class RangedWeapon : Weapon
     }
     public override void Use()
     {
+        if (Time.time < lastFireTime + fireRate) return;
         if (ammoInMagazine > 0)
         {
-            // Instantiate bullet and set its properties
             Bullet bullet = Instantiate(bulletPrefab, transform.position, transform.rotation);
-            // Implement shooting logic here
             ammoInMagazine--;
+            lastFireTime = Time.time;
+
             Debug.Log("Fired! Remaining ammo: " + ammoInMagazine);
         }
         else
