@@ -21,7 +21,7 @@ public class Enemy : MonoBehaviour, IEnemy
     // IEnemy implementation
     public int Health { get => health; set => health = value; }
     public float MoveSpeed { get => moveSpeed; set => moveSpeed = value; }
-    public Transform transform => base.transform;
+    public new Transform transform => base.transform;
     public float DetectionRange
     {
         get => detectionRange; set => detectionRange = value;

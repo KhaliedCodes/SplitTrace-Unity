@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerManager : MonoBehaviour
+public class WeaponManager : MonoBehaviour
 {
     [SerializeField] Transform weaponHolder;
     Weapon currentWeapon;

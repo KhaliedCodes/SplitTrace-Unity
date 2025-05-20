@@ -45,7 +45,7 @@ public class PickupController : MonoBehaviour
         if (distance <= pickupRange)
         {
 
-            var manager = player.GetComponent<PlayerManager>();
+            var manager = player.GetComponent<WeaponManager>();
             if (manager != null && weapon != null)
             {
                 Weapon sameType = weapon.weaponType == WeaponType.Ranged ? manager.GetRangedWeapon() : manager.GetMeleeWeapon();
@@ -55,9 +55,7 @@ public class PickupController : MonoBehaviour
                 rb.isKinematic = true;
                 boxCollider.isTrigger = true;
                 transform.SetParent(gunHandler);
-                transform.localPosition = Vector3.zero;
-                transform.localRotation = Quaternion.Euler(Vector3.zero);
-
+                transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.Euler(Vector3.zero));
                 manager.RegisterWeapon(weapon);
 
             }
