@@ -1,33 +1,39 @@
-using StarterAssets;
-using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class NPCController : MonoBehaviour
 {
     [Header("NPC Configuration")]
-    [SerializeField] private string npcName;
-    [SerializeField, TextArea(3, 5)] private string npcDescription;
+    [SerializeField] private NPCPersonality personality;
     [SerializeField] private Transform interactionTrigger;
     [SerializeField] private float interactionRadius = 2f;
 
-    [Header("AI Integration")]
-    [SerializeField] private GeminiAPIPersonality geminiAI;
-    [SerializeField, TextArea(3, 5)] private string personalityPrompt;
-
     [Header("UI Components")]
     [SerializeField] private GameObject interactionIndicator;
-    [SerializeField, TextArea(2, 4)] private string initialGreeting = "Hello there! What brings you here today?";
 
     private bool isInteracting;
     private PlayerController nearbyPlayer;
     private DialogueManager dialogueManager;
+    private GeminiAccessor geminiAccessor;
+
+    public string NPCName => personality != null ? personality.npcName : "NPC";
 
     private void Awake()
     {
         dialogueManager = FindFirstObjectByType<DialogueManager>();
-        ConfigureGeminiAI();
+
+        // Get or add the GeminiAccessor component
+        geminiAccessor = GetComponent<GeminiAccessor>();
+        if (geminiAccessor == null)
+            geminiAccessor = gameObject.AddComponent<GeminiAccessor>();
+
+        // Configure the system with our personality data - only pass to GeminiAccessor
+        if (personality != null)
+        {
+            geminiAccessor.ConfigureWithPersonality(personality);
+        }
+
+        // Subscribe to AI responses
+        geminiAccessor.OnResponseProcessed += HandleAIResponse;
     }
 
     private void Start()
@@ -38,116 +44,99 @@ public class NPCController : MonoBehaviour
 
     private void Update()
     {
+        if (isInteracting) return;
         CheckPlayerProximity();
-
-        if (nearbyPlayer != null && Input.GetKeyDown(KeyCode.E))
-        {
-            if (!isInteracting && !nearbyPlayer.IsInDialogue)
-            {
-                StartInteraction();
-            }
-        }
-    }
-
-    private void ConfigureGeminiAI()
-    {
-        if (geminiAI == null) return;
-
-        if (string.IsNullOrEmpty(geminiAI._systemInstructions))
-        {
-            string defaultPrompt = $"You are {npcName}, {npcDescription}. " +
-                                   "Respond in character with brief, natural dialogue. " +
-                                   "Include emotional state in JSON format at the end of each response: {{\"emotion\": \"happy/sad/angry/neutral\"}}";
-
-            string finalPrompt = string.IsNullOrWhiteSpace(personalityPrompt) ? defaultPrompt : personalityPrompt;
-
-            var field = typeof(GeminiAPIPersonality).GetField("_systemInstructions",
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-
-            field?.SetValue(geminiAI, finalPrompt);
-        }
-
-        geminiAI.ClearChatHistory();
     }
 
     private void CheckPlayerProximity()
     {
-        if (isInteracting) return;
-
         Collider[] colliders = Physics.OverlapSphere(
-            interactionTrigger ? interactionTrigger.position : transform.position,
+            interactionTrigger?.position ?? transform.position,
             interactionRadius);
-
-        PlayerController detectedPlayer = null;
 
         foreach (Collider col in colliders)
         {
-            detectedPlayer = col.GetComponent<PlayerController>();
-            if (detectedPlayer != null)
+            PlayerController player = col.GetComponent<PlayerController>();
+            if (player != null)
             {
-                nearbyPlayer = detectedPlayer;
+                nearbyPlayer = player;
                 nearbyPlayer.SetCurrentInteractable(this);
-                break;
+                interactionIndicator?.SetActive(true);
+                return;
             }
         }
 
-        // Player left
-        if (nearbyPlayer == null && detectedPlayer == null)
+        if (nearbyPlayer != null)
         {
-            FindFirstObjectByType<PlayerController>()?.ClearCurrentInteractable();
+            nearbyPlayer.ClearCurrentInteractable();
+            nearbyPlayer = null;
+            interactionIndicator?.SetActive(false);
         }
-
-        // Update indicator
-        if (interactionIndicator != null)
-            interactionIndicator.SetActive(detectedPlayer != null);
     }
 
     public void StartInteraction()
     {
-        if (isInteracting || dialogueManager == null) return;
+        if (isInteracting || dialogueManager == null)
+        {
+            Debug.LogWarning("StartInteraction failed: isInteracting=" + isInteracting + ", dialogueManager=" + dialogueManager);
+            return;
+        }
 
         isInteracting = true;
         interactionIndicator?.SetActive(false);
-
-        Debug.Log($"Starting interaction with {npcName}");
-        dialogueManager.StartDialogue(this, initialGreeting);
+        string greeting = personality != null ? personality.initialGreeting : "Hello there!";
+        dialogueManager.StartDialogue(this, greeting);
     }
 
     public void EndInteraction()
     {
-        if (!isInteracting) return;
-
         isInteracting = false;
+        geminiAccessor?.ClearChatHistory();
+        interactionIndicator?.SetActive(true);
+    }
 
-        Debug.Log($"Ending interaction with {npcName}");
-        geminiAI?.ClearChatHistory();
+    public void SendPlayerMessage(string message)
+    {
+        if (geminiAccessor != null)
+            geminiAccessor.SendPlayerInput(message);
+    }
 
-        if (interactionIndicator != null && nearbyPlayer != null)
-            interactionIndicator.SetActive(true);
+    private void HandleAIResponse(string responseText, string emotion)
+    {
+        if (string.IsNullOrEmpty(responseText)) return;
+
+        // If no emotion specified but our personality uses emotions, default to neutral
+        if (string.IsNullOrEmpty(emotion) && personality != null && personality.usesEmotions)
+        {
+            emotion = personality.defaultEmotion;
+        }
+        else if (string.IsNullOrEmpty(emotion))
+        {
+            emotion = "neutral";
+        }
+
+        string formattedResponse = $"{responseText} {{\"emotion\":\"{emotion}\"}}";
+        dialogueManager.DisplayNPCDialogue(formattedResponse);
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.GetComponent<PlayerController>() != nearbyPlayer) return;
-
-        nearbyPlayer.ClearCurrentInteractable();
-
-        if (isInteracting)
+        PlayerController player = other.GetComponent<PlayerController>();
+        if (player == nearbyPlayer)
         {
-            if (dialogueManager != null)
-                dialogueManager.EndDialogue();
-            else
-                EndInteraction();
+            player.ClearCurrentInteractable();
+            if (isInteracting) dialogueManager.EndDialogue();
+            nearbyPlayer = null;
         }
-
-        nearbyPlayer = null;
     }
 
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(
-            interactionTrigger ? interactionTrigger.position : transform.position,
+            interactionTrigger?.position ?? transform.position,
             interactionRadius);
     }
+
+    private void OnDestroy() => geminiAccessor.OnResponseProcessed -= HandleAIResponse;
 }

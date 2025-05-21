@@ -10,48 +10,36 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private LayerMask interactionLayer;
     [SerializeField] private TextMeshProUGUI interactionPromptText;
     [SerializeField] private GameObject interactionPrompt;
-    [SerializeField] private float interactionCooldown = 0.5f; // Prevent spam clicking
+    [SerializeField] private float interactionCooldown = 0.5f;
 
-    // References
     private CharacterController characterController;
     private NPCController currentInteractable;
     private ThirdPersonController thirdPersonController;
     private StarterAssetsInputs starterAssetsInputs;
     private PlayerInput playerInput;
     private float lastInteractionTime;
-
-    // Track if player is in dialogue
     private bool isInDialogue = false;
     public bool IsInDialogue => isInDialogue;
 
     private void Start()
     {
         characterController = GetComponent<CharacterController>();
-        if (!characterController)
-            characterController = gameObject.AddComponent<CharacterController>();
-
         thirdPersonController = GetComponent<ThirdPersonController>();
         starterAssetsInputs = GetComponent<StarterAssetsInputs>();
         playerInput = GetComponent<PlayerInput>();
-
-        if (interactionPrompt)
-            interactionPrompt.SetActive(false);
-
-        lastInteractionTime = -interactionCooldown;
+        interactionPrompt?.SetActive(false);
     }
 
     private void Update()
     {
-
         if (isInDialogue)
         {
-            // Allow Escape to end dialogue
             if (Keyboard.current.escapeKey.wasPressedThisFrame)
             {
                 DialogueManager.Instance?.EndDialogue();
-            }
+                EnableControls();
 
-            // Skip everything else while in dialogue
+            }
             return;
         }
 
@@ -62,104 +50,79 @@ public class PlayerController : MonoBehaviour
     private void CheckForInteractables()
     {
         currentInteractable = null;
-
         Collider[] colliders = Physics.OverlapSphere(transform.position, interactionRadius, interactionLayer);
 
-        if (colliders.Length > 0)
-        {
-            float closestDistance = float.MaxValue;
-            NPCController closestNPC = null;
+        NPCController closestNPC = null;
+        float closestDistance = float.MaxValue;
 
-            foreach (Collider col in colliders)
+        foreach (Collider col in colliders)
+        {
+            NPCController npc = col.GetComponent<NPCController>();
+            if (npc != null)
             {
-                NPCController npc = col.GetComponent<NPCController>();
-                if (npc != null)
+                float distance = Vector3.Distance(transform.position, col.transform.position);
+                if (distance < closestDistance)
                 {
-                    float distance = Vector3.Distance(transform.position, col.transform.position);
-                    if (distance < closestDistance)
-                    {
-                        closestDistance = distance;
-                        closestNPC = npc;
-                    }
+                    closestDistance = distance;
+                    closestNPC = npc;
                 }
             }
-
-            if (closestNPC != null)
-            {
-                currentInteractable = closestNPC;
-            }
         }
+
+        currentInteractable = closestNPC;
+        ShowInteractionPrompt(closestNPC != null, closestNPC?.NPCName);
     }
 
     private void HandleInteractionInput()
     {
-        if (isInDialogue)
-        {
-            return;
-
-        }
-        else
-        {
         if (Input.GetKeyDown(KeyCode.E) && Time.time > lastInteractionTime + interactionCooldown)
         {
             lastInteractionTime = Time.time;
-
             if (currentInteractable != null)
             {
                 DisableControls();
                 currentInteractable.StartInteraction();
-
-                ShowInteractionPrompt(true);
             }
-        }
-
         }
     }
 
     private void ShowInteractionPrompt(bool show, string npcName = "")
     {
-        if (interactionPrompt)
-            interactionPrompt.SetActive(show);
-
-        if (interactionPromptText && show)
-            interactionPromptText.text = $"Press E to talk with {npcName}";
+        interactionPrompt?.SetActive(show);
+        if (show) interactionPromptText.text = $"Press E to talk with {npcName}";
     }
 
     public void SetCurrentInteractable(NPCController interactable)
     {
-        if (!isInDialogue)
-        {
-            currentInteractable = interactable;
-            ShowInteractionPrompt(true, interactable.name);
-        }
+        if (!isInDialogue) currentInteractable = interactable;
     }
 
     public void ClearCurrentInteractable()
     {
-        if (!isInDialogue)
-        {
-            currentInteractable = null;
-            ShowInteractionPrompt(false);
-        }
+        if (!isInDialogue) currentInteractable = null;
     }
 
     public void DisableControls()
     {
         isInDialogue = true;
-
-        if (thirdPersonController) thirdPersonController.enabled = false;
-        if (starterAssetsInputs) starterAssetsInputs.enabled = false;
-        if (playerInput) playerInput.enabled = false;
+        thirdPersonController.enabled = false;
+        starterAssetsInputs.enabled = false;
+        playerInput.enabled = false;
     }
 
     public void EnableControls()
     {
-        if (thirdPersonController) thirdPersonController.enabled = true;
-        if (starterAssetsInputs) starterAssetsInputs.enabled = true;
-        if (playerInput) playerInput.enabled = true;
-
+        thirdPersonController.enabled = true;
+        starterAssetsInputs.enabled = true;
+        playerInput.enabled = true;
         isInDialogue = false;
-        ShowInteractionPrompt(true);
+    }
+
+    public void SetInDialogue(bool inDialogue)
+    {
+        isInDialogue = inDialogue;
+        Cursor.lockState = inDialogue ? CursorLockMode.None : CursorLockMode.Locked;
+        Cursor.visible = inDialogue;
     }
 
     private void OnDrawGizmosSelected()
