@@ -2,16 +2,17 @@ using UnityEngine.AI;
 using UnityEngine;
 using System.Collections.Generic;
 
-public class RangedEnemy : MonoBehaviour, IEnemy
+public class RangedEnemy : MonoBehaviour, IEnemy, IDamagable
 {
     [Header("Stats")]
-    public int health = 100;
-    public float moveSpeed = 2.5f;
-    public float attackDamage = 10f;
-    public float detectionRange = 12f;
-    public float attackRange = 8f;
-    public float attackCooldown = 1.5f;
-    public float startAttakingRange = 6f;
+    [SerializeField] private float health = 100;
+    [SerializeField] private float Maxhealth = 100;
+    [SerializeField] private float moveSpeed = 2.5f;
+    [SerializeField] private float attackDamage = 10f;
+    [SerializeField] private float detectionRange = 12f;
+    [SerializeField] private float attackRange = 8f;
+    [SerializeField] private float attackCooldown = 1.5f;
+    [SerializeField] private float startAttakingRange = 6f;
 
     [Header("Patrol Settings")]
     public List<Transform> waypoints;
@@ -30,7 +31,8 @@ public class RangedEnemy : MonoBehaviour, IEnemy
     private float lastAttackTime;
 
     // IEnemy implementation
-    public int Health { get => health; set => health = value; }
+    public float Health { get => health; set => health = value; }
+    public float MaxHealth { get => health; set => health = value; }
     public float MoveSpeed { get => moveSpeed; set => moveSpeed = value; }
     public Transform transform => base.transform;
     public float DetectionRange { get => detectionRange; set => detectionRange = value; }
@@ -58,6 +60,7 @@ public class RangedEnemy : MonoBehaviour, IEnemy
         navMeshAgent.speed = moveSpeed;
         animator = GetComponent<Animator>();
         ChangeState(new IdleState());
+        health = Maxhealth;
     }
 
     void Update()
@@ -101,10 +104,16 @@ public class RangedEnemy : MonoBehaviour, IEnemy
         currentState?.EnterState(this);
     }
 
-    public void TakeDamage(int damage)
+    public void TakeDamage(float damage)
     {
         health -= damage;
         if (IsDead) Die();
+    }
+
+    public float UpdateHealth(float heal,float Damage)
+    {
+        health += heal;
+        return health;
     }
 
     public void Die()

@@ -5,7 +5,6 @@ using UnityEngine.AI;
 public interface IEnemy
 {
     //Stats
-    int Health { get; set; }
     float MoveSpeed { get; set; }
     Transform transform { get; }
     float DetectionRange { get; set; }
@@ -29,7 +28,6 @@ public interface IEnemy
     int CurrentWaypointIndex { get; set; }
 
     //Methods
-    void TakeDamage(int damage);
     void Die();
     void ChangeState(IEnemyStates newState);
 }

@@ -3,10 +3,11 @@ using Unity.IO.LowLevel.Unsafe;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class Enemy : MonoBehaviour, IEnemy
+public class Enemy : MonoBehaviour, IEnemy, IDamagable
 {
     [Header("Stats")]
-    [SerializeField] private int health = 100;
+    [SerializeField] private float health = 100;
+    [SerializeField] private float Maxhealth = 100;
     [SerializeField] public float moveSpeed = 3.5f;
     [SerializeField] private float attackDamage = 15f;
     [SerializeField] public float detectionRange = 8f;
@@ -19,7 +20,8 @@ public class Enemy : MonoBehaviour, IEnemy
     public Animator animator;
 
     // IEnemy implementation
-    public int Health { get => health; set => health = value; }
+    public float Health { get => health; set => health = value; }
+    public float MaxHealth { get => health; set => health = value; }
     public float MoveSpeed { get => moveSpeed; set => moveSpeed = value; }
     public new Transform transform => base.transform;
     public float DetectionRange
@@ -65,7 +67,7 @@ public class Enemy : MonoBehaviour, IEnemy
         navMeshAgent.speed = moveSpeed;
         animator = GetComponent<Animator>();
         ChangeState(new IdleState());
-
+        health = Maxhealth;
     }
 
 
@@ -110,10 +112,16 @@ public class Enemy : MonoBehaviour, IEnemy
         return Time.time > _lastAttackTime + attackCooldown;
     }
 
-    public void TakeDamage(int damage)
+    public void TakeDamage(float damage)
     {
         health -= damage;
         if (IsDead) Die();
+    }
+
+    public float UpdateHealth(float heal, float Damage)
+    {
+        health += heal;
+        return health;
     }
 
     public void DealDamage()
