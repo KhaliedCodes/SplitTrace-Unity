@@ -6460,6 +6460,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 480538238}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1352378405
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1352378406}
+  m_Layer: 0
+  m_Name: RayCastStart
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1352378406
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1352378405}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.1389999, z: 0.21500015}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1765383551}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1353485579
 GameObject:
   m_ObjectHideFlags: 0
@@ -11357,6 +11388,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Enemy
       objectReference: {fileID: 0}
+    - target: {fileID: 2045936383568960569, guid: fc847424d564964438bd610711defbbd, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2411356334211885994, guid: fc847424d564964438bd610711defbbd, type: 3}
       propertyPath: m_LocalPosition.x
       value: 18.6
@@ -13859,6 +13894,22 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 974238578917724916}
     - target: {fileID: 3907320226847084612, guid: 29330c0d8f0a42e4e9ee84d3bc833ddf, type: 3}
+      propertyPath: RayCastY
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3907320226847084612, guid: 29330c0d8f0a42e4e9ee84d3bc833ddf, type: 3}
+      propertyPath: RayCastStart
+      value: 
+      objectReference: {fileID: 1352378405}
+    - target: {fileID: 3907320226847084612, guid: 29330c0d8f0a42e4e9ee84d3bc833ddf, type: 3}
+      propertyPath: attackCooldown
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3907320226847084612, guid: 29330c0d8f0a42e4e9ee84d3bc833ddf, type: 3}
+      propertyPath: detectionRange
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 3907320226847084612, guid: 29330c0d8f0a42e4e9ee84d3bc833ddf, type: 3}
       propertyPath: 'waypoints.Array.data[0]'
       value: 
       objectReference: {fileID: 1915122865}
@@ -13920,7 +13971,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 6645582605431803012, guid: 29330c0d8f0a42e4e9ee84d3bc833ddf, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1352378406}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 29330c0d8f0a42e4e9ee84d3bc833ddf, type: 3}
 --- !u!4 &8469682766826648525

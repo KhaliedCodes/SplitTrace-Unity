@@ -22,6 +22,7 @@ public class IdleState : IEnemyStates
         if (enemy.IsPlayerInDetectionRange)
         {
             enemy.ChangeState(new DetectionState());
+            return;
         }
         if (enemy.Waypoints != null && enemy.Waypoints.Count > 0)
         {

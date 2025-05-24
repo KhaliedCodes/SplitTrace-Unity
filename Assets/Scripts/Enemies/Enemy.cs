@@ -41,12 +41,11 @@ public class Enemy : MonoBehaviour, IEnemy, IDamagable
     public Animator Animator => animator;
     public bool IsDead => health <= 0;
 
+
     [Header("Patrol Settings")]
     public List<Transform> waypoints; 
     public float waypointStopTime = 2f;
     public int _currentWaypointIndex = 0;
-    private float _waitTimer = 0;
-    private bool _isWaiting = false;
 
 
     //Private Var
@@ -57,10 +56,17 @@ public class Enemy : MonoBehaviour, IEnemy, IDamagable
     [SerializeField] private StartAttackChecker _attackChecker;
     private bool _playerInDetectionRange;
     private bool _playerInAttackRange;
-
+    private Vector3 _lastKnownPlayerPosition;
 
     public float AttackRange { get => attackRange; set => attackRange = value; }
     public float AttackCooldown { get => attackCooldown; set => attackCooldown = value; }
+
+    public Vector3 LastKnownPlayerPosition
+    {
+        get => _lastKnownPlayerPosition;
+        set => _lastKnownPlayerPosition = value;
+    }
+
 
     private void Awake()
     {
@@ -114,7 +120,24 @@ public class Enemy : MonoBehaviour, IEnemy, IDamagable
         _currentState = newState;
         _currentState?.EnterState(this);
     }
-  
+    public bool HasLineOfSight()
+    {
+        if (Player == null) return false;
+
+        Vector3 direction = (Player.transform.position - transform.position).normalized;
+        float distance = Vector3.Distance(transform.position, Player.transform.position);
+
+        if (Physics.Raycast(transform.position + Vector3.up * 1.5f, direction, out RaycastHit hit, distance))
+        {
+            if (hit.collider.CompareTag("Player"))
+            {
+                _lastKnownPlayerPosition = Player.transform.position;
+                return true;
+            }
+        }
+
+        return false;
+    }
     public bool CanAttack()
     {
         return Time.time > _lastAttackTime + attackCooldown;

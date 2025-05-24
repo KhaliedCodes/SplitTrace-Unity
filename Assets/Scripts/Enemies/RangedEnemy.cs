@@ -32,10 +32,18 @@ public class RangedEnemy : MonoBehaviour, IEnemy, IDamagable
     // Private variables
     private float _lastAttackTime;
     private IEnemyStates _currentState;
+
     [SerializeField] private RangedDetectionChecker _detectionChecker;
     [SerializeField] private StartRangedAttackChecker _attackChecker;
-   [SerializeField] private bool _playerInDetectionRange;
-    [SerializeField] private bool _playerInAttackRange;
+    private bool _playerInDetectionRange;
+    private bool _playerInAttackRange;
+
+    [SerializeField] float RayCastY;
+
+    [SerializeField] private Vector3 _lastKnownPlayerPosition;
+    private bool _isSearching = false;
+    private float _searchStartTime;
+    private float _searchDuration = 4f;
 
     [Header("IEnemy Linking")]
     public float Health { get => health; set => health = value; }
@@ -56,6 +64,13 @@ public class RangedEnemy : MonoBehaviour, IEnemy, IDamagable
     public bool IsPlayerInDetectionRange => _playerInDetectionRange;
     public bool IsPlayerInAttackRange => _playerInAttackRange;
 
+    public Vector3 LastKnownPlayerPosition
+    {
+        get => _lastKnownPlayerPosition;
+        set => _lastKnownPlayerPosition = value;
+    }
+
+
     private void Awake()
     {
         _detectionChecker = GetComponentInChildren<RangedDetectionChecker>();
@@ -67,7 +82,7 @@ public class RangedEnemy : MonoBehaviour, IEnemy, IDamagable
         }
         if (_attackChecker != null)
         {
-            _attackChecker.Initialize(attackRange, this);
+           _attackChecker.Initialize(attackRange, this);
         }
     }
 
@@ -85,6 +100,10 @@ public class RangedEnemy : MonoBehaviour, IEnemy, IDamagable
         {
             _currentState?.UpdateState(this);
         }
+        //if (IsPlayerInDetectionRange)
+        //{
+        //    HasLineOfSight();
+        //}
     }
 
     public void SetPlayerInDetectionRange(bool inRange)
@@ -104,10 +123,32 @@ public class RangedEnemy : MonoBehaviour, IEnemy, IDamagable
         _currentState?.EnterState(this);
     }
 
+    public bool HasLineOfSight()
+    {
+        if (!player) return false;
+
+        Vector3 origin = transform.position + Vector3.up * RayCastY; 
+        Vector3 direction = (player.transform.position + new Vector3(0,1,0) - origin).normalized;
+        float distance = Vector3.Distance(origin, player.transform.position);
+
+        Debug.DrawRay(origin, direction * distance, Color.red);
+
+        if (Physics.Raycast(origin, direction, out RaycastHit hit, distance))
+        {
+            if (hit.collider.gameObject == player)
+            {
+                Debug.Log("Ray hit the player.");
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
     public bool CanAttack()
     {
          return Time.time > _lastAttackTime + attackCooldown;
-        
     }
 
     public void ShootProjectile()

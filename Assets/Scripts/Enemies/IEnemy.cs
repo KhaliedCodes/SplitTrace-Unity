@@ -20,8 +20,9 @@ public interface IEnemy
     bool IsDead { get; }
     bool IsPlayerInDetectionRange { get; }
     bool IsPlayerInAttackRange { get; }
+    Vector3 LastKnownPlayerPosition { get; set; }
     bool CanAttack();
-
+    bool HasLineOfSight();
     //patrol
     List<Transform> Waypoints { get; set; }
     float WaypointStopTime { get; set; }

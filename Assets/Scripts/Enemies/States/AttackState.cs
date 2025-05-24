@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class AttackState : IEnemyStates
 {
@@ -35,6 +35,11 @@ public class AttackState : IEnemyStates
             if (enemy is RangedEnemy rangedEnemy)
             {
                 rangedEnemy.ShootProjectile();
+            }
+            // Melee attack would be handled via animation events
+            if (enemy is Enemy meleeEnemy)
+            {
+                meleeEnemy.animator.Play("Attack");
             }
         }
     }
