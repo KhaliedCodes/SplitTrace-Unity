@@ -10,20 +10,24 @@ public class DetectionState : IEnemyStates
 
     public void UpdateState(IEnemy enemy)
     {
-        if (enemy.Player == null) return;
-
-        if (Vector3.Distance(enemy.transform.position, enemy.Player.transform.position) > enemy.DetectionRange)
+        if (!enemy.IsPlayerInDetectionRange)
         {
             enemy.ChangeState(new IdleState());
             return;
         }
 
-        enemy.NavMeshAgent.SetDestination(enemy.Player.transform.position);
+        if (enemy.Player != null)
+        {
+            enemy.NavMeshAgent.SetDestination(enemy.Player.transform.position);
+        }
 
-        if (Vector3.Distance(enemy.transform.position, enemy.Player.transform.position) < enemy.AttackRange)
+        if (enemy.IsPlayerInAttackRange)
         {
             enemy.ChangeState(new AttackState());
+            return;
         }
+
+        enemy.NavMeshAgent.SetDestination(enemy.Player.transform.position);
     }
 
     public void ExitState(IEnemy enemy)

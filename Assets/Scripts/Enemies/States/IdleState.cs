@@ -22,13 +22,17 @@ public class IdleState : IEnemyStates
         if (enemy.IsPlayerInDetectionRange)
         {
             enemy.ChangeState(new DetectionState());
-            return;
         }
+        if (enemy.Waypoints != null && enemy.Waypoints.Count > 0)
+        {
+            PatrolBehavior(enemy);
+        }
+       
+    }
 
-        // Patrol logic
-        if (enemy.Waypoints != null &&
-            enemy.Waypoints.Count > 0 &&
-            !enemy.NavMeshAgent.pathPending &&
+    private void PatrolBehavior(IEnemy enemy)
+    {
+        if (!enemy.NavMeshAgent.pathPending &&
             enemy.NavMeshAgent.remainingDistance <= enemy.NavMeshAgent.stoppingDistance)
         {
             _waypointTimer += Time.deltaTime;
@@ -46,4 +50,6 @@ public class IdleState : IEnemyStates
     {
         enemy.Animator.SetBool("IsMoving", false);
     }
+
+
 }

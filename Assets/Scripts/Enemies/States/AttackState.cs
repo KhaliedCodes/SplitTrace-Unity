@@ -29,17 +29,12 @@ public class AttackState : IEnemyStates
 
         if (enemy.CanAttack())
         {
-            enemy.Animator.SetTrigger("Attack");
+            enemy.Animator.SetTrigger("attack");
 
             // Handle ranged attack if it's a RangedEnemy
             if (enemy is RangedEnemy rangedEnemy)
             {
                 rangedEnemy.ShootProjectile();
-            }
-            // Melee attack would be handled via animation events
-            if (enemy is Enemy meleeEnemy)
-            {
-                meleeEnemy.animator.Play("Attack");
             }
         }
     }
