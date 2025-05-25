@@ -35,7 +35,7 @@ public class DetectionState : IEnemyStates
             enemy.LastKnownPlayerPosition = enemy.Player.transform.position;
             enemy.NavMeshAgent.SetDestination(enemy.Player.transform.position);
 
-            if (enemy.IsPlayerInAttackRange)
+            if (enemy.IsPlayerInAttackRange && enemy.HasLineOfSight())
             {
                 enemy.ChangeState(new AttackState());
             }

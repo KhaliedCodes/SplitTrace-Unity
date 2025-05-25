@@ -19,7 +19,7 @@ public class IdleState : IEnemyStates
     public void UpdateState(IEnemy enemy)
     {
         // Check for player entering detection range
-        if (enemy.IsPlayerInDetectionRange)
+        if (enemy.IsPlayerInDetectionRange && enemy.HasLineOfSight())
         {
             enemy.ChangeState(new DetectionState());
             return;

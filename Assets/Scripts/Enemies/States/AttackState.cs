@@ -21,7 +21,7 @@ public class AttackState : IEnemyStates
             return;
         }
 
-        if (!enemy.IsPlayerInDetectionRange)
+        if (!enemy.IsPlayerInDetectionRange || !enemy.HasLineOfSight())
         {
             enemy.ChangeState(new IdleState());
             return;
