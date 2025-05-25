@@ -19,8 +19,10 @@ public class WeaponManager : MonoBehaviour
     private Weapon currentWeapon;
     private RangedWeapon rangedWeapon;
     private MeleeWeapon meleeWeapon;
+    private float lastFireTime = -999f;
 
     private WeaponsInputSystem weaponInputs;
+    PlayerAnimations playerAnimations;
 
     private void Awake()
     {
@@ -39,6 +41,7 @@ public class WeaponManager : MonoBehaviour
         rangedIconUI.enabled = false;
         meleeIconUI.enabled = false;
         ammoText.enabled = false;
+        playerAnimations = GetComponent<PlayerAnimations>();
     }
 
     private void Update()
@@ -54,16 +57,25 @@ public class WeaponManager : MonoBehaviour
     private void OnShoot(InputAction.CallbackContext context)
     {
         currentWeapon?.Use();
+        if (currentWeapon != null && currentWeapon is MeleeWeapon)
+        {
+            if (Time.time < lastFireTime + ((MeleeWeapon)currentWeapon).attackDuration) return;
+            playerAnimations.SetAnimation("Attack");
+            lastFireTime = Time.time;
+        }
     }
 
     private void OnSwitchWeapon(InputAction.CallbackContext context)
     {
+      
         if (currentWeapon == rangedWeapon && meleeWeapon != null)
             SwitchWeapon(meleeWeapon);
         else if (currentWeapon == meleeWeapon && rangedWeapon != null)
             SwitchWeapon(rangedWeapon);
         else if (currentWeapon == null && rangedWeapon != null)
             SwitchWeapon(rangedWeapon);
+        
+
     }
 
     private void OnUnequip(InputAction.CallbackContext context)
@@ -169,7 +181,6 @@ public class WeaponManager : MonoBehaviour
         if (currentWeapon != null)
         {
             currentWeapon.Unequip();
-            currentWeapon.gameObject.SetActive(false);
             currentWeapon = null;
         }
     }

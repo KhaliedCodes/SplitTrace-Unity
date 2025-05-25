@@ -389,12 +389,5 @@ namespace StarterAssets
             }
         }
 
-        internal void SetAttackAnimation(bool v)
-        {
-            if (_hasAnimator)
-            {
-                _animator.SetTrigger("Attack");
-            }
-        }
     }
 }
