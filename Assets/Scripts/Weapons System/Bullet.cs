@@ -28,10 +28,7 @@ public class Bullet : MonoBehaviour
             {
                 target.TakeDamage(damage);
             }
-            else if (other.CompareTag("Player"))
-            {
-                target.TakeDamage(damage);
-            }
+
         }
     }
 }
