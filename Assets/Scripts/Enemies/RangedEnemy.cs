@@ -100,10 +100,6 @@ public class RangedEnemy : MonoBehaviour, IEnemy, IDamagable
         {
             _currentState?.UpdateState(this);
         }
-        //if (IsPlayerInDetectionRange)
-        //{
-        //    HasLineOfSight();
-        //}
     }
 
     public void SetPlayerInDetectionRange(bool inRange)
@@ -189,11 +185,7 @@ public class RangedEnemy : MonoBehaviour, IEnemy, IDamagable
 
     public void Die()
     {
-        animator.Play("Die");
-        navMeshAgent.speed = 0;
-        ChangeState(new IdleState());
-        navMeshAgent.isStopped = true;
-        Destroy(gameObject, 2f);
+        ChangeState(new DeathState());
     }
 
 #if UNITY_EDITOR
