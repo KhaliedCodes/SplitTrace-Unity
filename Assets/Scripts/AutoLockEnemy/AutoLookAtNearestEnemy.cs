@@ -231,8 +231,7 @@ public class AutoLookAtNearestEnemy : MonoBehaviour
                 SelectClosestTarget();
                 CreateTargetIndicator();
 
-                // Setup group targets and switch to lock-on camera
-                SetGroupTargets(playerTransform, targetEnemy);
+                // Switch to lock-on camera (no need for group targets anymore)
                 SwitchToLockOnCamera();
 
                 Debug.Log($"Lock-on mode enabled, targeting: {targetEnemy.name}");
@@ -262,9 +261,23 @@ public class AutoLookAtNearestEnemy : MonoBehaviour
             StoreInitialCameraSettings();
         }
 
-        // Set appropriate camera priorities to activate group camera
-        cinemachineCamera.Priority = inactivePriority;
-        cinemachineGroupCamera.Priority = activePriority;
+        // Instead of using group camera, modify the main camera to look at the enemy
+        // while still following the player for true third-person lock-on
+        if (cinemachineCamera != null && targetEnemy != null)
+        {
+            // Keep following the player (or lookAtTarget)
+            cinemachineCamera.Follow = lookAtTarget != null ? lookAtTarget : playerTransform;
+
+            // Make the camera look at the enemy instead
+            cinemachineCamera.LookAt = targetEnemy;
+
+            // Ensure main camera stays active
+            cinemachineCamera.Priority = activePriority;
+            cinemachineGroupCamera.Priority = inactivePriority;
+
+            // Force update the virtual camera
+            cinemachineCamera.PreviousStateIsValid = false;
+        }
 
         // Force Cinemachine to update immediately for smoother transition
         if (cinemachineBrain != null)
@@ -273,7 +286,7 @@ public class AutoLookAtNearestEnemy : MonoBehaviour
             cinemachineBrain.ManualUpdate();
         }
 
-        Debug.Log("Switched to lock-on group camera");
+        Debug.Log("Switched to lock-on camera (third-person view looking at enemy)");
     }
 
     // Improved method for switching back to player camera
@@ -356,17 +369,40 @@ public class AutoLookAtNearestEnemy : MonoBehaviour
         if (Time.time < nextDetectionTime) return;
         nextDetectionTime = Time.time + detectionInterval;
 
+        // Debug information
+        Debug.Log($"Searching for enemies with layer mask: {enemyLayer.value} (Layer names: {GetLayerNames(enemyLayer)})");
+        Debug.Log($"Player position: {transform.position}, Search range: {trackingRange}");
+
         // Get all colliders in range
         Collider[] hitColliders = Physics.OverlapSphere(transform.position, trackingRange, enemyLayer);
+        Debug.Log($"Found {hitColliders.Length} colliders in range with enemy layer");
+
+        // If no colliders found, try finding all colliders to debug
+        if (hitColliders.Length == 0)
+        {
+            Collider[] allColliders = Physics.OverlapSphere(transform.position, trackingRange);
+            Debug.Log($"Total colliders in range (all layers): {allColliders.Length}");
+
+            foreach (var col in allColliders)
+            {
+                Debug.Log($"Found collider: {col.name} on layer {col.gameObject.layer} ({LayerMask.LayerToName(col.gameObject.layer)})");
+            }
+        }
 
         foreach (var hitCollider in hitColliders)
         {
             Transform enemyTransform = hitCollider.transform;
+            Debug.Log($"Checking enemy: {enemyTransform.name} at position {enemyTransform.position}");
 
             // Check if enemy is in field of view
             if (IsInFieldOfView(enemyTransform))
             {
                 potentialTargets.Add(enemyTransform);
+                Debug.Log($"Added {enemyTransform.name} to potential targets (in FOV)");
+            }
+            else
+            {
+                Debug.Log($"Enemy {enemyTransform.name} not in field of view");
             }
         }
 
@@ -375,63 +411,32 @@ public class AutoLookAtNearestEnemy : MonoBehaviour
             Vector3.Distance(transform.position, a.position)
             .CompareTo(Vector3.Distance(transform.position, b.position)));
 
-        Debug.Log($"Found {potentialTargets.Count} potential targets in range");
+        Debug.Log($"Found {potentialTargets.Count} potential targets in range and FOV");
     }
 
     // Check if a target is within the field of view
     bool IsInFieldOfView(Transform target)
     {
-        if (target == null || cameraTransform == null) return false;
-
-        Vector3 directionToTarget = target.position - cameraTransform.position;
-        float distance = directionToTarget.magnitude;
-        if (distance > trackingRange) return false;
-
-        directionToTarget.Normalize();
-
-        // Convert direction to camera's local space
-        Vector3 localDir = cameraTransform.InverseTransformDirection(directionToTarget);
-
-        // Check if the target is in front of the camera
-        if (localDir.z <= 0)
+        if (target == null || cameraTransform == null)
         {
-            // Target is behind the camera
+            Debug.LogWarning("Target or camera transform is null in IsInFieldOfView");
             return false;
         }
 
-        // Calculate horizontal and vertical angles in degrees
-        float horizontalAngle = Mathf.Atan2(localDir.x, localDir.z) * Mathf.Rad2Deg;
-        float verticalAngle = Mathf.Atan2(localDir.y, localDir.z) * Mathf.Rad2Deg;
+        Vector3 directionToTarget = (target.position - cameraTransform.position).normalized;
+        Vector3 cameraForward = cameraTransform.forward;
 
-        // Check if angles are within FOV
-        bool isInHorizontalFOV = Mathf.Abs(horizontalAngle) <= horizontalFieldOfView * 0.5f;
-        bool isInVerticalFOV = Mathf.Abs(verticalAngle) <= verticalFieldOfView * 0.5f;
+        // Calculate angle between camera forward and direction to target
+        float angle = Vector3.Angle(cameraForward, directionToTarget);
 
-        return isInHorizontalFOV && isInVerticalFOV;
+        // For debugging
+        Debug.Log($"FOV Check for {target.name}: Angle = {angle:F1}°, Max allowed = {horizontalFieldOfView * 0.5f:F1}°");
+
+        // Simple horizontal FOV check (ignoring vertical for now to simplify debugging)
+        bool isInFOV = angle <= horizontalFieldOfView * 0.5f;
+
+        return isInFOV;
     }
-
-    //bool IsInFieldOfView(Transform target)
-    //{
-    //    if (target == null || cameraTransform == null) return false;
-
-    //    Vector3 directionToTarget = (target.position - cameraTransform.position).normalized;
-
-    //    // Calculate horizontal and vertical angles
-    //    float horizontalAngle = Vector3.Angle(cameraTransform.right,
-    //        new Vector3(directionToTarget.x, 0, directionToTarget.z).normalized);
-
-    //    if (Vector3.Dot(cameraTransform.forward, directionToTarget) < 0)
-    //        horizontalAngle = 180f;
-
-    //    float verticalAngle = Vector3.Angle(cameraTransform.up,
-    //        new Vector3(0, directionToTarget.y, 0).normalized);
-
-    //    // Check if target is within FOV
-    //    bool isInHorizontalFOV = horizontalAngle <= horizontalFieldOfView * 0.5f;
-    //    bool isInVerticalFOV = verticalAngle <= verticalFieldOfView * 0.5f;
-
-    //    return isInHorizontalFOV && isInVerticalFOV;
-    //}
 
     // Select the closest target from potential targets
     void SelectClosestTarget()
@@ -475,8 +480,12 @@ public class AutoLookAtNearestEnemy : MonoBehaviour
             targetEnemy = potentialTargets[currentTargetIndex];
             UpdateTargetIndicator();
 
-            // Update the target group
-            SetGroupTargets(playerTransform, targetEnemy);
+            // Update the camera to look at the new target
+            if (cinemachineCamera != null)
+            {
+                cinemachineCamera.LookAt = targetEnemy;
+                cinemachineCamera.PreviousStateIsValid = false;
+            }
 
             Debug.Log($"Switched target to: {targetEnemy.name}");
         }
@@ -507,8 +516,6 @@ public class AutoLookAtNearestEnemy : MonoBehaviour
             CreateTargetIndicator();
         }
     }
-
-    
 
     // Clear the target indicator
     void ClearTargetIndicator()
@@ -610,8 +617,12 @@ public class AutoLookAtNearestEnemy : MonoBehaviour
         SelectClosestTarget();
         UpdateTargetIndicator();
 
-        // Update group camera targets
-        SetGroupTargets(playerTransform, targetEnemy);
+        // Update camera to look at new target
+        if (cinemachineCamera != null && targetEnemy != null)
+        {
+            cinemachineCamera.LookAt = targetEnemy;
+            cinemachineCamera.PreviousStateIsValid = false;
+        }
     }
 
     // Add this method to verify camera states for debugging
@@ -621,6 +632,13 @@ public class AutoLookAtNearestEnemy : MonoBehaviour
         Debug.Log($"Group Camera Priority: {cinemachineGroupCamera.Priority}");
         Debug.Log($"Current Active Camera: {(cinemachineCamera.Priority > cinemachineGroupCamera.Priority ? "Player Camera" : "Group Camera")}");
         Debug.Log($"Lock-on State: {_isLockedOn}");
+        Debug.Log($"Main Camera Follow: {cinemachineCamera.Follow?.name ?? "null"}");
+        Debug.Log($"Main Camera LookAt: {cinemachineCamera.LookAt?.name ?? "null"}");
+
+        if (_isLockedOn && targetEnemy != null)
+        {
+            Debug.Log($"Current Target: {targetEnemy.name}");
+        }
     }
 
     // Optional visualization of detection range in editor
@@ -648,5 +666,46 @@ public class AutoLookAtNearestEnemy : MonoBehaviour
             Gizmos.DrawLine(cameraPos, cameraPos + rightEdge * viewDistance);
             Gizmos.DrawLine(cameraPos, cameraPos + leftEdge * viewDistance);
         }
+
+        // Draw lines to potential targets
+        Gizmos.color = Color.green;
+        foreach (var target in potentialTargets)
+        {
+            if (target != null)
+            {
+                Gizmos.DrawLine(transform.position, target.position);
+            }
+        }
+
+        // Draw line to current target
+        if (targetEnemy != null)
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawLine(transform.position, targetEnemy.position);
+        }
+    }
+
+    // Helper method to get layer names for debugging
+    private string GetLayerNames(LayerMask layerMask)
+    {
+        var layerNames = new System.Collections.Generic.List<string>();
+
+        for (int i = 0; i < 32; i++)
+        {
+            if ((layerMask.value & (1 << i)) != 0)
+            {
+                string layerName = LayerMask.LayerToName(i);
+                if (!string.IsNullOrEmpty(layerName))
+                {
+                    layerNames.Add(layerName);
+                }
+                else
+                {
+                    layerNames.Add($"Layer {i}");
+                }
+            }
+        }
+
+        return string.Join(", ", layerNames);
     }
 }
