@@ -12,19 +12,26 @@ public class HealthSystem : MonoBehaviour
     [Header("Health UI")]
     [SerializeField] Image healthBar;
 
-
-   void UpdateHealthAmount() {
-        //Update health of player and UI
-        if (currentHealth < 1.0f) { 
-
-            currentHealth += ammountPerHealth;
-            healthBar.fillAmount += currentHealth;
-        }
-   }
+    private void Start()
+    {
+        SetHealthValueUI();
+    }
    public void UpdateNumberOfHealthItem() {
         //Update health number Who player have
         healthNumber += 1;
+   }
+    void SetHealthValueUI() {
+        healthBar.fillAmount = currentHealth;
+    }
 
-
+    void IncreaseHealth() {
+        if (currentHealth < 1.0f) {
+            if (healthNumber > 0) {
+                currentHealth += ammountPerHealth;
+                SetHealthValueUI();
+                healthNumber -= 1;
+            }
+        }
+    
     }
 }
