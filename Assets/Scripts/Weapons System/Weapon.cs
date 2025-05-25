@@ -7,6 +7,7 @@ public abstract class Weapon : MonoBehaviour
     public string weaponName;
     public bool isEquipped;
     public WeaponType weaponType;
+    public Sprite weaponIcon;
 
     public virtual void Equip()
     {

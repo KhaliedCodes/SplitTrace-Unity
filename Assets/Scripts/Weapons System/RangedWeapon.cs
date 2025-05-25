@@ -4,11 +4,11 @@ public class RangedWeapon : Weapon
 {
 
     [SerializeField] int damage = 10;
-    [SerializeField] int ammoInMagazine = 30;
     [SerializeField] int magazineCapacity = 30;
-    [SerializeField] int totalAmmo = 120;
     [SerializeField] float fireRate = 0.5f;
     [SerializeField] Bullet bulletPrefab;
+    [SerializeField]public int ammoInMagazine = 30;
+    [SerializeField]public int totalAmmo = 120;
     float lastFireTime = -999f;
 
     private void Awake()

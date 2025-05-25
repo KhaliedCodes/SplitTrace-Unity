@@ -388,5 +388,13 @@ namespace StarterAssets
                 AudioSource.PlayClipAtPoint(LandingAudioClip, transform.TransformPoint(_controller.center), FootstepAudioVolume);
             }
         }
+
+        internal void SetAttackAnimation(bool v)
+        {
+            if (_hasAnimator)
+            {
+                _animator.SetTrigger("Attack");
+            }
+        }
     }
 }
