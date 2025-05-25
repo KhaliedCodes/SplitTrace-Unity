@@ -175,16 +175,73 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 1293029876712600392, guid: 2553cec8fdb3eb643bbe9f2ec880c472, type: 3}
-      insertIndex: 0
-      addedObject: {fileID: 217118323}
-    - targetCorrespondingSourceObject: {fileID: 1293029876712600392, guid: 2553cec8fdb3eb643bbe9f2ec880c472, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1935458217}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 1925873226565265906, guid: 2553cec8fdb3eb643bbe9f2ec880c472, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1870560309}
+    - targetCorrespondingSourceObject: {fileID: 1925873226565265906, guid: 2553cec8fdb3eb643bbe9f2ec880c472, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1870560310}
   m_SourcePrefab: {fileID: 100100000, guid: 2553cec8fdb3eb643bbe9f2ec880c472, type: 3}
+--- !u!1001 &202553857
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1662823930238448643, guid: e81508648e5e7e849b367055efa271d3, type: 3}
+      propertyPath: m_Name
+      value: HealthCollectable
+      objectReference: {fileID: 0}
+    - target: {fileID: 5989797256372225384, guid: e81508648e5e7e849b367055efa271d3, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 5.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5989797256372225384, guid: e81508648e5e7e849b367055efa271d3, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 3.16
+      objectReference: {fileID: 0}
+    - target: {fileID: 5989797256372225384, guid: e81508648e5e7e849b367055efa271d3, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -4.7808533
+      objectReference: {fileID: 0}
+    - target: {fileID: 5989797256372225384, guid: e81508648e5e7e849b367055efa271d3, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5989797256372225384, guid: e81508648e5e7e849b367055efa271d3, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5989797256372225384, guid: e81508648e5e7e849b367055efa271d3, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5989797256372225384, guid: e81508648e5e7e849b367055efa271d3, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5989797256372225384, guid: e81508648e5e7e849b367055efa271d3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5989797256372225384, guid: e81508648e5e7e849b367055efa271d3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5989797256372225384, guid: e81508648e5e7e849b367055efa271d3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: e81508648e5e7e849b367055efa271d3, type: 3}
 --- !u!1 &217118320
 GameObject:
   m_ObjectHideFlags: 0
@@ -272,11 +329,11 @@ Transform:
   m_GameObject: {fileID: 217118320}
   serializedVersion: 2
   m_LocalRotation: {x: 0.117023036, y: -0, z: -0, w: 0.9931292}
-  m_LocalPosition: {x: -0.96022105, y: 2.8266695, z: -8.83}
+  m_LocalPosition: {x: 1.78, y: 4.93, z: -15.727409}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1870560308}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 13.441, y: 0, z: 0}
 --- !u!114 &217118324
 MonoBehaviour:
@@ -728,7 +785,19 @@ MonoBehaviour:
   ammountPerHealth: 0.3
   maxHealth: 1
   currentHealth: 0.5
-  healthBar: {fileID: 0}
+  healthBar: {fileID: 1081005851}
+--- !u!114 &1870560310
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1870560302}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb89e493067ea274395d1a64f679798d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1906726017
 GameObject:
   m_ObjectHideFlags: 0
@@ -974,5 +1043,7 @@ SceneRoots:
   - {fileID: 621680791}
   - {fileID: 1089179444}
   - {fileID: 7466214024697335310}
+  - {fileID: 217118323}
   - {fileID: 99119944}
   - {fileID: 1906726020}
+  - {fileID: 202553857}
