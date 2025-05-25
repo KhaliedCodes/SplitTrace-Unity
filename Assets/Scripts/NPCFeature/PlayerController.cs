@@ -14,8 +14,8 @@ public class PlayerController : MonoBehaviour
 
     private CharacterController characterController;
     private NPCController currentInteractable;
-    private ThirdPersonController thirdPersonController;
-    private StarterAssetsInputs starterAssetsInputs;
+    private CustomThridPersonController thirdPersonController;
+    private CustomStarterAssetsInputs starterAssetsInputs;
     private PlayerInput playerInput;
     private float lastInteractionTime;
     private bool isInDialogue = false;
@@ -24,8 +24,8 @@ public class PlayerController : MonoBehaviour
     private void Start()
     {
         characterController = GetComponent<CharacterController>();
-        thirdPersonController = GetComponent<ThirdPersonController>();
-        starterAssetsInputs = GetComponent<StarterAssetsInputs>();
+        thirdPersonController = GetComponent<CustomThridPersonController>();
+        starterAssetsInputs = GetComponent<CustomStarterAssetsInputs>();
         playerInput = GetComponent<PlayerInput>();
         interactionPrompt?.SetActive(false);
     }
