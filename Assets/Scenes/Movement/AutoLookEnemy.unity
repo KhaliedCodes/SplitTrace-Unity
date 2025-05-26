@@ -2219,6 +2219,7 @@ GameObject:
   - component: {fileID: 4416926082891955983}
   - component: {fileID: 6982812147317424068}
   - component: {fileID: 6982812147317424070}
+  - component: {fileID: 6982812147317424071}
   m_Layer: 8
   m_Name: PlayerArmature
   m_TagString: Player
@@ -3083,7 +3084,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4416926082891955971}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a5bc25af9d10db34985bcc72d3b7cffb, type: 3}
   m_Name: 
@@ -3109,6 +3110,32 @@ MonoBehaviour:
   activePriority: 20
   inactivePriority: 0
   lookAtTarget: {fileID: 8338988565134001759}
+--- !u!114 &6982812147317424071
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4416926082891955971}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c651b3901a29ce4a82eb90f21770da2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  virtualCamera: {fileID: 2070925442752058860}
+  cameraRootTransform: {fileID: 8338988565134001759}
+  playerTransform: {fileID: 3893294198897436089}
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  lockOnRange: 15
+  playerRotationSpeed: 5
+  toggleLockOnKey: 101
+  movementThreshold: 0.1
+  stopDelay: 0.5
+  lookAtTransitionSpeed: 2
+  enemyFocusDistance: 8
+  normalFollowDistance: 6
 --- !u!4 &6983258930959877914
 Transform:
   m_ObjectHideFlags: 0
