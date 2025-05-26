@@ -4,11 +4,12 @@ public class RangedWeapon : Weapon
 {
 
     [SerializeField] int damage = 10;
-    [SerializeField] int ammoInMagazine = 30;
     [SerializeField] int magazineCapacity = 30;
-    [SerializeField] int totalAmmo = 120;
     [SerializeField] float fireRate = 0.5f;
     [SerializeField] Bullet bulletPrefab;
+    [SerializeField]public int ammoInMagazine = 30;
+    [SerializeField]public int totalAmmo = 120;
+    [SerializeField] Transform FirePoint;
     float lastFireTime = -999f;
     
     private void Awake()
@@ -20,7 +21,7 @@ public class RangedWeapon : Weapon
         if (Time.time < lastFireTime + fireRate) return;
         if (ammoInMagazine > 0)
         {
-            Bullet bullet = Instantiate(bulletPrefab, transform.position, transform.rotation);
+            Bullet bullet = Instantiate(bulletPrefab, FirePoint.position, FirePoint.rotation);
             ammoInMagazine--;
             lastFireTime = Time.time;
 

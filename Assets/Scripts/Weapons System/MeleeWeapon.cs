@@ -1,4 +1,5 @@
 using System.Collections;
+using StarterAssets;
 using UnityEngine;
 
 public class MeleeWeapon : Weapon
@@ -8,11 +9,14 @@ public class MeleeWeapon : Weapon
   public Collider hitbox;
   public float attackDuration = 0.3f;
 
+
+
     private void Awake()
     {
         weaponType = WeaponType.Melee;
         if (hitbox != null) hitbox.enabled = false;
     }
+  
     public override void Use()
     {
         StartCoroutine(PerformAttack());

@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class AttackState : IEnemyStates
 {
@@ -21,7 +21,7 @@ public class AttackState : IEnemyStates
             return;
         }
 
-        if (!enemy.IsPlayerInDetectionRange)
+        if (!enemy.IsPlayerInDetectionRange || !enemy.HasLineOfSight())
         {
             enemy.ChangeState(new IdleState());
             return;
@@ -29,7 +29,7 @@ public class AttackState : IEnemyStates
 
         if (enemy.CanAttack())
         {
-            enemy.Animator.SetTrigger("Attack");
+            enemy.Animator.SetTrigger("attack");
 
             // Handle ranged attack if it's a RangedEnemy
             if (enemy is RangedEnemy rangedEnemy)
