@@ -34,7 +34,7 @@ public class HealthItem : MonoBehaviour, ICollectable
     {
         if (other.tag =="Player"){
             
-            other.gameObject.GetComponent<HealthSystem>().UpdateNumberOfHealthItem();
+            other.gameObject.GetComponent<PlayerHealth>().UpdateNumberOfHealthItem();
 
             gameObject.SetActive(false);
 

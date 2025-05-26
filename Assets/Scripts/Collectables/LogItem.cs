@@ -6,7 +6,6 @@ public enum LogsType {
 public class LogItem : MonoBehaviour, ICollectable
 {
     [SerializeField] private int id=0;
-    [SerializeField] private string name;
     [SerializeField] private Category category = Category.LOGS;
     [SerializeField] private LogsType logType=LogsType.First;
     [SerializeField] private string contentOfLog;
