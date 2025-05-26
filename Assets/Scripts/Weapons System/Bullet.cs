@@ -2,9 +2,10 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
+    [Header("Bullet Settings")]
     [SerializeField] float speed = 20f;
     [SerializeField] float lifetime = 2f;
-    [SerializeField] int damage = 10;
+    [SerializeField] float damage = 10f;
     Rigidbody rb;
 
     private void Start()
@@ -14,19 +15,20 @@ public class Bullet : MonoBehaviour
         Destroy(gameObject, lifetime);
     }
 
-    private void OnCollisionEnter(Collision collision)
+
+
+    private void OnTriggerEnter(Collider other)
     {
-        if (collision.gameObject.CompareTag("Enemy"))
+        IDamagable target = other.GetComponent<IDamagable>();
+
+        if (target != null)
         {
-            // Try to get IDamagable component from the enemy
-            if (collision.gameObject.TryGetComponent<IDamagable>(out var damagable))
+
+            if (other.CompareTag("Enemy"))
             {
-                damagable.TakeDamage(damage);
+                target.TakeDamage(damage);
             }
         }
-        if (!collision.gameObject.CompareTag("Pistol"))
-        {
-            Destroy(gameObject);
-        }
+        Destroy(gameObject);
     }
 }
