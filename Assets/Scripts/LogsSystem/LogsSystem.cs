@@ -4,24 +4,24 @@ using UnityEngine;
 
 public class LogsSystem : MonoBehaviour
 {
-    int numberOfLogs=0 ;
+ 
     List<LogItem> logs = new List<LogItem>();
-    LogItem[] readLogs; 
+  
     public List<LogItem> Logs { get { return logs; } }
 
    
 
     void ReadLog(LogsType type) {
 
-        readLogs=logs.ToArray();
-        if (readLogs.Length > 0) {
-            for (int i = 0; i < readLogs.Length; i++)
-            {
-                if (readLogs[i].LogType == type) {
+        if (logs.ToArray().Length > 0) {
+            foreach (LogItem item in logs) {
+                if (item.LogType == type)
+                {
                     // write this log in Text Box
                     // Active Text Box
                 }
             }
+           
         
         }
     }
