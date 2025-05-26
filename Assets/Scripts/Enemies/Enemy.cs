@@ -3,23 +3,26 @@ using Unity.IO.LowLevel.Unsafe;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class Enemy : MonoBehaviour, IEnemy
+public class Enemy : MonoBehaviour, IEnemy, IDamagable
 {
     [Header("Stats")]
-    [SerializeField] private int health = 100;
+    [SerializeField] private float health = 100;
+    [SerializeField] private float Maxhealth = 100;
     [SerializeField] public float moveSpeed = 3.5f;
     [SerializeField] private float attackDamage = 15f;
     [SerializeField] public float detectionRange = 8f;
-    [SerializeField] public float StartAttakingRange = 2f;
+    [SerializeField] public float attackRange = 1.5f;
     [SerializeField] private float attackCooldown = 2f;
 
+ 
     [Header("References")]
     public GameObject player;
     public NavMeshAgent navMeshAgent;
     public Animator animator;
 
-    // IEnemy implementation
-    public int Health { get => health; set => health = value; }
+    [Header("IEnemy Linking")]
+    public float Health { get => health; set => health = value; }
+    public float MaxHealth { get => Maxhealth; set => Maxhealth = value; }
     public float MoveSpeed { get => moveSpeed; set => moveSpeed = value; }
     public new Transform transform => base.transform;
     public float DetectionRange
@@ -38,36 +41,55 @@ public class Enemy : MonoBehaviour, IEnemy
     public Animator Animator => animator;
     public bool IsDead => health <= 0;
 
+
     [Header("Patrol Settings")]
-    public List<Transform> waypoints;  // Assign in Inspector
+    public List<Transform> waypoints; 
     public float waypointStopTime = 2f;
     public int _currentWaypointIndex = 0;
-    private float _waitTimer = 0;
-    private bool _isWaiting = false;
 
-    [Header("Combat")]
-    public float attackRange = 1.5f;
-    [SerializeField] private float startAttakingRange = 2f;
 
-    //Properties
+    //Private Var
 
     private float _lastAttackTime;
+    private IEnemyStates _currentState;
+    [SerializeField] private DetectionChecker _detectionChecker;
+    [SerializeField] private StartAttackChecker _attackChecker;
+    private bool _playerInDetectionRange;
+    private bool _playerInAttackRange;
+    private Vector3 _lastKnownPlayerPosition;
 
     public float AttackRange { get => attackRange; set => attackRange = value; }
     public float AttackCooldown { get => attackCooldown; set => attackCooldown = value; }
 
-    private IEnemyStates _currentState;
+    public Vector3 LastKnownPlayerPosition
+    {
+        get => _lastKnownPlayerPosition;
+        set => _lastKnownPlayerPosition = value;
+    }
 
+
+    private void Awake()
+    {
+        _detectionChecker = GetComponentInChildren<DetectionChecker>();
+        _attackChecker = GetComponentInChildren<StartAttackChecker>();
+
+        if (_detectionChecker != null)
+        {
+            _detectionChecker.Initialize(detectionRange, this);
+        }
+        if (_attackChecker != null)
+        {
+            _attackChecker.Initialize(attackRange, this);
+        }
+    }
 
     private void Start()
     {
-        player = GameObject.FindWithTag("Player");
         navMeshAgent.speed = moveSpeed;
         animator = GetComponent<Animator>();
         ChangeState(new IdleState());
-
+        health = Maxhealth;
     }
-
 
     void Update()
     {
@@ -77,6 +99,19 @@ public class Enemy : MonoBehaviour, IEnemy
         }
     }
 
+    //Checkers From Children
+    public bool IsPlayerInDetectionRange => _playerInDetectionRange;
+    public bool IsPlayerInAttackRange => _playerInAttackRange;
+
+    public void SetPlayerInDetectionRange(bool inRange)
+    {
+        _playerInDetectionRange = inRange;
+    }
+
+    public void SetPlayerInAttackRange(bool inRange)
+    {
+        _playerInAttackRange = inRange;
+    }
 
 
     public void ChangeState(IEnemyStates newState)
@@ -85,35 +120,39 @@ public class Enemy : MonoBehaviour, IEnemy
         _currentState = newState;
         _currentState?.EnterState(this);
     }
-
-
-    public bool IsPlayerInDetectionRange
+    public bool HasLineOfSight()
     {
-        get
-        {
-            if (Player == null) return false;
-            return Vector3.Distance(transform.position, Player.transform.position) <= detectionRange;
-        }
-    }
+        if (Player == null) return false;
 
-    public bool IsPlayerInAttackRange
-    {
-        get
-        {
-            if (Player == null) return false;
-            return Vector3.Distance(transform.position, Player.transform.position) <= attackRange;
-        }
-    }
+        Vector3 direction = (Player.transform.position - transform.position).normalized;
+        float distance = Vector3.Distance(transform.position, Player.transform.position);
 
+        if (Physics.Raycast(transform.position + Vector3.up * 1.5f, direction, out RaycastHit hit, distance))
+        {
+            if (hit.collider.CompareTag("Player"))
+            {
+                _lastKnownPlayerPosition = Player.transform.position;
+                return true;
+            }
+        }
+
+        return false;
+    }
     public bool CanAttack()
     {
         return Time.time > _lastAttackTime + attackCooldown;
     }
 
-    public void TakeDamage(int damage)
+    public void TakeDamage(float damage)
     {
         health -= damage;
         if (IsDead) Die();
+    }
+
+    public float UpdateHealth(float heal, float Damage)
+    {
+        health += heal;
+        return health;
     }
 
     public void DealDamage()
@@ -124,6 +163,8 @@ public class Enemy : MonoBehaviour, IEnemy
     public void Die()
     {
         animator.Play("Die");
+        navMeshAgent.speed = 0;
+        ChangeState(new IdleState());
         navMeshAgent.isStopped = true;
         Destroy(gameObject, 2f);
     }

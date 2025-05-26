@@ -5,7 +5,6 @@ using UnityEngine.AI;
 public interface IEnemy
 {
     //Stats
-    int Health { get; set; }
     float MoveSpeed { get; set; }
     Transform transform { get; }
     float DetectionRange { get; set; }
@@ -21,15 +20,15 @@ public interface IEnemy
     bool IsDead { get; }
     bool IsPlayerInDetectionRange { get; }
     bool IsPlayerInAttackRange { get; }
+    Vector3 LastKnownPlayerPosition { get; set; }
     bool CanAttack();
-
+    bool HasLineOfSight();
     //patrol
     List<Transform> Waypoints { get; set; }
     float WaypointStopTime { get; set; }
     int CurrentWaypointIndex { get; set; }
 
     //Methods
-    void TakeDamage(int damage);
     void Die();
     void ChangeState(IEnemyStates newState);
 }
