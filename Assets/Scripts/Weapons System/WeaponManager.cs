@@ -8,12 +8,14 @@ public class WeaponManager : MonoBehaviour
     Weapon currentWeapon;
     RangedWeapon rangedWeapon;
     MeleeWeapon meleeWeapon;
-
+    int totalAmmo;
+    public int TotalAmmo { get { return totalAmmo; } }
     WeaponsInputSystem weaponInputs;
-
-
+   
+    
     private void Awake()
     {
+        
         weaponInputs = new WeaponsInputSystem();
         weaponInputs.Enable();
         weaponInputs.WeaponsActions.Reload.performed += OnReload;
@@ -89,6 +91,12 @@ public class WeaponManager : MonoBehaviour
 
     }
 
+    public void GetUdateAmmo(int amount, int sign)
+    {
+
+        totalAmmo += amount * sign;
+
+    }
 
     public Weapon GetRangedWeapon() => rangedWeapon;
     public Weapon GetMeleeWeapon() => meleeWeapon;

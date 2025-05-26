@@ -30,7 +30,7 @@ public class AmmoItem : MonoBehaviour, ICollectable
     {
         if (other.tag == "Player") {
 
-            other.GetComponent<RangedWeapon>().UpdateAmmoNumber(itemAmount, 1);
+            other.GetComponent<WeaponManager>().GetUdateAmmo(itemAmount, 1);
 
             gameObject.SetActive(false);
 
