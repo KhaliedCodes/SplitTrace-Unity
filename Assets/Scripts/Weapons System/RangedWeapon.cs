@@ -11,7 +11,7 @@ public class RangedWeapon : Weapon
     [SerializeField]public int totalAmmo = 120;
     [SerializeField] Transform FirePoint;
     float lastFireTime = -999f;
-
+    
     private void Awake()
     {
         weaponType = WeaponType.Ranged;
@@ -54,5 +54,9 @@ public class RangedWeapon : Weapon
         {
             Debug.Log("No more total ammo to reload!");
         }
+    }
+    public void UpdateAmmoNumber(int amount, int sign)
+    {
+        totalAmmo += sign * amount;
     }
 }

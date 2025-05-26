@@ -23,9 +23,11 @@ public class WeaponManager : MonoBehaviour
 
     private WeaponsInputSystem weaponInputs;
     PlayerAnimations playerAnimations;
+    int totalAmmo;
 
     private void Awake()
     {
+        
         weaponInputs = new WeaponsInputSystem();
         weaponInputs.Enable();
         weaponInputs.WeaponsActions.Reload.performed += OnReload;
@@ -185,6 +187,12 @@ public class WeaponManager : MonoBehaviour
         }
     }
 
+    public void UpdateAmmo(int amount)
+    {
+
+        totalAmmo += amount;
+
+    }
 
     public void AmmoUI()
     {

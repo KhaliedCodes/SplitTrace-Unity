@@ -1,27 +1,31 @@
-using Unity.Android.Gradle.Manifest;
-using UnityEngine;
 
+using UnityEngine;
+public enum LogsType { 
+    First,Second,Third
+}
 public class LogItem : MonoBehaviour, ICollectable
 {
-    int id;
-    Category category;
-    public int Id { get { return id; } set { id = value; } }
-    public string Name { get; set; }
-    public Category Category { get { return category; } set { category = value; } }
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
+    [SerializeField] private int id=0;
+    [SerializeField] private string name;
+    [SerializeField] private Category category = Category.LOGS;
+    [SerializeField] private LogsType logType=LogsType.First;
+    [SerializeField] private string contentOfLog;
+    public int Id { get { return id; } }
+    public string Name { get;  }
+    public Category _Category { get { return category; } }
+    public LogsType LogType { get { return logType; } }
+    public string LogContent { get { return contentOfLog; } }
+    
     public void UpdateState(Category _category)
     {
         // update here new state of player after collect
+    }
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.tag == "Player")
+        {
+            gameObject.SetActive(false);
+            other.GetComponent<LogsSystem>().Logs.Add(this);
+        }
     }
 }
