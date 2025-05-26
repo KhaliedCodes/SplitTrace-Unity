@@ -111,7 +111,7 @@ Transform:
   m_GameObject: {fileID: 8217719646189535612}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.64}
+  m_LocalPosition: {x: 0, y: 0, z: 1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -252,6 +252,7 @@ MonoBehaviour:
   bulletPrefab: {fileID: 4619085187832863620, guid: ac1345739343ff749a5b464d1f75178a, type: 3}
   ammoInMagazine: 30
   totalAmmo: 120
+  FirePoint: {fileID: 8001091450715196491}
 --- !u!54 &2867879922264720194
 Rigidbody:
   m_ObjectHideFlags: 0

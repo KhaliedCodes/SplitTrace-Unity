@@ -23,12 +23,12 @@ public class Bullet : MonoBehaviour
 
         if (target != null)
         {
-            
+
             if (other.CompareTag("Enemy"))
             {
                 target.TakeDamage(damage);
             }
         }
-            Destroy(gameObject);
+        Destroy(gameObject);
     }
 }

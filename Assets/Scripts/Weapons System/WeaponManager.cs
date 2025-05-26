@@ -57,9 +57,9 @@ public class WeaponManager : MonoBehaviour
     private void OnShoot(InputAction.CallbackContext context)
     {
         currentWeapon?.Use();
-        if (currentWeapon != null && currentWeapon is MeleeWeapon)
+        if (currentWeapon != null && currentWeapon is MeleeWeapon weapon)
         {
-            if (Time.time < lastFireTime + ((MeleeWeapon)currentWeapon).attackDuration) return;
+            if (Time.time < lastFireTime + weapon.attackDuration) return;
             playerAnimations.SetAnimation("Attack");
             lastFireTime = Time.time;
         }
