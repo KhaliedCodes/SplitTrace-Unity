@@ -71,6 +71,15 @@ public partial class @WeaponsInputSystem: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Unequip"",
+                    ""type"": ""Button"",
+                    ""id"": ""d209bb43-4159-47bc-840d-1c922882be40"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -139,6 +148,17 @@ public partial class @WeaponsInputSystem: IInputActionCollection2, IDisposable
                     ""action"": ""Reload"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""8974977a-4690-49af-b355-dc04887035ca"",
+                    ""path"": ""<Keyboard>/o"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Unequip"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -152,6 +172,7 @@ public partial class @WeaponsInputSystem: IInputActionCollection2, IDisposable
         m_WeaponsActions_Pickup = m_WeaponsActions.FindAction("Pickup", throwIfNotFound: true);
         m_WeaponsActions_Drop = m_WeaponsActions.FindAction("Drop", throwIfNotFound: true);
         m_WeaponsActions_Reload = m_WeaponsActions.FindAction("Reload", throwIfNotFound: true);
+        m_WeaponsActions_Unequip = m_WeaponsActions.FindAction("Unequip", throwIfNotFound: true);
     }
 
     ~@WeaponsInputSystem()
@@ -223,6 +244,7 @@ public partial class @WeaponsInputSystem: IInputActionCollection2, IDisposable
     private readonly InputAction m_WeaponsActions_Pickup;
     private readonly InputAction m_WeaponsActions_Drop;
     private readonly InputAction m_WeaponsActions_Reload;
+    private readonly InputAction m_WeaponsActions_Unequip;
     public struct WeaponsActionsActions
     {
         private @WeaponsInputSystem m_Wrapper;
@@ -232,6 +254,7 @@ public partial class @WeaponsInputSystem: IInputActionCollection2, IDisposable
         public InputAction @Pickup => m_Wrapper.m_WeaponsActions_Pickup;
         public InputAction @Drop => m_Wrapper.m_WeaponsActions_Drop;
         public InputAction @Reload => m_Wrapper.m_WeaponsActions_Reload;
+        public InputAction @Unequip => m_Wrapper.m_WeaponsActions_Unequip;
         public InputActionMap Get() { return m_Wrapper.m_WeaponsActions; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -256,6 +279,9 @@ public partial class @WeaponsInputSystem: IInputActionCollection2, IDisposable
             @Reload.started += instance.OnReload;
             @Reload.performed += instance.OnReload;
             @Reload.canceled += instance.OnReload;
+            @Unequip.started += instance.OnUnequip;
+            @Unequip.performed += instance.OnUnequip;
+            @Unequip.canceled += instance.OnUnequip;
         }
 
         private void UnregisterCallbacks(IWeaponsActionsActions instance)
@@ -275,6 +301,9 @@ public partial class @WeaponsInputSystem: IInputActionCollection2, IDisposable
             @Reload.started -= instance.OnReload;
             @Reload.performed -= instance.OnReload;
             @Reload.canceled -= instance.OnReload;
+            @Unequip.started -= instance.OnUnequip;
+            @Unequip.performed -= instance.OnUnequip;
+            @Unequip.canceled -= instance.OnUnequip;
         }
 
         public void RemoveCallbacks(IWeaponsActionsActions instance)
@@ -299,5 +328,6 @@ public partial class @WeaponsInputSystem: IInputActionCollection2, IDisposable
         void OnPickup(InputAction.CallbackContext context);
         void OnDrop(InputAction.CallbackContext context);
         void OnReload(InputAction.CallbackContext context);
+        void OnUnequip(InputAction.CallbackContext context);
     }
 }
