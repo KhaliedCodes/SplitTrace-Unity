@@ -2218,7 +2218,6 @@ GameObject:
   - component: {fileID: 5885216828926809587}
   - component: {fileID: 4416926082891955983}
   - component: {fileID: 6982812147317424068}
-  - component: {fileID: 6982812147317424070}
   - component: {fileID: 6982812147317424071}
   m_Layer: 8
   m_Name: PlayerArmature
@@ -3077,39 +3076,6 @@ MonoBehaviour:
   dodgeInvulnerabilityTime: 0.15
   isDodging: 0
   dodgeCooldownTimer: 0
---- !u!114 &6982812147317424070
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4416926082891955971}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a5bc25af9d10db34985bcc72d3b7cffb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cameraTransform: {fileID: 8944336657305306384}
-  cinemachineCamera: {fileID: 2070925442752058860}
-  trackingRange: 15
-  horizontalFieldOfView: 90
-  verticalFieldOfView: 60
-  detectionInterval: 1
-  enemyLayer:
-    serializedVersion: 2
-    m_Bits: 64
-  toggleLockOnKey: 101
-  nextTargetKey: 113
-  previousTargetKey: 122
-  blendTime: 0.5
-  blendStyle: 1
-  cinemachineGroupCamera: {fileID: 985776228}
-  targetGroup: {fileID: 1457425136}
-  playerTransform: {fileID: 8338988565134001759}
-  targetIndicatorPrefab: {fileID: 0}
-  activePriority: 20
-  inactivePriority: 0
-  lookAtTarget: {fileID: 8338988565134001759}
 --- !u!114 &6982812147317424071
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3735,8 +3701,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8944336657305306389}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.7305172, y: 1.375001, z: -2.7329273}
+  m_LocalRotation: {x: -0.07355547, y: 0.012400861, z: 0.0009146999, w: 0.9972136}
+  m_LocalPosition: {x: 0, y: 0, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3803,7 +3769,7 @@ Camera:
     height: 1
   near clip plane: 0.2
   far clip plane: 500
-  field of view: 40
+  field of view: 67.92647
   orthographic: 0
   orthographic size: 10
   m_Depth: -1
