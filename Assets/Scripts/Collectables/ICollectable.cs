@@ -6,10 +6,10 @@ public enum Category {
 
 public interface ICollectable 
 {
-    int Id { get; set;}
-    string Name { get; set; }
+    int Id { get;}
+    string Name { get;  }
 
-    Category Category { get; set; }
+    Category _Category { get; }
 
     void UpdateState(Category category);
 }

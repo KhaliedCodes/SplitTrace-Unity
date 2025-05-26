@@ -5,13 +5,16 @@ public class AmmoItem : MonoBehaviour, ICollectable
 {
     int id;
     Category category;
-    public int Id { get { return id; } set { id = value; } }
-    public string Name { get; set; }
-    public Category Category { get { return category; } set { category = value; } }
+
+    int itemAmount =15;
+    public int Id { get { return id; } }
+    public string Name { get;  }
+    public Category _Category { get { return category; } }
 
     void Start()
     {
-
+        id = 1;
+        category = Category.AMMO;
     }
 
 
@@ -22,5 +25,16 @@ public class AmmoItem : MonoBehaviour, ICollectable
     public void UpdateState(Category _category)
     {
         // update here new state of player after collect
+    }
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.tag == "Player") {
+
+            other.GetComponent<WeaponManager>().UpdateAmmo(itemAmount);
+
+            gameObject.SetActive(false);
+
+            //play Sound Collect
+        }
     }
 }

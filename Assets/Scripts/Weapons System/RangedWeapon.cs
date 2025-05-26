@@ -10,7 +10,7 @@ public class RangedWeapon : Weapon
     [SerializeField] float fireRate = 0.5f;
     [SerializeField] Bullet bulletPrefab;
     float lastFireTime = -999f;
-
+    
     private void Awake()
     {
         weaponType = WeaponType.Ranged;
@@ -53,5 +53,9 @@ public class RangedWeapon : Weapon
         {
             Debug.Log("No more total ammo to reload!");
         }
+    }
+    public void UpdateAmmoNumber(int amount, int sign)
+    {
+        totalAmmo += sign * amount;
     }
 }
