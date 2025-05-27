@@ -15,6 +15,9 @@ public class RuntimeLockOnCamera : MonoBehaviour
     [SerializeField] private float lockOnRange = 15f;
     [SerializeField] private float playerRotationSpeed = 5f; // Speed at which player rotates to face enemy
     [SerializeField] private KeyCode toggleLockOnKey = KeyCode.E;
+    [SerializeField] private KeyCode switchTargetKey = KeyCode.Tab; // Key to switch between enemies
+    [SerializeField] private float forwardAngleThreshold = 60f; // Angle in degrees to consider "in front"
+    [SerializeField] private float forwardPriorityWeight = 2f; // How much to prioritize forward enemies
 
     [Header("Camera Behavior Settings")]
     [SerializeField] private float movementThreshold = 0.1f;        // Minimum movement to consider player "moving"
@@ -28,6 +31,8 @@ public class RuntimeLockOnCamera : MonoBehaviour
     private Vector3 lastPlayerPosition;
     private float timeSinceLastMovement = 0f;
     private bool isLookingAtEnemy = false;
+    private Transform[] availableEnemies; // Array to store enemies in range
+    private int currentEnemyIndex = 0; // Current enemy index for cycling
 
     // Camera component references
     private CinemachineTransposer transposer;
@@ -71,8 +76,8 @@ public class RuntimeLockOnCamera : MonoBehaviour
         {
             if (!isLockedOn)
             {
-                // Try to find the nearest enemy to lock on
-                currentTargetEnemy = FindNearestEnemy();
+                // Try to find the best enemy to lock on (prioritizing forward direction)
+                currentTargetEnemy = FindBestEnemyToLockOn();
 
                 if (currentTargetEnemy != null)
                 {
@@ -87,6 +92,12 @@ public class RuntimeLockOnCamera : MonoBehaviour
             {
                 Unlock();
             }
+        }
+
+        // Handle tab to switch between enemies when locked on
+        if (Input.GetKeyDown(switchTargetKey) && isLockedOn)
+        {
+            SwitchToNextEnemy();
         }
 
         // Handle movement detection and camera behavior when locked on
@@ -231,6 +242,141 @@ public class RuntimeLockOnCamera : MonoBehaviour
         return lookAtObject.transform;
     }
 
+    Transform FindBestEnemyToLockOn()
+    {
+        // Get all enemies in range and sort them
+        UpdateAvailableEnemies();
+        
+        if (availableEnemies == null || availableEnemies.Length == 0)
+            return null;
+
+        // Return the best enemy (first in sorted list)
+        currentEnemyIndex = 0;
+        return availableEnemies[0];
+    }
+
+    void UpdateAvailableEnemies()
+    {
+        Collider[] enemiesInRange = Physics.OverlapSphere(cameraRootTransform.position, lockOnRange, enemyLayer);
+        
+        // Filter out trigger colliders and create list of valid enemies
+        System.Collections.Generic.List<Transform> validEnemies = new System.Collections.Generic.List<Transform>();
+        
+        foreach (Collider enemyCollider in enemiesInRange)
+        {
+            if (!enemyCollider.isTrigger)
+            {
+                validEnemies.Add(enemyCollider.transform);
+            }
+        }
+
+        if (validEnemies.Count == 0)
+        {
+            availableEnemies = null;
+            return;
+        }
+
+        // Sort enemies by score (best first)
+        availableEnemies = validEnemies.ToArray();
+        System.Array.Sort(availableEnemies, CompareEnemiesByScore);
+    }
+
+    int CompareEnemiesByScore(Transform enemyA, Transform enemyB)
+    {
+        float scoreA = CalculateEnemyScore(enemyA);
+        float scoreB = CalculateEnemyScore(enemyB);
+        
+        // Sort in descending order (higher scores first)
+        return scoreB.CompareTo(scoreA);
+    }
+
+    float CalculateEnemyScore(Transform enemy)
+    {
+        Vector3 enemyPosition = enemy.position;
+        float distance = Vector3.Distance(cameraRootTransform.position, enemyPosition);
+
+        // Get camera's forward direction
+        Vector3 cameraForward = GetCameraForwardDirection();
+
+        // Calculate direction from camera to enemy
+        Vector3 directionToEnemy = (enemyPosition - cameraRootTransform.position).normalized;
+        
+        // Calculate angle between camera forward and direction to enemy
+        float angle = Vector3.Angle(cameraForward, directionToEnemy);
+        
+        // Check if enemy is within the forward angle threshold
+        bool isInFront = angle <= forwardAngleThreshold;
+
+        // Calculate score based on distance and forward priority
+        float distanceScore = 1f / (1f + distance); // Closer enemies get higher score
+        float forwardScore = isInFront ? forwardPriorityWeight : 1f; // Forward enemies get priority
+        float angleScore = 1f - (angle / 180f); // Enemies more aligned with forward get higher score
+
+        return distanceScore * forwardScore * angleScore;
+    }
+
+    void SwitchToNextEnemy()
+    {
+        if (availableEnemies == null || availableEnemies.Length <= 1)
+        {
+            Debug.Log("No other enemies available to switch to.");
+            return;
+        }
+
+        // Refresh available enemies to account for any that may have moved out of range
+        UpdateAvailableEnemies();
+        
+        if (availableEnemies == null || availableEnemies.Length <= 1)
+        {
+            Debug.Log("No other enemies available to switch to.");
+            return;
+        }
+
+        // Find current enemy in the updated list
+        int currentIndex = -1;
+        for (int i = 0; i < availableEnemies.Length; i++)
+        {
+            if (availableEnemies[i] == currentTargetEnemy)
+            {
+                currentIndex = i;
+                break;
+            }
+        }
+
+        // Move to next enemy in the list
+        if (currentIndex >= 0)
+        {
+            currentEnemyIndex = (currentIndex + 1) % availableEnemies.Length;
+        }
+        else
+        {
+            // Current enemy not found (might be out of range), start from beginning
+            currentEnemyIndex = 0;
+        }
+
+        // Switch to the new target
+        currentTargetEnemy = availableEnemies[currentEnemyIndex];
+        
+        // Reset camera behavior for smooth transition to new target
+        isLookingAtEnemy = false;
+        timeSinceLastMovement = 0f;
+        
+        Debug.Log("Switched to enemy: " + currentTargetEnemy.name);
+    }
+
+    Vector3 GetCameraForwardDirection()
+    {
+        // Get the actual camera transform from the virtual camera
+        Camera cam = virtualCamera.VirtualCameraGameObject.GetComponent<Camera>();
+        if (cam != null)
+        {
+            return cam.transform.forward;
+        }
+        
+        // Fallback: use the camera root's forward direction
+        return cameraRootTransform.forward;
+    }
+
     Transform FindNearestEnemy()
     {
         Collider[] enemiesInRange = Physics.OverlapSphere(cameraRootTransform.position, lockOnRange, enemyLayer);
@@ -259,6 +405,9 @@ public class RuntimeLockOnCamera : MonoBehaviour
         timeSinceLastMovement = 0f;
         lastPlayerPosition = cameraRootTransform.position;
 
+        // Update available enemies list for tab switching
+        UpdateAvailableEnemies();
+
         // Camera remains following player but will adjust behavior based on movement
         virtualCamera.Follow = cameraRootTransform;
         virtualCamera.LookAt = cameraRootTransform;
@@ -272,6 +421,8 @@ public class RuntimeLockOnCamera : MonoBehaviour
         currentTargetEnemy = null;
         isLookingAtEnemy = false;
         timeSinceLastMovement = 0f;
+        availableEnemies = null; // Clear the enemies list
+        currentEnemyIndex = 0;
 
         // Reset camera to original settings
         virtualCamera.Follow = cameraRootTransform;
@@ -330,6 +481,16 @@ public class RuntimeLockOnCamera : MonoBehaviour
                     Gizmos.DrawLine(cameraRootTransform.position, currentTargetEnemy.position);
                 }
             }
+
+            // Visualize forward detection cone
+            Vector3 cameraForward = GetCameraForwardDirection();
+            Vector3 leftBoundary = Quaternion.AngleAxis(-forwardAngleThreshold, Vector3.up) * cameraForward;
+            Vector3 rightBoundary = Quaternion.AngleAxis(forwardAngleThreshold, Vector3.up) * cameraForward;
+
+            Gizmos.color = Color.green;
+            Gizmos.DrawRay(cameraRootTransform.position, leftBoundary * lockOnRange);
+            Gizmos.DrawRay(cameraRootTransform.position, rightBoundary * lockOnRange);
+            Gizmos.DrawRay(cameraRootTransform.position, cameraForward * lockOnRange);
         }
     }
 }

@@ -71,7 +71,7 @@ public class AutoLookAtNearestEnemy : MonoBehaviour
         inputHandler = GetComponent<CustomStarterAssetsInputs>();
 
         // Find the CinemachineBrain for managing blends
-        cinemachineBrain = FindObjectOfType<CinemachineBrain>();
+        cinemachineBrain = FindFirstObjectByType<CinemachineBrain>();
         if (cinemachineBrain == null)
         {
             Debug.LogWarning("CinemachineBrain not found. Camera transitions may not blend properly.");
@@ -430,7 +430,7 @@ public class AutoLookAtNearestEnemy : MonoBehaviour
         float angle = Vector3.Angle(cameraForward, directionToTarget);
 
         // For debugging
-        Debug.Log($"FOV Check for {target.name}: Angle = {angle:F1}°, Max allowed = {horizontalFieldOfView * 0.5f:F1}°");
+        Debug.Log($"FOV Check for {target.name}: Angle = {angle:F1}ï¿½, Max allowed = {horizontalFieldOfView * 0.5f:F1}ï¿½");
 
         // Simple horizontal FOV check (ignoring vertical for now to simplify debugging)
         bool isInFOV = angle <= horizontalFieldOfView * 0.5f;
