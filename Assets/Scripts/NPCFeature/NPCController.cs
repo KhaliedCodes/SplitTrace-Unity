@@ -6,10 +6,9 @@ public class NPCController : MonoBehaviour
     [SerializeField] private NPCPersonality personality;
     [SerializeField] private Transform interactionTrigger;
     [SerializeField] private float interactionRadius = 2f;
-
+    [SerializeField] private GameObject playerPrefab;
     [Header("UI Components")]
-    [SerializeField] private GameObject interactionIndicator;
-
+    private GameObject interactionIndicator;
     private bool isInteracting;
     private PlayerController nearbyPlayer;
     private DialogueManager dialogueManager;
@@ -20,10 +19,21 @@ public class NPCController : MonoBehaviour
     private void Awake()
     {
         dialogueManager = FindFirstObjectByType<DialogueManager>();
+       
+        if (dialogueManager != null)
+        {
+            interactionIndicator = dialogueManager.gameObject;
+            Debug.Log("found in scene.");
+        }
+        else
+        {
+            Debug.LogWarning("not found in scene.");
+        }
 
         // Get or add the GeminiAccessor component
         geminiAccessor = GetComponent<GeminiAccessor>();
         if (geminiAccessor == null)
+        
             geminiAccessor = gameObject.AddComponent<GeminiAccessor>();
 
         // Configure the system with our personality data - only pass to GeminiAccessor
