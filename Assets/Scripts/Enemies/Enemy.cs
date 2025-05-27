@@ -9,12 +9,12 @@ public class Enemy : MonoBehaviour, IEnemy, IDamagable
     [SerializeField] private float health = 100;
     [SerializeField] private float Maxhealth = 100;
     [SerializeField] public float moveSpeed = 3.5f;
-    [SerializeField] private float attackDamage = 15f;
+    [SerializeField] public float attackDamage = 15f;
     [SerializeField] public float detectionRange = 8f;
     [SerializeField] public float attackRange = 1.5f;
     [SerializeField] private float attackCooldown = 2f;
 
- 
+    
     [Header("References")]
     public GameObject player;
     public NavMeshAgent navMeshAgent;
