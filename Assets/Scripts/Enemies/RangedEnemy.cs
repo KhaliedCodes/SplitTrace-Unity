@@ -8,7 +8,7 @@ public class RangedEnemy : MonoBehaviour, IEnemy, IDamagable
     [SerializeField] private float health = 100;
     [SerializeField] private float Maxhealth = 100;
     [SerializeField] private float moveSpeed = 2.5f;
-    [SerializeField] private float attackDamage = 10f;
+    [SerializeField] public float attackDamage = 10f;
     [SerializeField] private float detectionRange = 12f;
     [SerializeField] private float attackRange = 8f;
     [SerializeField] private float attackCooldown = 1.5f;
@@ -133,7 +133,6 @@ public class RangedEnemy : MonoBehaviour, IEnemy, IDamagable
         {
             if (hit.collider.gameObject == player)
             {
-                Debug.Log("Ray hit the player.");
                 return true;
             }
         }
@@ -157,6 +156,12 @@ public class RangedEnemy : MonoBehaviour, IEnemy, IDamagable
             transform.position + Vector3.up * 0.5f,
             Quaternion.LookRotation(direction)
         );
+
+        // Pass the damage to the bullet
+        if (projectile.TryGetComponent<EnemyBulletEffector>(out var bulletEffector))
+        {
+            bulletEffector.DamageAmount = attackDamage;
+        }
 
         if (projectile.TryGetComponent<Rigidbody>(out var rb))
         {

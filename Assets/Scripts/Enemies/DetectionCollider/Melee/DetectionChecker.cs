@@ -14,6 +14,7 @@ public class DetectionChecker : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             _enemy.SetPlayerInDetectionRange(true) ;
+            _enemy.player = other.gameObject;
         }
     }
 
@@ -22,6 +23,7 @@ public class DetectionChecker : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             _enemy.SetPlayerInDetectionRange(false);
+            _enemy.player = null;
         }
     }
 
