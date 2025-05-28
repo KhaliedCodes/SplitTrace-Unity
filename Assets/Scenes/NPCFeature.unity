@@ -1650,8 +1650,6 @@ MonoBehaviour:
   _modelName: gemini-2.0-flash
   _apiKey: AIzaSyBlrcA4jL8e8ZBNBdp7haF7-KRLOBzbOXY
   _responseMimeType: 1
-  _npcPersonality: {fileID: 11400000, guid: b0201de81c302b445bf59d95490b64ad, type: 2}
-  _systemInstructions: 
   _enableChatHistory: 1
   _maxHistory: 5
   _chatHistory: []
@@ -1670,8 +1668,7 @@ MonoBehaviour:
   personality: {fileID: 11400000, guid: b0201de81c302b445bf59d95490b64ad, type: 2}
   interactionTrigger: {fileID: 1471629828}
   interactionRadius: 2
-  geminiAccessor: {fileID: 1471629824}
-  interactionIndicator: {fileID: 39002646}
+  playerPrefab: {fileID: 0}
 --- !u!114 &1471629824
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1685,7 +1682,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   geminiAPI: {fileID: 1471629822}
-  npcPersonality: {fileID: 11400000, guid: b0201de81c302b445bf59d95490b64ad, type: 2}
 --- !u!136 &1471629825
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -2131,7 +2127,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1705400583
 RectTransform:
   m_ObjectHideFlags: 0
