@@ -37,7 +37,6 @@ public class PlayerController : MonoBehaviour
             if (Keyboard.current.escapeKey.wasPressedThisFrame)
             {
                 DialogueManager.Instance?.EndDialogue();
-                EnableControls();
 
             }
             return;

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using System.Text.RegularExpressions;
 
@@ -11,8 +12,9 @@ public class GeminiAccessor : MonoBehaviour
     private NPCPersonality npcPersonality;
     private Animator npcAnimator;
 
-    // Event for sending processed responses back to NPCController
+    // Events for sending processed responses back to NPCController
     public event Action<string, string> OnResponseProcessed;
+    public event Action<List<string>> OnChoicesReceived;
 
     private void Start()
     {
@@ -43,12 +45,22 @@ public class GeminiAccessor : MonoBehaviour
 
     public void SendPlayerInput(string input) => geminiAPI.GetAIResponse(input);
 
+    public void RequestChoices() => geminiAPI.GetChoicesResponse();
+
     public void ClearChatHistory() => geminiAPI.ClearChatHistory();
 
     private void ProcessResponse(string response)
     {
         if (string.IsNullOrEmpty(response)) return;
 
+        // Check if this is a choices response (JSON array format)
+        if (response.Trim().StartsWith("[") && response.Trim().EndsWith("]"))
+        {
+            ProcessChoicesResponse(response);
+            return;
+        }
+
+        // Process regular dialogue response
         var emotionMatch = Regex.Match(response, @"{\s*""emotion""\s*:\s*""(\w+)""\s*}");
         string emotion = npcPersonality != null ? npcPersonality.defaultEmotion : "neutral";
         string cleanResponse = response;
@@ -70,6 +82,52 @@ public class GeminiAccessor : MonoBehaviour
 
         UpdateAnimation(emotion);
         OnResponseProcessed?.Invoke(cleanResponse, emotion);
+    }
+
+    private void ProcessChoicesResponse(string response)
+    {
+        try
+        {
+            // Parse JSON array of choices
+            List<string> choices = new List<string>();
+            
+            // Simple JSON parsing for array of strings
+            string cleanResponse = response.Trim().TrimStart('[').TrimEnd(']');
+            string[] choiceParts = cleanResponse.Split(',');
+            
+            foreach (string part in choiceParts)
+            {
+                string choice = part.Trim().Trim('"').Trim();
+                if (!string.IsNullOrEmpty(choice))
+                {
+                    choices.Add(choice);
+                }
+            }
+
+            // Fallback choices if parsing fails or no choices found
+            if (choices.Count == 0)
+            {
+                choices = GetDefaultChoices();
+            }
+
+            OnChoicesReceived?.Invoke(choices);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Error parsing choices response: {e.Message}");
+            OnChoicesReceived?.Invoke(GetDefaultChoices());
+        }
+    }
+
+    private List<string> GetDefaultChoices()
+    {
+        return new List<string>
+        {
+            "Tell me more about yourself",
+            "What do you know about this place?",
+            "I have a question for you",
+            "I should go now"
+        };
     }
 
     private void UpdateAnimation(string emotion)

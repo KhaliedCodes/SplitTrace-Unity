@@ -12,6 +12,9 @@ public class GeminiAPIClient : MonoBehaviour
     public enum ResponseMimeType { PlainText, Json }
 
     private const string BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models/";
+    private const string CHOICE_PROMPT = "Based on our conversation, provide 3-4 appropriate dialogue choices for the player. " +
+                                       "Format your response as a JSON array of strings, like: [\"Choice 1\", \"Choice 2\", \"Choice 3\"]. " +
+                                       "Keep choices concise and relevant to the conversation context. " + "one of the choices must be extremely aggressive";
 
     [Header("API Configuration")]
     [SerializeField] private string _modelName = "gemini-2.0-flash";
@@ -60,10 +63,10 @@ public class GeminiAPIClient : MonoBehaviour
         _systemInstructions = instructions;
     }
 
-    public async Task<string> GenerateContentAsync(string prompt)
+    public async Task<string> GenerateContentAsync(string prompt, bool forChoices = false)
     {
         string url = $"{BASE_URL}{_modelName}:generateContent?key={_apiKey}";
-        var requestBody = CreateRequestBody(prompt);
+        var requestBody = CreateRequestBody(prompt, forChoices);
         string jsonData = JsonUtility.ToJson(requestBody);
 
         using UnityWebRequest request = new UnityWebRequest(url, "POST");
@@ -83,9 +86,9 @@ public class GeminiAPIClient : MonoBehaviour
 
             JObject responseJObject = JObject.Parse(request.downloadHandler.text);
             string aiResponse = responseJObject["candidates"]?[0]?["content"]?["parts"]?[0]?["text"]?.ToString();
-            string rawResponse = CleanAIResponse(aiResponse);
+            string rawResponse = forChoices ? aiResponse : CleanAIResponse(aiResponse);
 
-            if (_enableChatHistory && !string.IsNullOrEmpty(rawResponse))
+            if (_enableChatHistory && !string.IsNullOrEmpty(rawResponse) && !forChoices)
             {
                 _chatHistory.Add(CreateMessageObject("model", rawResponse));
                 if (_chatHistory.Count > _maxHistory * 2)
@@ -104,7 +107,7 @@ public class GeminiAPIClient : MonoBehaviour
         }
     }
 
-    private GeminiRequestBody CreateRequestBody(string prompt)
+    private GeminiRequestBody CreateRequestBody(string prompt, bool forChoices = false)
     {
         var requestBody = new GeminiRequestBody
         {
@@ -121,7 +124,7 @@ public class GeminiAPIClient : MonoBehaviour
             };
         }
 
-        if (_enableChatHistory)
+        if (_enableChatHistory && !forChoices)
         {
             requestBody.contents = _chatHistory.Select(msg => new Content
             {
@@ -136,7 +139,8 @@ public class GeminiAPIClient : MonoBehaviour
             parts = new List<Part> { new Part { text = prompt } }
         });
 
-        if (_responseMimeType == ResponseMimeType.Json)
+        // Force JSON response for choices, use configured type for regular responses
+        if (forChoices || _responseMimeType == ResponseMimeType.Json)
         {
             requestBody.generationConfig.responseMimeType = "application/json";
         }
@@ -155,7 +159,13 @@ public class GeminiAPIClient : MonoBehaviour
             _chatHistory.RemoveAt(0);
         }
 
-        string aiResponse = await GenerateContentAsync(playerMessage);
+        string aiResponse = await GenerateContentAsync(playerMessage, false);
+        OnResponseReceived?.Invoke(aiResponse);
+    }
+
+    public async void GetChoicesResponse()
+    {
+        string aiResponse = await GenerateContentAsync(CHOICE_PROMPT, true);
         OnResponseReceived?.Invoke(aiResponse);
     }
 
