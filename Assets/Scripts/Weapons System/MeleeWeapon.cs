@@ -25,8 +25,8 @@ public class MeleeWeapon : Weapon
     IEnumerator PerformAttack()
     {
         Debug.Log("Swinging melee weapon...");
+        AudioManager.Instance.PlayAudioClip("Weapons", $"{weaponName}", false);
         hitbox.enabled = true;
-
         yield return new WaitForSeconds(attackDuration);
 
         hitbox.enabled = false;

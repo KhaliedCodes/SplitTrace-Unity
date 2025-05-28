@@ -1,8 +1,9 @@
-using System;
+using Cinemachine;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+
 
 public class WeaponManager : MonoBehaviour
 {
@@ -16,14 +17,27 @@ public class WeaponManager : MonoBehaviour
     [SerializeField] Image rangedIconUI;
     [SerializeField] Image meleeIconUI;
 
+    [Header("Cinemachine Cameras")]
+    [SerializeField] CinemachineVirtualCamera followCamera;
+    [SerializeField] CinemachineVirtualCamera aimCamera;
+
+    [Header("Aiming UI")]
+    [SerializeField] GameObject defultCrosshairUI;
+    [SerializeField] GameObject aimCrosshairUI;
+
+    //[SerializeField] Transform aimTarget;
+    //[SerializeField] Transform projectileSpawnPoint;
+
+
     private Weapon currentWeapon;
     private RangedWeapon rangedWeapon;
     private MeleeWeapon meleeWeapon;
-    private float lastFireTime = -999f;
-
     private WeaponsInputSystem weaponInputs;
-    PlayerAnimations playerAnimations;
-    int totalAmmo;
+    private PlayerAnimations playerAnimations;
+    private float lastFireTime = -999f;
+    private int totalAmmo;
+
+    
 
     private void Awake()
     {
@@ -36,6 +50,8 @@ public class WeaponManager : MonoBehaviour
         weaponInputs.WeaponsActions.Unequip.performed += OnUnequip;
         weaponInputs.WeaponsActions.Drop.performed += OnDrop;
         weaponInputs.WeaponsActions.Pickup.performed += OnPickup;
+        weaponInputs.WeaponsActions.Aim.performed += ctx => SetAim(true); 
+        weaponInputs.WeaponsActions.Aim.canceled += ctx => SetAim(false);
     }
 
     private void Start()
@@ -49,6 +65,7 @@ public class WeaponManager : MonoBehaviour
     private void Update()
     {
         AmmoUI();
+
     }
 
     private void OnReload(InputAction.CallbackContext context)
@@ -58,13 +75,18 @@ public class WeaponManager : MonoBehaviour
 
     private void OnShoot(InputAction.CallbackContext context)
     {
-        currentWeapon?.Use();
+        if (!currentWeapon) return;
+        
         if (currentWeapon != null && currentWeapon is MeleeWeapon weapon)
         {
             if (Time.time < lastFireTime + weapon.attackDuration) return;
             playerAnimations.SetAnimation("Attack");
             lastFireTime = Time.time;
+
         }
+        currentWeapon?.Use();
+        
+
     }
 
     private void OnSwitchWeapon(InputAction.CallbackContext context)
@@ -151,6 +173,8 @@ public class WeaponManager : MonoBehaviour
             rangedWeapon = rw;
             rangedIconUI.sprite = rw.weaponIcon;
             rangedIconUI.enabled = true;
+            defultCrosshairUI.SetActive(true);
+
         }
         else if (newWeapon is MeleeWeapon mw)
         {
@@ -203,7 +227,6 @@ public class WeaponManager : MonoBehaviour
             {
                 ammoText.enabled = true;
                 RangedWeapon rw = (RangedWeapon)currentWeapon;
-                Debug.Log($"Ammo: {rw.ammoInMagazine}/{rw.totalAmmo}");
                 ammoText.text = $"Current Ammo: {rw.ammoInMagazine} / {rw.totalAmmo}";
             }
             else 
@@ -213,4 +236,33 @@ public class WeaponManager : MonoBehaviour
         }
  
     }
+
+
+    private void SetAim(bool isAiming)
+    {
+        if (currentWeapon && currentWeapon == rangedWeapon)
+        {
+            if (isAiming)
+            {
+                aimCamera.Priority = 20;
+                followCamera.Priority = 10;
+                defultCrosshairUI.SetActive(false);
+                aimCrosshairUI.SetActive(true);
+                playerAnimations.PistolAim(true);
+
+            }
+            else
+            {
+                aimCamera.Priority = 5;
+                followCamera.Priority = 10;
+                defultCrosshairUI.SetActive(true);
+                aimCrosshairUI.SetActive(false);
+                playerAnimations.PistolAim(false);
+            }
+        }
+    }
+
+ 
+
+
 }

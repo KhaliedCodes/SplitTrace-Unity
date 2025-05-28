@@ -5,7 +5,8 @@ public class Bullet : MonoBehaviour
     [Header("Bullet Settings")]
     [SerializeField] float speed = 20f;
     [SerializeField] float lifetime = 2f;
-    [SerializeField] float damage = 10f;
+    //[SerializeField] float damage = 10f;
+    RangedWeapon rangedWeapon;
     Rigidbody rb;
 
     private void Start()
@@ -26,7 +27,7 @@ public class Bullet : MonoBehaviour
 
             if (other.CompareTag("Enemy"))
             {
-                target.TakeDamage(damage);
+                target.TakeDamage(rangedWeapon.damage);
             }
         }
         Destroy(gameObject);
