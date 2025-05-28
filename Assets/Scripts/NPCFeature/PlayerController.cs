@@ -10,15 +10,16 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private LayerMask interactionLayer;
     [SerializeField] private TextMeshProUGUI interactionPromptText;
     [SerializeField] private GameObject interactionPrompt;
-    [SerializeField] private float interactionCooldown = 0.5f;
-
+    
     private CharacterController characterController;
-    private NPCController currentInteractable;
     private CustomThridPersonController thirdPersonController;
     private CustomStarterAssetsInputs starterAssetsInputs;
     private PlayerInput playerInput;
-    private float lastInteractionTime;
-    private bool isInDialogue = false;
+    private SphereCollider interactionCollider;
+    
+    private NPCController currentInteractable;
+    private bool isInDialogue;
+
     public bool IsInDialogue => isInDialogue;
 
     private void Start()
@@ -27,67 +28,53 @@ public class PlayerController : MonoBehaviour
         thirdPersonController = GetComponent<CustomThridPersonController>();
         starterAssetsInputs = GetComponent<CustomStarterAssetsInputs>();
         playerInput = GetComponent<PlayerInput>();
+        
+        interactionCollider = gameObject.AddComponent<SphereCollider>();
+        interactionCollider.radius = interactionRadius;
+        interactionCollider.isTrigger = true;
+        interactionCollider.center = Vector3.up * 0.5f;
+        
         interactionPrompt?.SetActive(false);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (((1 << other.gameObject.layer) & interactionLayer) == 0) return;
+        
+        NPCController npc = other.GetComponent<NPCController>();
+        if (npc != null)
+        {
+            currentInteractable = npc;
+            ShowInteractionPrompt(true, npc.NPCName);
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.GetComponent<NPCController>() == currentInteractable)
+        {
+            currentInteractable = null;
+            ShowInteractionPrompt(false);
+        }
     }
 
     private void Update()
     {
-        if (isInDialogue)
+        if (isInDialogue && Keyboard.current.escapeKey.wasPressedThisFrame)
+            DialogueManager.Instance?.EndDialogue();
+        
+        if (Input.GetKeyDown(KeyCode.E) && currentInteractable != null)
         {
-            if (Keyboard.current.escapeKey.wasPressedThisFrame)
-            {
-                DialogueManager.Instance?.EndDialogue();
-
-            }
-            return;
-        }
-
-        CheckForInteractables();
-        HandleInteractionInput();
-    }
-
-    private void CheckForInteractables()
-    {
-        currentInteractable = null;
-        Collider[] colliders = Physics.OverlapSphere(transform.position, interactionRadius, interactionLayer);
-
-        NPCController closestNPC = null;
-        float closestDistance = float.MaxValue;
-
-        foreach (Collider col in colliders)
-        {
-            NPCController npc = col.GetComponent<NPCController>();
-            if (npc != null)
-            {
-                float distance = Vector3.Distance(transform.position, col.transform.position);
-                if (distance < closestDistance)
-                {
-                    closestDistance = distance;
-                    closestNPC = npc;
-                }
-            }
-        }
-
-        currentInteractable = closestNPC;
-        ShowInteractionPrompt(closestNPC != null, closestNPC?.NPCName);
-    }
-
-    private void HandleInteractionInput()
-    {
-        if (Input.GetKeyDown(KeyCode.E) && Time.time > lastInteractionTime + interactionCooldown)
-        {
-            lastInteractionTime = Time.time;
-            if (currentInteractable != null)
-            {
-                DisableControls();
-                currentInteractable.StartInteraction();
-            }
+            DisableControls();
+            currentInteractable.StartInteraction();
         }
     }
 
     private void ShowInteractionPrompt(bool show, string npcName = "")
     {
-        interactionPrompt?.SetActive(show);
+        if (interactionPrompt == null) return;
+        
+        interactionPrompt.SetActive(show);
         if (show) interactionPromptText.text = $"Press E to talk with {npcName}";
     }
 
@@ -122,11 +109,5 @@ public class PlayerController : MonoBehaviour
         isInDialogue = inDialogue;
         Cursor.lockState = inDialogue ? CursorLockMode.None : CursorLockMode.Locked;
         Cursor.visible = inDialogue;
-    }
-
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.green;
-        Gizmos.DrawWireSphere(transform.position, interactionRadius);
     }
 }

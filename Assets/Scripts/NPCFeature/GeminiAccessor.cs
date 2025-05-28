@@ -1,84 +1,50 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Text.RegularExpressions;
 
 public class GeminiAccessor : MonoBehaviour
 {
     [Header("Gemini Configuration")]
     [SerializeField] private GeminiAPIClient geminiAPI;
 
-    // Store personality reference and handle all personality-related logic here
     private NPCPersonality npcPersonality;
     private Animator npcAnimator;
 
-    // Events for sending processed responses back to NPCController
     public event Action<string, string> OnResponseProcessed;
     public event Action<List<string>> OnChoicesReceived;
 
     private void Start()
     {
         npcAnimator = GetComponent<Animator>();
-
-        // Initialize the API client
-        if (geminiAPI == null)
-        {
-            geminiAPI = gameObject.AddComponent<GeminiAPIClient>();
-        }
-
+        geminiAPI = geminiAPI ?? gameObject.AddComponent<GeminiAPIClient>();
         geminiAPI.OnResponseReceived += ProcessResponse;
     }
 
     public void ConfigureWithPersonality(NPCPersonality personality)
     {
-        if (personality == null) return;
-
         npcPersonality = personality;
-
-        // Generate the system prompt from the personality
-        string systemPrompt = personality.GenerateSystemPrompt();
-
-        // Configure the API client with the system prompt
-        geminiAPI.SetSystemInstructions(systemPrompt);
+        geminiAPI.SetSystemInstructions(personality.GenerateSystemPrompt());
         ClearChatHistory();
     }
 
     public void SendPlayerInput(string input) => geminiAPI.GetAIResponse(input);
-
     public void RequestChoices() => geminiAPI.GetChoicesResponse();
-
     public void ClearChatHistory() => geminiAPI.ClearChatHistory();
 
     private void ProcessResponse(string response)
     {
         if (string.IsNullOrEmpty(response)) return;
 
-        // Check if this is a choices response (JSON array format)
-        if (response.Trim().StartsWith("[") && response.Trim().EndsWith("]"))
+        if (response.Trim().StartsWith("["))
         {
             ProcessChoicesResponse(response);
             return;
         }
 
-        // Process regular dialogue response
-        var emotionMatch = Regex.Match(response, @"{\s*""emotion""\s*:\s*""(\w+)""\s*}");
-        string emotion = npcPersonality != null ? npcPersonality.defaultEmotion : "neutral";
-        string cleanResponse = response;
-
-        if (emotionMatch.Success)
-        {
-            emotion = emotionMatch.Groups[1].Value.ToLower();
-            cleanResponse = Regex.Replace(response, @"{\s*""emotion""\s*:\s*""\w+""\s*}", "").Trim();
-        }
-
-        // Validate the emotion is one of the allowed emotions
-        if (npcPersonality != null && npcPersonality.availableEmotions.Count > 0)
-        {
-            if (!npcPersonality.availableEmotions.Contains(emotion))
-            {
-                emotion = npcPersonality.defaultEmotion;
-            }
-        }
+        var (emotion, cleanResponse) = EmotionParser.Parse(response);
+        
+        if (npcPersonality != null && !npcPersonality.availableEmotions.Contains(emotion))
+            emotion = npcPersonality.defaultEmotion;
 
         UpdateAnimation(emotion);
         OnResponseProcessed?.Invoke(cleanResponse, emotion);
@@ -88,33 +54,21 @@ public class GeminiAccessor : MonoBehaviour
     {
         try
         {
-            // Parse JSON array of choices
-            List<string> choices = new List<string>();
+            response = response.Trim().TrimStart('[').TrimEnd(']');
+            string[] choices = response.Split(',');
             
-            // Simple JSON parsing for array of strings
-            string cleanResponse = response.Trim().TrimStart('[').TrimEnd(']');
-            string[] choiceParts = cleanResponse.Split(',');
+            List<string> cleanedChoices = new List<string>();
+            foreach (string choice in choices)
+            {
+                cleanedChoices.Add(choice.Trim().Trim('"', ' '));
+            }
             
-            foreach (string part in choiceParts)
-            {
-                string choice = part.Trim().Trim('"').Trim();
-                if (!string.IsNullOrEmpty(choice))
-                {
-                    choices.Add(choice);
-                }
-            }
-
-            // Fallback choices if parsing fails or no choices found
-            if (choices.Count == 0)
-            {
-                choices = GetDefaultChoices();
-            }
-
-            OnChoicesReceived?.Invoke(choices);
+            OnChoicesReceived?.Invoke(cleanedChoices.Count > 0 ? 
+                cleanedChoices : GetDefaultChoices());
         }
         catch (Exception e)
         {
-            Debug.LogError($"Error parsing choices response: {e.Message}");
+            Debug.LogError($"Choice parsing error: {e.Message}");
             OnChoicesReceived?.Invoke(GetDefaultChoices());
         }
     }
@@ -133,26 +87,24 @@ public class GeminiAccessor : MonoBehaviour
     private void UpdateAnimation(string emotion)
     {
         if (npcAnimator == null) return;
-
+        
         npcAnimator.ResetTrigger("Neutral");
-        npcAnimator.SetTrigger("Neutral");
-
-        switch (emotion.ToLower())
+        npcAnimator.ResetTrigger("Happy");
+        npcAnimator.ResetTrigger("Sad");
+        npcAnimator.ResetTrigger("Angry");
+        
+        npcAnimator.SetTrigger(emotion switch
         {
-            case "happy":
-                npcAnimator.ResetTrigger("Happy");
-                npcAnimator.SetTrigger("Happy");
-                break;
-            case "sad":
-                npcAnimator.ResetTrigger("Sad");
-                npcAnimator.SetTrigger("Sad");
-                break;
-            case "angry":
-                npcAnimator.ResetTrigger("Angry");
-                npcAnimator.SetTrigger("Angry");
-                break;
-        }
+            "happy" => "Happy",
+            "sad" => "Sad",
+            "angry" => "Angry",
+            _ => "Neutral"
+        });
     }
 
-    private void OnDestroy() => geminiAPI.OnResponseReceived -= ProcessResponse;
+    private void OnDestroy()
+    {
+        if (geminiAPI != null)
+            geminiAPI.OnResponseReceived -= ProcessResponse;
+    }
 }
