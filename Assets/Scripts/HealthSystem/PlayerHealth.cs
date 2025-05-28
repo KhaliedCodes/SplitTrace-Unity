@@ -1,11 +1,13 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PlayerHealth : MonoBehaviour ,IDamagable
+public class PlayerHealth : MonoBehaviour, IDamagable
 {
     [Header("Health Settings")]
     [SerializeField] private float maxHealth = 100f;
     [SerializeField] private Image healthBarFill;
+    [SerializeField] int HealthItemsAmount = 0;
+    [SerializeField] float HealAmount = 10f;
 
     public float Health { get; set; }
     public float MaxHealth { get => maxHealth; set => maxHealth = value; }
@@ -37,12 +39,32 @@ public class PlayerHealth : MonoBehaviour ,IDamagable
     private void UpdateHealthUI()
     {
         if (healthBarFill != null)
-            healthBarFill.transform.localScale = new Vector3(Health / MaxHealth, 1, 1); 
+            healthBarFill.transform.localScale = new Vector3(Health / MaxHealth, 1, 1);
     }
 
     private void Die()
     {
         Debug.Log("Player died.");
         // TODO: Handle death animation, game over screen, etc.
+    }
+
+    public void UpdateNumberOfHealthItem()
+    {
+        //Update health number Who player have
+        HealthItemsAmount += 1;
+    }
+
+    void IncreaseHealth()
+    {
+        if (Health < 100f)
+        {
+            if (HealthItemsAmount > 0)
+            {
+                Health += HealAmount;
+                HealthItemsAmount -= 1;
+                UpdateHealthUI();
+            }
+        }
+
     }
 }
