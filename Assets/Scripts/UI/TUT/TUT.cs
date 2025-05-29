@@ -71,10 +71,6 @@ public class TUT : MonoBehaviour
             OnTutorialStart("Enemy");
         } 
         
-        if(other.CompareTag ("Weapon"))
-        {
-            OnTutorialStart("Weapon");
-        }
     }
 
 

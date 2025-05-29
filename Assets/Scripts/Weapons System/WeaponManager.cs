@@ -25,6 +25,9 @@ public class WeaponManager : MonoBehaviour
     PlayerAnimations playerAnimations;
     int totalAmmo;
 
+    //TUT Script
+    [SerializeField] TUT WeaponTut;
+
     private void Awake()
     {
         
@@ -91,6 +94,9 @@ public class WeaponManager : MonoBehaviour
     private void OnPickup(InputAction.CallbackContext context)
     {
         TryPickupNearbyWeapon();
+
+        WeaponTut.OnTutorialStart("Weapon");
+
     }
 
     private void TryPickupNearbyWeapon()
