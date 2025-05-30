@@ -95,12 +95,10 @@ public class Dodge : MonoBehaviour
         isDodging = true;
         isInvulnerable = true;
 
-        Debug.Log("Dodge started");
 
         // Use jump animation for dodge start
         if (_hasAnimator)
         {
-            Debug.Log("Animator found, setting dodge animation");
             _animator.SetBool(_animIDJump, true);
             _animator.SetBool(_animIDFreeFall, false);
         }
@@ -146,7 +144,6 @@ public class Dodge : MonoBehaviour
         // Define the height parameters for the dodge arc
         float maxHeight = 0.5f; // Maximum height of the jump during dodge
 
-        Debug.Log("Dodge direction: " + dodgeDirection + ", distance: " + dodgeDistance);
 
         // Execute the dodge movement over time
         float timeElapsed = 0f;
@@ -216,7 +213,6 @@ public class Dodge : MonoBehaviour
             _animator.SetBool(_animIDFreeFall, false);
         }
 
-        Debug.Log("Dodge movement completed");
 
         // End invulnerability frames after specified time (but don't make it negative)
         float remainingInvulnerabilityTime = Mathf.Max(0, dodgeInvulnerabilityTime - dodgeDuration);
@@ -235,7 +231,6 @@ public class Dodge : MonoBehaviour
 
         // End dodge state
         isDodging = false;
-        Debug.Log("Dodge fully completed");
     }
 
     // Method that can be called by other scripts to check if player is invulnerable

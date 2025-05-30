@@ -23,7 +23,6 @@ public class NPCController : MonoBehaviour
         if (dialogueManager != null)
         {
             interactionIndicator = dialogueManager.gameObject;
-            Debug.Log("found in scene.");
         }
         else
         {
