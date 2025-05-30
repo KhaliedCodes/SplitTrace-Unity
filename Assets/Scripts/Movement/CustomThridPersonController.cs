@@ -105,6 +105,10 @@ public class CustomThridPersonController : MonoBehaviour
     private CustomStarterAssetsInputs _input;
     private Dodge _dodge;
     private GameObject _mainCamera;
+    [Header("Enemy Lock-On")]
+    private AutoLookAtNearestEnemy _autoLook;
+    public Transform enemyTarget => _autoLook != null ? _autoLook.currentTarget : null;
+    public bool lockOnToEnemy => _autoLook != null && _autoLook.isLockedOn;
 
     private const float _threshold = 0.01f;
 
@@ -112,6 +116,7 @@ public class CustomThridPersonController : MonoBehaviour
 
     // UI reference for dodge cooldown indicator (optional)
     public UnityEngine.UI.Image dodgeCooldownIndicator;
+ 
 
     private bool IsCurrentDeviceMouse
     {
@@ -150,6 +155,7 @@ public class CustomThridPersonController : MonoBehaviour
         _hasAnimator = TryGetComponent(out _animator);
         _controller = GetComponent<CharacterController>();
         _input = GetComponent<CustomStarterAssetsInputs>();
+        _autoLook = GetComponent<AutoLookAtNearestEnemy>();
         _dodge = GetComponent<Dodge>();
 
 #if ENABLE_INPUT_SYSTEM
@@ -170,7 +176,7 @@ public class CustomThridPersonController : MonoBehaviour
         _hasAnimator = TryGetComponent(out _animator);
 
         _dodge.HandleDodge();
-        JumpAndGravity();
+        // JumpAndGravity();
         GroundedCheck();
 
         // Only run movement logic if not dodging
@@ -286,85 +292,130 @@ public class CustomThridPersonController : MonoBehaviour
         // if there is a move input rotate player when the player is moving
         if (_input.move != Vector2.zero)
         {
-            _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg +
-                              _mainCamera.transform.eulerAngles.y;
-            float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity,
-                RotationSmoothTime);
+            // Different handling depending on whether locked onto an enemy or not
+            Vector3 targetDirection;
 
-            // rotate to face input direction relative to camera position
-            transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
-        }
+            if (lockOnToEnemy && enemyTarget != null)
+            {
+                // When locked on to an enemy, ALWAYS face the enemy regardless of movement direction
+                Vector3 lookDirection = enemyTarget.position - transform.position;
+                lookDirection.y = 0f; // Ignore vertical difference
+                Quaternion targetRotation = Quaternion.LookRotation(lookDirection);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10f);
 
+                // Create a movement direction that's perpendicular to the look direction when moving left/right
+                Vector3 forward = transform.forward;    // Points at the enemy since we've rotated to face them
+                Vector3 right = transform.right;        // Perpendicular to forward (strafe direction)
 
-        Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
+                // Combine the inputs to create a movement vector relative to where the player is facing
+                // For standard Unity input settings:
+                // x = horizontal = left/right
+                // y = vertical = forward/back
+                targetDirection = right * _input.move.x + forward * _input.move.y;
 
-        // move the player
-        _controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) +
-                         new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
+                // Normalize the direction to ensure consistent speed in all directions
+                if (targetDirection.magnitude > 0.1f)
+                {
+                    targetDirection.Normalize();
+                }
+            }
+            else
+            {
+                // Normal movement (not locked on)
+                _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg +
+                                  _mainCamera.transform.eulerAngles.y;
+                float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity,
+                    RotationSmoothTime);
 
-        // update animator if using character
-        if (_hasAnimator)
-        {
-            _animator.SetFloat(_animIDSpeed, _animationBlend);
-            _animator.SetFloat(_animIDMotionSpeed, inputMagnitude);
-        }
-    }
+                transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
 
-    private void JumpAndGravity()
-    {
-        if (Grounded)
-        {
-            // reset the fall timeout timer
-            _fallTimeoutDelta = FallTimeout;
+                // Move in the direction we're facing
+                targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
+            }
+
+            // Apply gravity
+            if (Grounded)
+            {
+                // reset the fall timeout timer
+                _fallTimeoutDelta = FallTimeout;
+
+                // update animator if using character
+                if (_hasAnimator)
+                {
+                    _animator.SetBool(_animIDJump, false);
+                    _animator.SetBool(_animIDFreeFall, false);
+                }
+
+                // stop our velocity dropping infinitely when grounded
+                if (_verticalVelocity < 0.0f)
+                {
+                    _verticalVelocity = -2f;
+                }
+            }
+            else
+            {
+                // fall timeout
+                if (_fallTimeoutDelta >= 0.0f)
+                {
+                    _fallTimeoutDelta -= Time.deltaTime;
+                }
+                else
+                {
+                    // update animator if using character
+                    if (_hasAnimator)
+                    {
+                        _animator.SetBool(_animIDFreeFall, true);
+                    }
+                }
+            }
+
+            // apply gravity over time if under terminal (multiply by delta time twice to linearly speed up over time)
+            if (_verticalVelocity < _terminalVelocity)
+            {
+                _verticalVelocity += Gravity * Time.deltaTime;
+            }
+
+            // move the player
+            _controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) +
+                             new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
 
             // update animator if using character
             if (_hasAnimator)
             {
-                _animator.SetBool(_animIDJump, false);
-                _animator.SetBool(_animIDFreeFall, false);
-            }
-
-            // stop our velocity dropping infinitely when grounded
-            if (_verticalVelocity < 0.0f)
-            {
-                _verticalVelocity = -2f;
-            }
-
-            // jump timeout
-            if (_jumpTimeoutDelta >= 0.0f)
-            {
-                _jumpTimeoutDelta -= Time.deltaTime;
+                _animator.SetFloat(_animIDSpeed, _animationBlend);
+                _animator.SetFloat(_animIDMotionSpeed, inputMagnitude);
             }
         }
         else
         {
-            // reset the jump timeout timer
-            _jumpTimeoutDelta = JumpTimeout;
-
-            // fall timeout
-            if (_fallTimeoutDelta >= 0.0f)
+            // Handle vertical movement/gravity when not moving horizontally
+            if (Grounded)
             {
-                _fallTimeoutDelta -= Time.deltaTime;
+                if (_verticalVelocity < 0.0f)
+                {
+                    _verticalVelocity = -2f;
+                }
             }
             else
             {
-                // update animator if using character
-                if (_hasAnimator)
+                if (_verticalVelocity < _terminalVelocity)
                 {
-                    _animator.SetBool(_animIDFreeFall, true);
+                    _verticalVelocity += Gravity * Time.deltaTime;
                 }
+
+                // Only apply vertical velocity when not moving horizontally
+                _controller.Move(new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
             }
 
-            // if we are not grounded, do not jump
-            _input.jump = false;
-        }
-
-        // apply gravity over time if under terminal (multiply by delta time twice to linearly speed up over time)
-        if (_verticalVelocity < _terminalVelocity)
-        {
-            _verticalVelocity += Gravity * Time.deltaTime;
+            // Update animator
+            if (_hasAnimator)
+            {
+                _animator.SetFloat(_animIDSpeed, 0);
+                _animator.SetFloat(_animIDMotionSpeed, 0);
+            }
         }
     }
+
 
     private static float ClampAngle(float lfAngle, float lfMin, float lfMax)
     {
