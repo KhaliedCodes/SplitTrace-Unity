@@ -11,6 +11,9 @@ public class UiManager : MonoBehaviour
     [SerializeField] private TMP_Text tutorialText;
     [SerializeField] private GameObject TutCollider;
 
+
+    [Header("UI Collectable")]
+    [SerializeField] GameObject collectablUi;
     private bool isTutorialActive = false;
 
 
@@ -86,6 +89,13 @@ public class UiManager : MonoBehaviour
         Debug.Log("Prefs Reset");
         PlayerPrefs.DeleteAll(); 
         PlayerPrefs.Save();
+    }
+    public void DisplayPickUp() {
+        collectablUi.SetActive(true);
+    }
+    public void ClosePickUpPanel()
+    {
+        collectablUi.SetActive(false);
     }
 
 }

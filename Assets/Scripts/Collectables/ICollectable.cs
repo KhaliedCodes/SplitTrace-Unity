@@ -12,5 +12,8 @@ public interface ICollectable
     Category _Category { get; }
 
     void UpdateState(Category category);
+
+    void CallingUIHint();
+    void HideUIHint();
 }
 

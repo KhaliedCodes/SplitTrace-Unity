@@ -33,13 +33,26 @@ public class HealthItem : MonoBehaviour, ICollectable
     private void OnTriggerEnter(Collider other)
     {
         if (other.tag =="Player"){
-            
-            other.gameObject.GetComponent<PlayerHealth>().UpdateNumberOfHealthItem();
+            CallingUIHint();
+            if (Input.GetKey(KeyCode.E)) {
 
-            gameObject.SetActive(false);
+                other.gameObject.GetComponent<PlayerHealth>().UpdateNumberOfHealthItem();
+                gameObject.SetActive(false);
+                HideUIHint();
+            }
 
             //play Sound Collect
 
         }
+    }
+
+    public void CallingUIHint()
+    {
+        UiManager.Instance.DisplayPickUp();
+    }
+
+    public void HideUIHint()
+    {
+        UiManager.Instance.ClosePickUpPanel();
     }
 }

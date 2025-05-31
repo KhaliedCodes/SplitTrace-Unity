@@ -30,11 +30,25 @@ public class AmmoItem : MonoBehaviour, ICollectable
     {
         if (other.tag == "Player") {
 
-            other.GetComponent<WeaponManager>().UpdateAmmo(itemAmount);
+            CallingUIHint();
+            if (Input.GetKey(KeyCode.E)) { 
+                other.GetComponent<WeaponManager>().UpdateAmmo(itemAmount);
+                //play Sound Collect
+                gameObject.SetActive(false);
+                HideUIHint();
+            }
 
-            gameObject.SetActive(false);
-
-            //play Sound Collect
+            
         }
+    }
+
+    public void CallingUIHint()
+    {
+        UiManager.Instance.DisplayPickUp();
+    }
+
+    public void HideUIHint()
+    {
+        UiManager.Instance.ClosePickUpPanel();
     }
 }

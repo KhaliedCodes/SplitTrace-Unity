@@ -23,8 +23,22 @@ public class LogItem : MonoBehaviour, ICollectable
     {
         if (other.tag == "Player")
         {
-            gameObject.SetActive(false);
-            other.GetComponent<LogsSystem>().Logs.Add(this);
+            CallingUIHint();
+            if (Input.GetKey(KeyCode.E)) { 
+                gameObject.SetActive(false);
+                other.GetComponent<LogsSystem>().Logs.Add(this);
+                HideUIHint();
+            }
         }
+    }
+
+    public void CallingUIHint()
+    {
+        UiManager.Instance.DisplayPickUp();
+    }
+
+    public void HideUIHint()
+    {
+        UiManager.Instance.ClosePickUpPanel();
     }
 }
