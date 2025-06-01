@@ -8,7 +8,7 @@ public class HealthItem : MonoBehaviour, ICollectable
     public int      Id { get { return id; } }
     public string   Name { get;  }
     public Category _Category { get { return category; } }
-
+    bool collectingProcess, thereExistItem;
 
 
 
@@ -24,7 +24,12 @@ public class HealthItem : MonoBehaviour, ICollectable
     // Update is called once per frame
     void Update()
     {
-        
+        if (Input.GetKey(KeyCode.E)&& thereExistItem) {
+            collectingProcess=true;
+            thereExistItem=false;
+
+
+        }
     }
     public void UpdateState(Category _category)
     {
@@ -33,8 +38,9 @@ public class HealthItem : MonoBehaviour, ICollectable
     private void OnTriggerEnter(Collider other)
     {
         if (other.tag =="Player"){
+            thereExistItem=true;
             CallingUIHint();
-            if (Input.GetKey(KeyCode.E)) {
+            if (collectingProcess) {
 
                 other.gameObject.GetComponent<PlayerHealth>().UpdateNumberOfHealthItem();
                 gameObject.SetActive(false);
@@ -44,6 +50,11 @@ public class HealthItem : MonoBehaviour, ICollectable
             //play Sound Collect
 
         }
+    }
+    private void OnTriggerExit(Collider other)
+    {
+        HideUIHint();
+
     }
 
     public void CallingUIHint()

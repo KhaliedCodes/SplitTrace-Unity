@@ -130,4 +130,9 @@ public class PlayerController : MonoBehaviour
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(transform.position, interactionRadius);
     }
+
+    public void OnCollect() { 
+        playerInput.enabled=false;
+    
+    }
 }
