@@ -7,12 +7,31 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
 
+
+[Serializable]
+    public struct Content
+    {
+        public string role;
+        public List<Part> parts;
+    }
+
+    [Serializable]
+    public struct Part
+    {
+        public string text;
+    }
+
+    [Serializable]
+    public struct GenerationConfig
+    {
+        public string responseMimeType;
+    }
 public class GeminiAPIClient : MonoBehaviour
 {
     public enum ResponseMimeType { PlainText, Json }
 
     private const string BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models/";
-    private const string CHOICE_PROMPT = "Based on our conversation, provide 3-4 appropriate dialogue choices for the player. " +
+    private const string CHOICE_PROMPT = "Based on our chat history provide 3-4 appropriate dialogue choices for the player. " +
                                        "Format your response as a JSON array of strings, like: [\"Choice 1\", \"Choice 2\", \"Choice 3\"]. " +
                                        "Keep choices concise and relevant to the conversation context. " + "two of the choices must be extremely aggressive";
 
@@ -38,26 +57,6 @@ public class GeminiAPIClient : MonoBehaviour
         public Content systemInstruction;
         public GenerationConfig generationConfig;
     }
-
-    [Serializable]
-    public struct Content
-    {
-        public string role;
-        public List<Part> parts;
-    }
-
-    [Serializable]
-    public struct Part
-    {
-        public string text;
-    }
-
-    [Serializable]
-    public struct GenerationConfig
-    {
-        public string responseMimeType;
-    }
-
     public void SetSystemInstructions(string instructions)
     {
         _systemInstructions = instructions;
