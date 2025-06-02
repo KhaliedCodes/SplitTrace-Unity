@@ -13,7 +13,5 @@ public interface ICollectable
 
     void UpdateState(Category category);
 
-    void CallingUIHint();
-    void HideUIHint();
 }
 

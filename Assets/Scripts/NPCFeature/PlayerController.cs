@@ -20,6 +20,7 @@ public class PlayerController : MonoBehaviour
     private float lastInteractionTime;
     private bool isInDialogue = false;
     public bool IsInDialogue => isInDialogue;
+    bool collectingProcess, thereExistItem;
 
     private void Start()
     {
@@ -134,5 +135,59 @@ public class PlayerController : MonoBehaviour
     public void OnCollect() { 
         playerInput.enabled=false;
     
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.tag == "Health")
+        {
+            thereExistItem = true;
+            CallingUIHint();
+            if (collectingProcess)
+            {
+                gameObject.GetComponent<PlayerHealth>().UpdateNumberOfHealthItem();
+                other.gameObject.SetActive(false);
+                HideUIHint();
+            }
+        }
+        if (other.tag == "Ammo")
+        {
+            thereExistItem = true;
+            CallingUIHint();
+            if (collectingProcess)
+            {
+                gameObject.GetComponent<WeaponManager>().UpdateAmmo(other.gameObject.GetComponent<AmmoItem>().ItemAmount);
+                other.gameObject.SetActive(false);
+                HideUIHint();
+            }
+        }
+        if (other.tag == "Log") {
+
+            thereExistItem = true;
+            CallingUIHint();
+            if (collectingProcess)
+            {
+                gameObject.GetComponent<LogsSystem>().Logs.Add(other.gameObject.GetComponent<LogItem>());
+                other.gameObject.SetActive(false);
+                HideUIHint();
+                collectingProcess = false;
+            }
+        }
+
+    }
+    private void OnTriggerExit(Collider other)
+    {
+        HideUIHint();
+
+    }
+
+    public void CallingUIHint()
+    {
+        UiManager.Instance.DisplayPickUp();
+    }
+
+    public void HideUIHint()
+    {
+        UiManager.Instance.ClosePickUpPanel();
     }
 }
