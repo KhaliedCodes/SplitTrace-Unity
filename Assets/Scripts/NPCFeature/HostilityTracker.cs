@@ -9,7 +9,7 @@ public class HostilityTracker
     public bool canBecomeEnemy = true;
     public int hostilityThreshold = 3;
     public float hostilityDecayRate = 0.1f;
-    public float decayInterval = 5f; // Seconds between decay checks
+    public float decayInterval = 5f; 
     public string[] hostileTriggerWords = { "threaten", "attack", "kill", "hurt", "fight", "enemy", "hate" };
     public string[] peacefulTriggerWords = { "sorry", "peace", "friend", "help", "apologize", "calm" };
 
@@ -49,7 +49,6 @@ public class HostilityTracker
 
         string lowerText = text.ToLower();
         bool foundHostile = false;
-        bool foundPeaceful = false;
 
         foreach (string word in hostileTriggerWords)
         {
@@ -69,7 +68,7 @@ public class HostilityTracker
                 if (lowerText.Contains(word))
                 {
                     currentHostility = Mathf.Max(0, currentHostility - 0.5f);
-                    foundPeaceful = true;
+
                     break;
                 }
             }

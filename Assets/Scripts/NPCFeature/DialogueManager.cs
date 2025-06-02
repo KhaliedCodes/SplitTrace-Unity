@@ -25,13 +25,6 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private float typingSpeed = 0.05f;
     [SerializeField] private AudioSource typingSoundEffect;
     [SerializeField] private bool useTypewriterEffect = true;
-
-    [Header("Emotion Expressions")]
-    [SerializeField] private Sprite neutralExpression;
-    [SerializeField] private Sprite happyExpression;
-    [SerializeField] private Sprite sadExpression;
-    [SerializeField] private Sprite angryExpression;
-
     private PlayerController playerController;
     private NPCController currentNPC;
     private Coroutine typingCoroutine;
@@ -53,7 +46,6 @@ public class DialogueManager : MonoBehaviour
     {
         dialoguePanel?.SetActive(false);
         endConversationButton?.onClick.AddListener(EndDialogue);
-        if (npcPortrait != null) npcPortrait.sprite = neutralExpression;
         FindPlayerController();
         InitializeChoiceButtons();
     }
@@ -65,7 +57,6 @@ public class DialogueManager : MonoBehaviour
         if (Keyboard.current.escapeKey.wasPressedThisFrame)
         {
             EndDialogue();
-            Debug.Log("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
         }
 
         HandleNumberKeySelection();
@@ -211,7 +202,7 @@ private void SetupDynamicScalingButton(GameObject buttonObj, int index)
 
         // Outline settings
         buttonText.fontMaterial.EnableKeyword("OUTLINE_ON");
-        buttonText.outlineColor = new Color32(255, 0, 0, 255); // Black outline
+        buttonText.outlineColor = new Color32(255, 0, 0, 255); 
         buttonText.outlineWidth = 0.01f;
 
         // Ensure text fills the button properly
@@ -220,7 +211,7 @@ private void SetupDynamicScalingButton(GameObject buttonObj, int index)
         {
             textRect.anchorMin = Vector2.zero;
             textRect.anchorMax = Vector2.one;
-            textRect.offsetMin = new Vector2(15, 5); // More horizontal padding
+            textRect.offsetMin = new Vector2(15, 5); 
             textRect.offsetMax = new Vector2(-15, -5);
         }
 
@@ -230,28 +221,6 @@ private void SetupDynamicScalingButton(GameObject buttonObj, int index)
             colorChanger = buttonObj.AddComponent<TMPButtonTextColorChanger>();
         }
         colorChanger.text = buttonText;
-        // Set up color transitions for hover/selected
-
-        /*
-    Color normalColor = new Color(1f, 1f, 1f);             // White
-    Color highlightedColor = new Color(0.85f, 0.85f, 1f);  // Light blue
-    Color pressedColor = new Color(0.7f, 0.7f, 1f);        // Darker blue
-    Color selectedColor = new Color(0.9f, 0.9f, 1f);       // Slightly different
-
-    ColorBlock colors = buttonComponent.colors;
-    colors.normalColor = normalColor;
-    colors.highlightedColor = highlightedColor;
-    colors.pressedColor = pressedColor;
-    colors.selectedColor = selectedColor;
-    colors.disabledColor = new Color(0.5f, 0.5f, 0.5f);
-    colors.colorMultiplier = 1f;
-    colors.fadeDuration = 0.1f;
-    buttonComponent.colors = colors;
-
-    // Set TMP text as the target graphic so the text color responds to state
-    buttonComponent.targetGraphic = buttonText;
-    buttonText.raycastTarget = true; // Ensure it's interactable
-    */
     }
     else
     {
@@ -260,8 +229,8 @@ private void SetupDynamicScalingButton(GameObject buttonObj, int index)
 
     choiceButtons.Add(buttonComponent);
 
-    // Set up button click listener
-    int choiceIndex = index; // Capture the index for the closure
+    
+    int choiceIndex = index; 
     buttonComponent.onClick.AddListener(() => OnChoiceSelected(choiceIndex));
 }
 
@@ -272,7 +241,6 @@ private void SetupDynamicScalingButton(GameObject buttonObj, int index)
         dialoguePanel.SetActive(true);
         currentNPC = npc;
         npcNameText.text = npc.NPCName;
-        npcPortrait.sprite = neutralExpression;
         isDialogueActive = true;
 
         chatHistoryText.text = "";
@@ -285,13 +253,13 @@ private void SetupDynamicScalingButton(GameObject buttonObj, int index)
 
     public void EndDialogue()
 {
-    // Only proceed if we're in an active dialogue
+   
     if (!isDialogueActive) return;
     
     dialoguePanel.SetActive(false);
     
-    // Clear references without triggering NPCController's EndInteraction
-    currentNPC?.OnDialogueEnded();  // New method in NPCController
+   
+    currentNPC?.OnDialogueEnded(); 
     currentNPC = null;
     
     isDialogueActive = false;
@@ -321,7 +289,7 @@ private void SetupDynamicScalingButton(GameObject buttonObj, int index)
         if (string.IsNullOrEmpty(dialogue)) return;
 
         var (emotion, displayText) = EmotionParser.Parse(dialogue);
-        UpdateNPCExpression(emotion);
+
 
         if (useTypewriterEffect)
         {
@@ -345,20 +313,6 @@ private void SetupDynamicScalingButton(GameObject buttonObj, int index)
         yield return new WaitForSeconds(0.5f);
         currentNPC?.RequestDialogueChoices();
     }
-
-    private void UpdateNPCExpression(string emotion)
-    {
-        if (npcPortrait == null) return;
-
-        npcPortrait.sprite = emotion switch
-        {
-            "happy" => happyExpression,
-            "sad" => sadExpression,
-            "angry" => angryExpression,
-            _ => neutralExpression
-        };
-    }
-
     private IEnumerator TypeDialogue(string text)
     {
         dialogueText.text = "";

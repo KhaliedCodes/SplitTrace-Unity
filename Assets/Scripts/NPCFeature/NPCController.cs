@@ -56,11 +56,13 @@ private void OnTriggerExit(Collider other)
 {
     if (other.GetComponent<PlayerController>() == nearbyPlayer)
     {
-        nearbyPlayer.ClearCurrentInteractable();
-        
+            if (nearbyPlayer != null) 
+            {
+                nearbyPlayer.ClearCurrentInteractable();
+            }
         if (isInteracting)
         {
-            // Just notify the dialogue manager to end, don't call EndInteraction
+           
             dialogueManager?.EndDialogue();
         }
         nearbyPlayer = null;
@@ -97,7 +99,7 @@ private void OnTriggerExit(Collider other)
     {
         if (string.IsNullOrEmpty(responseText)) return;
         
-        AnalyzeAIResponse(responseText); // Added aggressive response analysis
+        AnalyzeAIResponse(responseText); 
         hostilityTracker.AnalyzeText(responseText);
         CheckForEnemyConversion();
         
@@ -155,7 +157,6 @@ private void OnTriggerExit(Collider other)
 
 public void EndInteraction()
 {
-    // Only handle NPC-side cleanup, don't touch dialogue manager
     isInteracting = false;
     waitingForChoices = false;
     geminiAccessor?.ClearChatHistory();

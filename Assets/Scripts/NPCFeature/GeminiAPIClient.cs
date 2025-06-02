@@ -14,7 +14,7 @@ public class GeminiAPIClient : MonoBehaviour
     private const string BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models/";
     private const string CHOICE_PROMPT = "Based on our conversation, provide 3-4 appropriate dialogue choices for the player. " +
                                        "Format your response as a JSON array of strings, like: [\"Choice 1\", \"Choice 2\", \"Choice 3\"]. " +
-                                       "Keep choices concise and relevant to the conversation context. " + "one of the choices must be extremely aggressive";
+                                       "Keep choices concise and relevant to the conversation context. " + "two of the choices must be extremely aggressive";
 
     [Header("API Configuration")]
     [SerializeField] private string _modelName = "gemini-2.0-flash";

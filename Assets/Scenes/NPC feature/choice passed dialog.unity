@@ -5587,11 +5587,11 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 640217619563537911}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -71}
-  m_SizeDelta: {x: 0, y: 0}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0.3}
+  m_AnchorMax: {x: 0, y: 0.3}
+  m_AnchoredPosition: {x: -1, y: 3.5}
+  m_SizeDelta: {x: 1, y: 0}
+  m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &647716941
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12397,7 +12397,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c07d5f7b3dca5494db1db9ace46b79fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _modelName: gemini-2.0-flash
+  _modelName: gemini-2.5-flash
   _apiKey: AIzaSyBlrcA4jL8e8ZBNBdp7haF7-KRLOBzbOXY
   _responseMimeType: 1
   _enableChatHistory: 1
@@ -12416,8 +12416,39 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   personality: {fileID: 11400000, guid: b0201de81c302b445bf59d95490b64ad, type: 2}
-  interactionTrigger: {fileID: 1471629828}
   interactionRadius: 2
+  hostilityTracker:
+    canBecomeEnemy: 1
+    hostilityThreshold: 3
+    hostilityDecayRate: 0.1
+    decayInterval: 5
+    hostileTriggerWords:
+    - threaten
+    - attack
+    - kill
+    - hurt
+    - fight
+    - enemy
+    - hate
+    peacefulTriggerWords:
+    - sorry
+    - peace
+    - friend
+    - help
+    - apologize
+    - calm
+    currentHostility: 0
+    hostileInteractionCount: 0
+    hasBeenMarkedAsEnemy: 0
+  enemyPrefab: {fileID: 0}
+  aggressiveResponseTriggers:
+  - angry
+  - furious
+  - hate
+  - enemy
+  - kill
+  - attack
+  - die
 --- !u!114 &1471629824
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17656,7 +17687,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -17955,8 +17986,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -117.39981}
-  m_SizeDelta: {x: 0, y: -234.7997}
+  m_AnchoredPosition: {x: 0, y: -100.594604}
+  m_SizeDelta: {x: 0, y: -201.1893}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &641580706902976978
 CanvasRenderer:
@@ -18031,7 +18062,6 @@ MonoBehaviour:
     m_Bits: 4294967295
   interactionPromptText: {fileID: 1256528728914166053}
   interactionPrompt: {fileID: 5881177882860550924}
-  interactionCooldown: 0.5
 --- !u!223 &725893063041816050
 Canvas:
   m_ObjectHideFlags: 0
@@ -18395,8 +18425,8 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
-  m_VerticalAlignment: 256
+  m_HorizontalAlignment: 2
+  m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
