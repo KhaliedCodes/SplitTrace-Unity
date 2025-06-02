@@ -209,7 +209,6 @@ public class WeaponManager : MonoBehaviour
             {
                 ammoText.enabled = true;
                 RangedWeapon rw = (RangedWeapon)currentWeapon;
-                Debug.Log($"Ammo: {rw.ammoInMagazine}/{rw.totalAmmo}");
                 ammoText.text = $"Current Ammo: {rw.ammoInMagazine} / {rw.totalAmmo}";
             }
             else 
