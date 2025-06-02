@@ -25,7 +25,6 @@ public class RangedWeapon : Weapon
             ammoInMagazine--;
             lastFireTime = Time.time;
 
-            Debug.Log("Fired! Remaining ammo: " + ammoInMagazine);
         }
         else
         {
@@ -48,7 +47,6 @@ public class RangedWeapon : Weapon
                 ammoInMagazine += totalAmmo;
                 totalAmmo = 0;
             }
-            Debug.Log("Reloaded! Current ammo: " + ammoInMagazine);
         }
         else
         {
