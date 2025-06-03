@@ -16,10 +16,7 @@ public class PlayerAnimations : MonoBehaviour
         if (animator) animator.SetTrigger(anim);
         
     }
-    public void PistolAim(bool val )
-    {
-        if (animator) animator.SetBool("Aim",val);
-    }
+   
 
 
 }

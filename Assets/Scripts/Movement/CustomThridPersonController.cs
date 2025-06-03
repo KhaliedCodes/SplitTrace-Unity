@@ -1,4 +1,4 @@
-using StarterAssets;
+﻿using StarterAssets;
 using UnityEngine;
 using System.Collections;
 using UnityEngine.InputSystem;
@@ -109,6 +109,7 @@ public class CustomThridPersonController : MonoBehaviour
     private const float _threshold = 0.01f;
 
     private bool _hasAnimator;
+    private bool _rotateOnMove = true;
 
     // UI reference for dodge cooldown indicator (optional)
     public UnityEngine.UI.Image dodgeCooldownIndicator;
@@ -284,6 +285,15 @@ public class CustomThridPersonController : MonoBehaviour
 
         // note: Vector2's != operator uses approximation so is not floating point error prone, and is cheaper than magnitude
         // if there is a move input rotate player when the player is moving
+
+        //if (WeaponManager.Instance != null && WeaponManager.Instance.IsAiming)
+        //{
+        //    // 👇 Directly face camera forward
+        //    float cameraY = _mainCamera.transform.eulerAngles.y ;
+        //    float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, cameraY, ref _rotationVelocity, RotationSmoothTime);
+        //    transform.rotation = Quaternion.Euler(5.0f, rotation, 0.0f);
+        //}
+        //else
         if (_input.move != Vector2.zero)
         {
             _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg +
@@ -292,7 +302,8 @@ public class CustomThridPersonController : MonoBehaviour
                 RotationSmoothTime);
 
             // rotate to face input direction relative to camera position
-            transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
+            if (_rotateOnMove)
+                transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
         }
 
 
@@ -350,5 +361,10 @@ public class CustomThridPersonController : MonoBehaviour
         {
             AudioSource.PlayClipAtPoint(LandingAudioClip, transform.TransformPoint(_controller.center), FootstepAudioVolume);
         }
+    }
+
+    public void SetRotateOnMove(bool rotate)
+    {
+        _rotateOnMove = rotate;
     }
 }
