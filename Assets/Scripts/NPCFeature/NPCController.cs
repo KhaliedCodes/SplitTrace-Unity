@@ -8,7 +8,6 @@ public class NPCController : MonoBehaviour
 
     [Header("Enemy Conversion")]
     [SerializeField] private HostilityTracker hostilityTracker;
-    [SerializeField] private GameObject enemyPrefab;
     [SerializeField] private string[] aggressiveResponseTriggers = 
         { "angry", "furious", "hate", "enemy", "kill", "attack", "die" };
 
@@ -138,13 +137,9 @@ private void OnTriggerExit(Collider other)
 
     private void ConvertToEnemy()
     {
-        if (enemyPrefab != null)
-            Instantiate(enemyPrefab, transform.position, transform.rotation);
-        else
-            Debug.LogError("Enemy prefab not assigned for conversion!");
-
-        EndInteraction();
-        Destroy(gameObject);
+      Debug.Log($"[ENEMY CONVERSION] {NPCName} has become hostile!");
+        dialogueManager?.DisplayNPCDialogue($"{NPCName} has turned against you!");
+    
     }
 
     public void OnDialogueEnded()
