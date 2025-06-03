@@ -137,8 +137,9 @@ private void OnTriggerExit(Collider other)
 
     private void ConvertToEnemy()
     {
-      Debug.Log($"[ENEMY CONVERSION] {NPCName} has become hostile!");
+        Debug.Log($"[ENEMY CONVERSION] {NPCName} has become hostile!");
         dialogueManager?.DisplayNPCDialogue($"{NPCName} has turned against you!");
+        dialogueManager.EndDialogue();
     
     }
 

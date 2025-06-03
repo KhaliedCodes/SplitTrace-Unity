@@ -12397,7 +12397,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c07d5f7b3dca5494db1db9ace46b79fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _modelName: gemini-2.5-flash
+  _modelName: gemini-2.0-flash
   _apiKey: AIzaSyBlrcA4jL8e8ZBNBdp7haF7-KRLOBzbOXY
   _responseMimeType: 1
   _enableChatHistory: 1
@@ -12440,7 +12440,6 @@ MonoBehaviour:
     currentHostility: 0
     hostileInteractionCount: 0
     hasBeenMarkedAsEnemy: 0
-  enemyPrefab: {fileID: 0}
   aggressiveResponseTriggers:
   - angry
   - furious
@@ -22628,10 +22627,6 @@ MonoBehaviour:
   typingSpeed: 0.05
   typingSoundEffect: {fileID: 0}
   useTypewriterEffect: 1
-  neutralExpression: {fileID: 1573701562, guid: 1708623bd21f1f84d8495f2ed28de371, type: 3}
-  happyExpression: {fileID: 1573701562, guid: 1708623bd21f1f84d8495f2ed28de371, type: 3}
-  sadExpression: {fileID: 1573701562, guid: 1708623bd21f1f84d8495f2ed28de371, type: 3}
-  angryExpression: {fileID: 1573701562, guid: 1708623bd21f1f84d8495f2ed28de371, type: 3}
 --- !u!1 &7927561249601141021
 GameObject:
   m_ObjectHideFlags: 0
@@ -22764,6 +22759,7 @@ MonoBehaviour:
   ammoText: {fileID: 206714494849389300}
   rangedIconUI: {fileID: 2244533583538008830}
   meleeIconUI: {fileID: 4523599414858451362}
+  WeaponTut: {fileID: 0}
 --- !u!1 &8167576148454893072
 GameObject:
   m_ObjectHideFlags: 0
