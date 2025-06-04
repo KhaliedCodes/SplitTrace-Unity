@@ -8,7 +8,6 @@ public class NPCController : MonoBehaviour
 
     [Header("Enemy Conversion")]
     [SerializeField] private HostilityTracker hostilityTracker;
-    [SerializeField] private GameObject enemyPrefab;
     [SerializeField] private string[] aggressiveResponseTriggers = 
         { "angry", "furious", "hate", "enemy", "kill", "attack", "die" };
 
@@ -56,11 +55,13 @@ private void OnTriggerExit(Collider other)
 {
     if (other.GetComponent<PlayerController>() == nearbyPlayer)
     {
-        nearbyPlayer?.ClearCurrentInteractable();
-        
+            if (nearbyPlayer != null) 
+            {
+                nearbyPlayer.ClearCurrentInteractable();
+            }
         if (isInteracting)
         {
-            // Just notify the dialogue manager to end, don't call EndInteraction
+           
             dialogueManager?.EndDialogue();
         }
         nearbyPlayer = null;
@@ -97,7 +98,7 @@ private void OnTriggerExit(Collider other)
     {
         if (string.IsNullOrEmpty(responseText)) return;
         
-        AnalyzeAIResponse(responseText); // Added aggressive response analysis
+        AnalyzeAIResponse(responseText); 
         hostilityTracker.AnalyzeText(responseText);
         CheckForEnemyConversion();
         
@@ -136,13 +137,10 @@ private void OnTriggerExit(Collider other)
 
     private void ConvertToEnemy()
     {
-        if (enemyPrefab != null)
-            Instantiate(enemyPrefab, transform.position, transform.rotation);
-        else
-            Debug.LogError("Enemy prefab not assigned for conversion!");
-
-        EndInteraction();
-        Destroy(gameObject);
+        Debug.Log($"[ENEMY CONVERSION] {NPCName} has become hostile!");
+        dialogueManager?.DisplayNPCDialogue($"{NPCName} has turned against you!");
+        dialogueManager.EndDialogue();
+    
     }
 
     public void OnDialogueEnded()
@@ -155,7 +153,6 @@ private void OnTriggerExit(Collider other)
 
 public void EndInteraction()
 {
-    // Only handle NPC-side cleanup, don't touch dialogue manager
     isInteracting = false;
     waitingForChoices = false;
     geminiAccessor?.ClearChatHistory();

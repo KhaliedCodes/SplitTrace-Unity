@@ -46,7 +46,6 @@ public class GeminiAccessor : MonoBehaviour
         if (npcPersonality != null && !npcPersonality.availableEmotions.Contains(emotion))
             emotion = npcPersonality.defaultEmotion;
 
-        UpdateAnimation(emotion);
         OnResponseProcessed?.Invoke(cleanResponse, emotion);
     }
 
@@ -82,24 +81,6 @@ public class GeminiAccessor : MonoBehaviour
             "I have a question for you",
             "I should go now"
         };
-    }
-
-    private void UpdateAnimation(string emotion)
-    {
-        if (npcAnimator == null) return;
-        
-        npcAnimator.ResetTrigger("Neutral");
-        npcAnimator.ResetTrigger("Happy");
-        npcAnimator.ResetTrigger("Sad");
-        npcAnimator.ResetTrigger("Angry");
-        
-        npcAnimator.SetTrigger(emotion switch
-        {
-            "happy" => "Happy",
-            "sad" => "Sad",
-            "angry" => "Angry",
-            _ => "Neutral"
-        });
     }
 
     private void OnDestroy()
