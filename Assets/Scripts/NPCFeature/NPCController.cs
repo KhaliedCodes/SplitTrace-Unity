@@ -56,7 +56,7 @@ private void OnTriggerExit(Collider other)
 {
     if (other.GetComponent<PlayerController>() == nearbyPlayer)
     {
-        nearbyPlayer.ClearCurrentInteractable();
+        nearbyPlayer?.ClearCurrentInteractable();
         
         if (isInteracting)
         {

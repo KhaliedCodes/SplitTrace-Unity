@@ -25,6 +25,9 @@ public class WeaponManager : MonoBehaviour
     PlayerAnimations playerAnimations;
     int totalAmmo;
 
+    //TUT Script
+    [SerializeField] TUT WeaponTut;
+
     private void Awake()
     {
         
@@ -91,6 +94,9 @@ public class WeaponManager : MonoBehaviour
     private void OnPickup(InputAction.CallbackContext context)
     {
         TryPickupNearbyWeapon();
+
+        WeaponTut.OnTutorialStart("Weapon");
+
     }
 
     private void TryPickupNearbyWeapon()
@@ -203,7 +209,6 @@ public class WeaponManager : MonoBehaviour
             {
                 ammoText.enabled = true;
                 RangedWeapon rw = (RangedWeapon)currentWeapon;
-                Debug.Log($"Ammo: {rw.ammoInMagazine}/{rw.totalAmmo}");
                 ammoText.text = $"Current Ammo: {rw.ammoInMagazine} / {rw.totalAmmo}";
             }
             else 

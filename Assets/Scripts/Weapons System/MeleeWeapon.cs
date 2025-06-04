@@ -24,13 +24,11 @@ public class MeleeWeapon : Weapon
     }
     IEnumerator PerformAttack()
     {
-        Debug.Log("Swinging melee weapon...");
         hitbox.enabled = true;
 
         yield return new WaitForSeconds(attackDuration);
 
         hitbox.enabled = false;
-        Debug.Log("Attack finished.");
     }
     public override void Reload()
     {

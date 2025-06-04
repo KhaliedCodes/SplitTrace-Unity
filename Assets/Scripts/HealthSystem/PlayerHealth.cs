@@ -22,7 +22,6 @@ public class PlayerHealth : MonoBehaviour, IDamagable
     {
         Health = Mathf.Max(0, Health - damage);
         UpdateHealthUI();
-        Debug.Log("Player took damage: " + damage + ", Current Health: " + Health);
         if (Health <= 0)
         {
             Die();

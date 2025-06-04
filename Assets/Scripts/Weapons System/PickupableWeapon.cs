@@ -32,7 +32,6 @@ public class PickupableWeapon : MonoBehaviour
 
     public void Drop(Vector3 dropDirection)
     {
-        Debug.Log($"Dropping weapon{weapon.weaponName}");
         IsEquipped = false;
         SetPhysicsState(false);
         transform.SetParent(null);
