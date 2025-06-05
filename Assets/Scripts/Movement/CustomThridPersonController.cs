@@ -116,7 +116,12 @@ public class CustomThridPersonController : MonoBehaviour
 
     // UI reference for dodge cooldown indicator (optional)
     public UnityEngine.UI.Image dodgeCooldownIndicator;
- 
+
+    // Stunning 
+    public bool Stunned = false;
+    [SerializeField] private float stunDuration = 2f; // Duration of the stun effect in seconds
+    private float defaultMoveSpeed;
+    private float defaultSprintSpeed;
 
     private bool IsCurrentDeviceMouse
     {
@@ -146,6 +151,9 @@ public class CustomThridPersonController : MonoBehaviour
         {
             dodgeTrail.emitting = false;
         }
+
+        defaultMoveSpeed = MoveSpeed;
+        defaultSprintSpeed = SprintSpeed;
     }
 
     private void Start()
@@ -456,5 +464,25 @@ public class CustomThridPersonController : MonoBehaviour
         {
             AudioSource.PlayClipAtPoint(LandingAudioClip, transform.TransformPoint(_controller.center), FootstepAudioVolume);
         }
+    }
+
+    public void Stun(float duration)
+    {
+        if (!Stunned)
+        {
+            Stunned = true;
+            MoveSpeed = 0;
+            SprintSpeed = 0;
+            GetComponent<Animator>()?.SetBool("Stun", true);
+            StartCoroutine(RecoverFromStun(duration));
+        }
+    }
+    private IEnumerator RecoverFromStun(float duration)
+    {
+        yield return new WaitForSeconds(duration);
+        MoveSpeed = defaultMoveSpeed;
+        SprintSpeed = defaultSprintSpeed;
+        GetComponent<Animator>()?.SetBool("Stun", false);
+        Stunned = false;
     }
 }
