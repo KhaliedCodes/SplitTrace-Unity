@@ -21,14 +21,14 @@ public class EnemyBulletEffector : MonoBehaviour
 
             if (controller == null || playerHealth == null) return;
 
-            // Normal bullet or player is already stunned
-            if (bulletType == BulletType.Normal || controller.Stunned)
+            // Normal bullet
+            if (bulletType == BulletType.Normal)
             {
                 playerHealth.TakeDamage(DamageAmount);
                 Destroy(gameObject);
             }
-            // Stunning bullet and player is not stunned
-            else if (bulletType == BulletType.Stunning && !controller.Stunned)
+            // Stunning bullet
+            else if (bulletType == BulletType.Stunning)
             {
                 controller.Stun(stunDuration);
                 Destroy(gameObject);

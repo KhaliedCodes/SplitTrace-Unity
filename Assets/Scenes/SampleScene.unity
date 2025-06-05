@@ -14851,6 +14851,8 @@ MonoBehaviour:
   animator: {fileID: 1765383556}
   projectilePrefab: {fileID: 4954223955266911571, guid: 0ee78e782619af24ebe8546ea38f1908, type: 3}
   StunprojectilePrefab: {fileID: 0}
+  CanStun: 0
+  stunCooldown: 5
   waypoints:
   - {fileID: 637271281}
   - {fileID: 1479253200}
@@ -17894,6 +17896,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 3907320226847084612, guid: 29330c0d8f0a42e4e9ee84d3bc833ddf, type: 3}
+      propertyPath: CanStun
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3907320226847084612, guid: 29330c0d8f0a42e4e9ee84d3bc833ddf, type: 3}
       propertyPath: RayCastY
       value: 1
       objectReference: {fileID: 0}
@@ -17901,6 +17907,10 @@ PrefabInstance:
       propertyPath: RayCastStart
       value: 
       objectReference: {fileID: 1352378405}
+    - target: {fileID: 3907320226847084612, guid: 29330c0d8f0a42e4e9ee84d3bc833ddf, type: 3}
+      propertyPath: stunCooldown
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 3907320226847084612, guid: 29330c0d8f0a42e4e9ee84d3bc833ddf, type: 3}
       propertyPath: attackCooldown
       value: 1
@@ -17911,6 +17921,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3907320226847084612, guid: 29330c0d8f0a42e4e9ee84d3bc833ddf, type: 3}
       propertyPath: projectilePrefab
+      value: 
+      objectReference: {fileID: 4954223955266911571, guid: 0ee78e782619af24ebe8546ea38f1908, type: 3}
+    - target: {fileID: 3907320226847084612, guid: 29330c0d8f0a42e4e9ee84d3bc833ddf, type: 3}
+      propertyPath: StunprojectilePrefab
       value: 
       objectReference: {fileID: 4954223955266911571, guid: c171b83b161650f4785fb5a33c6d790e, type: 3}
     - target: {fileID: 3907320226847084612, guid: 29330c0d8f0a42e4e9ee84d3bc833ddf, type: 3}
