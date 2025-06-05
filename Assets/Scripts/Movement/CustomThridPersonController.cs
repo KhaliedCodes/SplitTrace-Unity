@@ -119,7 +119,6 @@ public class CustomThridPersonController : MonoBehaviour
 
     // Stunning 
     public bool Stunned = false;
-    [SerializeField] private float stunDuration = 2f; // Duration of the stun effect in seconds
     private float defaultMoveSpeed;
     private float defaultSprintSpeed;
 
