@@ -57,7 +57,7 @@ public class NPCPersonality : ScriptableObject
             knowledgeString = "You have knowledge about: " + string.Join(", ", knowledgeTopics) + ".";
         }
 
-        string fullPrompt = $"You are {npcName}, {characterDescription}. " +
+        string fullPrompt =$"You are {npcName}, {characterDescription}. " +
                            $"{personalityTraits} " +
                            $"{(!string.IsNullOrEmpty(backgroundStory) ? backgroundStory : "")} " +
                            $"{knowledgeString} " +
