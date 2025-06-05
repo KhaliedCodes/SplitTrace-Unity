@@ -473,6 +473,7 @@ public class CustomThridPersonController : MonoBehaviour
             MoveSpeed = 0;
             SprintSpeed = 0;
             GetComponent<Animator>()?.SetBool("Stun", true);
+            GetComponent<PlayerInput>().enabled = false; // Disable input during stun
             StartCoroutine(RecoverFromStun(duration));
         }
     }
@@ -483,5 +484,7 @@ public class CustomThridPersonController : MonoBehaviour
         SprintSpeed = defaultSprintSpeed;
         GetComponent<Animator>()?.SetBool("Stun", false);
         Stunned = false;
+        GetComponent<PlayerInput>().enabled = true; // Disable input during stun
+
     }
 }

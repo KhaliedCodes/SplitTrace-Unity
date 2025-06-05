@@ -23,6 +23,7 @@ public class RangedEnemy : MonoBehaviour, IEnemy, IDamagable
     public NavMeshAgent navMeshAgent;
     public Animator animator;
     public GameObject projectilePrefab;
+    public GameObject StunprojectilePrefab;
 
     [Header("Patrol Settings")]
     public List<Transform> waypoints;

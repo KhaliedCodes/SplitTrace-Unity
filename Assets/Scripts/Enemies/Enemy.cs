@@ -20,6 +20,7 @@ public class Enemy : MonoBehaviour, IEnemy, IDamagable
     public GameObject player;
     public NavMeshAgent navMeshAgent;
     public Animator animator;
+    public GameObject StunProjectilePrefab;
 
     [Header("IEnemy Linking")]
     public float Health { get => health; set => health = value; }
