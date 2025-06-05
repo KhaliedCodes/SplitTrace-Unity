@@ -1,151 +1,169 @@
 using UnityEngine;
-
+using System.Collections.Generic;
 public class NPCController : MonoBehaviour
 {
     [Header("NPC Configuration")]
     [SerializeField] private NPCPersonality personality;
-    [SerializeField] private Transform interactionTrigger;
     [SerializeField] private float interactionRadius = 2f;
-    [SerializeField] private GameObject playerPrefab;
-    [Header("UI Components")]
-    private GameObject interactionIndicator;
-    private bool isInteracting;
-    private PlayerController nearbyPlayer;
+
+    [Header("Enemy Conversion")]
+    [SerializeField] private HostilityTracker hostilityTracker;
+    [SerializeField] private string[] aggressiveResponseTriggers = 
+        { "angry", "furious", "hate", "enemy", "kill", "attack", "die" };
+
+    private SphereCollider interactionTrigger;
     private DialogueManager dialogueManager;
     private GeminiAccessor geminiAccessor;
+    private PlayerController nearbyPlayer;
+    
+    private bool isInteracting;
+    private bool waitingForChoices = false;
 
-    public string NPCName => personality != null ? personality.npcName : "NPC";
+    public string NPCName => personality?.npcName ?? "NPC";
 
     private void Awake()
     {
-        dialogueManager = FindFirstObjectByType<DialogueManager>();
-       
-        if (dialogueManager != null)
-        {
-            interactionIndicator = dialogueManager.gameObject;
-        }
-        else
-        {
-            Debug.LogWarning("not found in scene.");
-        }
-
-        // Get or add the GeminiAccessor component
-        geminiAccessor = GetComponent<GeminiAccessor>();
-        if (geminiAccessor == null)
+        interactionTrigger = gameObject.AddComponent<SphereCollider>();
+        interactionTrigger.radius = interactionRadius;
+        interactionTrigger.isTrigger = true;
         
-            geminiAccessor = gameObject.AddComponent<GeminiAccessor>();
-
-        // Configure the system with our personality data - only pass to GeminiAccessor
+        dialogueManager = FindFirstObjectByType<DialogueManager>();
+        geminiAccessor = GetComponent<GeminiAccessor>() ?? gameObject.AddComponent<GeminiAccessor>();
+        
         if (personality != null)
-        {
             geminiAccessor.ConfigureWithPersonality(personality);
-        }
 
-        // Subscribe to AI responses
         geminiAccessor.OnResponseProcessed += HandleAIResponse;
+        geminiAccessor.OnChoicesReceived += HandleChoicesReceived;
+        
+        hostilityTracker.Initialize();
     }
 
-    private void Start()
-    {
-        if (interactionIndicator != null)
-            interactionIndicator.SetActive(false);
-    }
+    private void Update() => hostilityTracker.Update();
 
-    private void Update()
+    private void OnTriggerEnter(Collider other)
     {
-        if (isInteracting) return;
-        CheckPlayerProximity();
-    }
-
-    private void CheckPlayerProximity()
-    {
-        Collider[] colliders = Physics.OverlapSphere(
-            interactionTrigger?.position ?? transform.position,
-            interactionRadius);
-
-        foreach (Collider col in colliders)
+        if (other.TryGetComponent<PlayerController>(out var player))
         {
-            PlayerController player = col.GetComponent<PlayerController>();
-            if (player != null)
+            nearbyPlayer = player;
+            player.SetCurrentInteractable(this);
+        }
+    }
+
+    // Fixed OnTriggerExit
+private void OnTriggerExit(Collider other)
+{
+    if (other.GetComponent<PlayerController>() == nearbyPlayer)
+    {
+            if (nearbyPlayer != null) 
             {
-                nearbyPlayer = player;
-                nearbyPlayer.SetCurrentInteractable(this);
-                interactionIndicator?.SetActive(true);
-                return;
+                nearbyPlayer.ClearCurrentInteractable();
             }
-        }
-
-        if (nearbyPlayer != null)
+        if (isInteracting)
         {
-            nearbyPlayer.ClearCurrentInteractable();
-            nearbyPlayer = null;
-            interactionIndicator?.SetActive(false);
+           
+            dialogueManager?.EndDialogue();
         }
+        nearbyPlayer = null;
     }
+}
 
     public void StartInteraction()
     {
-        if (isInteracting || dialogueManager == null)
-        {
-            Debug.LogWarning("StartInteraction failed: isInteracting=" + isInteracting + ", dialogueManager=" + dialogueManager);
-            return;
-        }
+        if (isInteracting || dialogueManager == null) return;
 
         isInteracting = true;
-        interactionIndicator?.SetActive(false);
-        string greeting = personality != null ? personality.initialGreeting : "Hello there!";
-        dialogueManager.StartDialogue(this, greeting);
+        dialogueManager.StartDialogue(this, personality?.initialGreeting ?? "Hello there!");
     }
 
-    public void EndInteraction()
+    public void SendPlayerChoice(string choiceText, int choiceIndex)
     {
-        isInteracting = false;
-        geminiAccessor?.ClearChatHistory();
-        interactionIndicator?.SetActive(true);
+        hostilityTracker.AnalyzeText(choiceText);
+        CheckForEnemyConversion();
+        
+        waitingForChoices = false;
+        geminiAccessor.SendPlayerInput(choiceText);
     }
 
-    public void SendPlayerMessage(string message)
+    public void RequestDialogueChoices()
     {
-        if (geminiAccessor != null)
-            geminiAccessor.SendPlayerInput(message);
+        if (!waitingForChoices && geminiAccessor != null)
+        {
+            waitingForChoices = true;
+            geminiAccessor.RequestChoices();
+        }
     }
 
     private void HandleAIResponse(string responseText, string emotion)
     {
         if (string.IsNullOrEmpty(responseText)) return;
-
-        // If no emotion specified but our personality uses emotions, default to neutral
-        if (string.IsNullOrEmpty(emotion) && personality != null && personality.usesEmotions)
-        {
-            emotion = personality.defaultEmotion;
-        }
-        else if (string.IsNullOrEmpty(emotion))
-        {
-            emotion = "neutral";
-        }
-
-        string formattedResponse = $"{responseText} {{\"emotion\":\"{emotion}\"}}";
-        dialogueManager.DisplayNPCDialogue(formattedResponse);
+        
+        AnalyzeAIResponse(responseText); 
+        hostilityTracker.AnalyzeText(responseText);
+        CheckForEnemyConversion();
+        
+        dialogueManager.DisplayNPCDialogue($"{responseText} {{\"emotion\":\"{emotion}\"}}");
     }
 
-    private void OnTriggerExit(Collider other)
+    private void AnalyzeAIResponse(string responseText)
     {
-        PlayerController player = other.GetComponent<PlayerController>();
-        if (player == nearbyPlayer)
+        if (!hostilityTracker.canBecomeEnemy || hostilityTracker.IsEnemy) return;
+
+        string lowerResponse = responseText.ToLower();
+        
+        foreach (string aggressiveWord in aggressiveResponseTriggers)
         {
-            player.ClearCurrentInteractable();
-            if (isInteracting) dialogueManager.EndDialogue();
-            nearbyPlayer = null;
+            if (lowerResponse.Contains(aggressiveWord))
+            {
+                hostilityTracker.AddHostility(0.3f);
+                Debug.Log($"[ENEMY CONVERSION] AI responded aggressively: '{responseText}'");
+                Debug.Log($"[ENEMY CONVERSION] Hostility increased to: {hostilityTracker.CurrentHostility}");
+                break;
+            }
         }
     }
 
-    private void OnDrawGizmosSelected()
+    private void HandleChoicesReceived(List<string> choices)
     {
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(
-            interactionTrigger?.position ?? transform.position,
-            interactionRadius);
+        waitingForChoices = false;
+        dialogueManager?.DisplayChoices(choices);
     }
 
-    private void OnDestroy() => geminiAccessor.OnResponseProcessed -= HandleAIResponse;
+    private void CheckForEnemyConversion()
+    {
+        if (hostilityTracker.CheckEnemyConversion())
+            ConvertToEnemy();
+    }
+
+    private void ConvertToEnemy()
+    {
+        Debug.Log($"[ENEMY CONVERSION] {NPCName} has become hostile!");
+        dialogueManager?.DisplayNPCDialogue($"{NPCName} has turned against you!");
+        dialogueManager.EndDialogue();
+    
+    }
+
+    public void OnDialogueEnded()
+{
+    isInteracting = false;
+    waitingForChoices = false;
+    geminiAccessor?.ClearChatHistory();
+}
+
+
+public void EndInteraction()
+{
+    isInteracting = false;
+    waitingForChoices = false;
+    geminiAccessor?.ClearChatHistory();
+}
+
+    private void OnDestroy()
+    {
+        if (geminiAccessor != null)
+        {
+            geminiAccessor.OnResponseProcessed -= HandleAIResponse;
+            geminiAccessor.OnChoicesReceived -= HandleChoicesReceived;
+        }
+    }
 }

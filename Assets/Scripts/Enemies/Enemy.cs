@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Unity.IO.LowLevel.Unsafe;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -129,8 +130,10 @@ public class Enemy : MonoBehaviour, IEnemy, IDamagable
 
         if (Physics.Raycast(transform.position + Vector3.up * 1.5f, direction, out RaycastHit hit, distance))
         {
+            Debug.Log(hit.collider.tag);
+
             if (hit.collider.CompareTag("Player"))
-            {
+            { 
                 _lastKnownPlayerPosition = Player.transform.position;
                 return true;
             }
@@ -228,6 +231,13 @@ public class Enemy : MonoBehaviour, IEnemy, IDamagable
             UnityEditor.Handles.Label(transform.position + Vector3.up * 2f,
                                     $"State: {stateName}\nHealth: {health}", style);
         }
+        if (player == null) return;
+        Vector3 dir = (Player.transform.position - transform.position).normalized;
+        Gizmos.color = Color.red;
+        Gizmos.DrawRay(transform.position + Vector3.up * 1.5f, dir * detectionRange);
+
+
+
     }
 
     // Helper for drawing arrows
