@@ -17,7 +17,7 @@ public class MeleeWeapon : Weapon
         if (hitbox != null) hitbox.enabled = false;
     }
   
-    public override void Use()
+    public override void Use(Vector3 a)
     {
         StartCoroutine(PerformAttack());
 

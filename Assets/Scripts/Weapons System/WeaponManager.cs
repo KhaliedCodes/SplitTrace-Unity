@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.Animations.Rigging;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
-//using UnityEngine.UIElements;
 
 
 public class WeaponManager : MonoBehaviour
@@ -27,9 +26,7 @@ public class WeaponManager : MonoBehaviour
     [SerializeField] GameObject aimCrosshairUI;
     [SerializeField] Transform aimTarget;
 
-    
-    //[SerializeField] Transform aimTarget;
-    //[SerializeField] Transform projectileSpawnPoint;
+
     [Header("Animation Rig")]
     [SerializeField] Rig aimRig;
     [SerializeField] LayerMask aimLayerMask;
@@ -48,9 +45,11 @@ public class WeaponManager : MonoBehaviour
     private WeaponsInputSystem weaponInputs;
     private PlayerAnimations playerAnimations;
 
-    public Animator animator;   
-    bool isAimingMode = false;
-    
+    public Animator animator;
+
+
+    public Vector3 mouseWorldPosition { get; private set; } = Vector3.zero;
+
     public bool IsAiming { get; private set; }
 
     public static WeaponManager Instance;
@@ -88,7 +87,7 @@ public class WeaponManager : MonoBehaviour
 
     private void Update()
     {
-        AmmoUI();
+        
         aimLayerCurrentWeight = Mathf.Lerp(aimLayerCurrentWeight, aimLayerTargetWeight, Time.deltaTime * aimLayerSmoothSpeed);
         animator.SetLayerWeight(1, aimLayerCurrentWeight);
 
@@ -96,7 +95,6 @@ public class WeaponManager : MonoBehaviour
         //aimLayerTargetWeight = currentWeapon &&currentWeapon == rangedWeapon ? 1f : 0f;
         UpdateAnimatorRangedType();
 
-        Vector3 mouseWorldPosition = Vector3.zero;
         Vector2 screenCenterPoint = new Vector2(Screen.width / 2, Screen.height / 2);
         Ray ray = Camera.main.ScreenPointToRay(screenCenterPoint);
         if (Physics.Raycast(ray, out RaycastHit hit, 999f, aimLayerMask))
@@ -105,6 +103,12 @@ public class WeaponManager : MonoBehaviour
 
             mouseWorldPosition = hit.point;
         }
+        else
+        {
+            mouseWorldPosition = ray.origin + ray.direction * 100f;
+        }
+
+
         if (IsAiming)
         {
             Vector3 worldAimTarget = mouseWorldPosition;
@@ -127,6 +131,7 @@ public class WeaponManager : MonoBehaviour
     private void OnReload(InputAction.CallbackContext context)
     {
         currentWeapon?.Reload();
+        AmmoUI();
     }
 
     private void OnShoot(bool IsShooting)
@@ -145,15 +150,15 @@ public class WeaponManager : MonoBehaviour
             animator.SetBool("Shoot", IsShooting);
         }
         animator.SetTrigger("Aim");
-        currentWeapon?.Use();
-
+        currentWeapon?.Use(mouseWorldPosition);
+        AmmoUI();
 
     }
 
     private void OnSwitchWeapon(InputAction.CallbackContext context)
     {
 
-        if (currentWeapon == rangedWeapon && meleeWeapon != null && isAimingMode == false)
+        if (currentWeapon == rangedWeapon && meleeWeapon != null && IsAiming == false)
             SwitchWeapon(meleeWeapon);
         else if (currentWeapon == meleeWeapon && rangedWeapon != null)
             SwitchWeapon(rangedWeapon);
@@ -169,7 +174,9 @@ public class WeaponManager : MonoBehaviour
     }
     private void OnDrop(InputAction.CallbackContext context)
     {
+        if(!IsAiming)
         DropCurrentWeapon();
+        AmmoUI();
     }
     private void OnPickup(InputAction.CallbackContext context)
     {
@@ -237,7 +244,7 @@ public class WeaponManager : MonoBehaviour
 
             rw.UpdateAmmoNumber(managerTotalAmmo);
             managerTotalAmmo = 0;
-
+            
 
         }
         else if (newWeapon is MeleeWeapon mw)
@@ -245,9 +252,10 @@ public class WeaponManager : MonoBehaviour
             meleeWeapon = mw;
             meleeIconUI.sprite = mw.weaponIcon;
             meleeIconUI.enabled = true;
-         
+            
         }
         SwitchWeapon(newWeapon);
+        AmmoUI();
     }
 
 
@@ -264,6 +272,7 @@ public class WeaponManager : MonoBehaviour
         {
             currentWeapon.Equip();
         }
+        AmmoUI();
     }
 
     public void UnequipWeapon()
@@ -275,49 +284,50 @@ public class WeaponManager : MonoBehaviour
         }
     }
 
+    private bool HasRangedEquipped(out RangedWeapon rw)
+    {
+        rw = currentWeapon as RangedWeapon;
+        return rw != null;
+    }
     public void UpdateAmmo(int amount)
     {
         managerTotalAmmo += amount;
         Debug.Log($"Collected ammo: {amount}, Stored: {managerTotalAmmo}");
-
-        if (currentWeapon != null && currentWeapon.weaponType == WeaponType.Ranged)
+        if (HasRangedEquipped(out RangedWeapon rw))
         {
-            RangedWeapon rw = (RangedWeapon)currentWeapon;
+             rw = (RangedWeapon)currentWeapon;
             rw.UpdateAmmoNumber(managerTotalAmmo);
             managerTotalAmmo = 0;
-
+            AmmoUI();
         }
+
     }
 
 
     public void AmmoUI()
     {
-
-        if (currentWeapon != null)
+        if (currentWeapon is RangedWeapon rw)
         {
-            if (currentWeapon.weaponType == WeaponType.Ranged)
-            {
-                ammoText.enabled = true;
-                RangedWeapon rw = (RangedWeapon)currentWeapon;
-                ammoText.text = $"Current Ammo: {rw.ammoInMagazine} / {rw.totalAmmo}";
-                defultCrosshairUI.SetActive(true);
-            }
-            else
-            {
-                ammoText.enabled = false;
-                defultCrosshairUI.SetActive(false);
-            }
+            ammoText.enabled = true;
+            ammoText.text = $"Current Ammo: {rw.ammoInMagazine} / {rw.totalAmmo + managerTotalAmmo}";
+            defultCrosshairUI.SetActive(!IsAiming);
+            Debug.Log("in ranged");
         }
-
+        else
+        {
+            Debug.Log("in melee");
+            ammoText.enabled = false;
+            defultCrosshairUI.SetActive(false);
+        }
     }
+
 
 
     private void SetAim(bool isAiming)
     {
-        if (currentWeapon && currentWeapon == rangedWeapon)
+        if (HasRangedEquipped(out RangedWeapon rw))
         {
             IsAiming = isAiming;
-            isAimingMode = isAiming ? true : false;
             
             aimCamera.Priority = isAiming ? 20 : 5;
             defultCrosshairUI.SetActive(!isAiming);
@@ -342,7 +352,7 @@ public class WeaponManager : MonoBehaviour
     {
         int rangedTypeValue = 0;
 
-        if (currentWeapon && currentWeapon.weaponType == WeaponType.Ranged)
+        if (HasRangedEquipped(out RangedWeapon rw))
         {
             if (rangedWeapon.rangedType == 1)
                 rangedTypeValue = 1;

@@ -10,37 +10,34 @@ public enum RangedType
 public class RangedWeapon : Weapon
 {
 
-    [SerializeField] int magazineCapacity = 30;
-    [SerializeField] float fireRate = 0.5f;
-    [SerializeField] Bullet bulletPrefab;
     [SerializeField] public int damage = 10;
     [SerializeField] public int ammoInMagazine = 30;
     [SerializeField] public int totalAmmo = 120;
+    [SerializeField] public int rangedType;
     [SerializeField] public Transform firePoint;
+    [SerializeField] int magazineCapacity = 30;
+    [SerializeField] float fireRate = 0.5f;
     [SerializeField] GameObject muzzleFlash;
     [SerializeField] GameObject bulletHoleEffect;
     [SerializeField] LayerMask aimLayerMask;
-    [SerializeField] public int rangedType;
+    [SerializeField] Bullet bulletPrefab;
 
-   
-    float lastFireTime = -999f;
 
+    private float lastFireTime = -999f;
 
     private void Awake()
     {
         weaponType = WeaponType.Ranged;
+
     }
 
-    public override void Use()
+    public override void Use(Vector3 aimPoint)
     {
         if (Time.time < lastFireTime + fireRate) return;
 
         if (ammoInMagazine > 0)
         {
-            Vector3 aimPoint = GetAimPoint();
             Vector3 direction = (aimPoint - firePoint.position).normalized;
-            //firePoint.forward = direction;
-
             if (!WeaponManager.Instance.IsAiming)
             {
                 Transform playerTransform = WeaponManager.Instance.transform;
@@ -52,12 +49,13 @@ public class RangedWeapon : Weapon
                 playerTransform.rotation = targetRotation.normalized;
 
             }
+            GameObject impact = Instantiate(bulletHoleEffect, aimPoint, Quaternion.LookRotation(aimPoint));
+            Destroy(impact, 2f);
 
-           
             ammoInMagazine--;
-            lastFireTime = Time.time;
-            //HitImpact();
-            Bullet bullet = Instantiate(bulletPrefab, firePoint.position ,Quaternion.LookRotation(direction , Vector3.up));
+                lastFireTime = Time.time;
+            
+                Bullet bullet = Instantiate(bulletPrefab, firePoint.position, Quaternion.LookRotation(direction, Vector3.up));
             Debug.Log("Fired! Remaining ammo: " + ammoInMagazine);
             StartCoroutine(ActivateMuzzleFlash());
             AudioManager.Instance.PlayAudioClip("Weapons", $"{weaponName}", false);
@@ -103,27 +101,7 @@ public class RangedWeapon : Weapon
         muzzleFlash.SetActive(false);
 
     }
-    private Vector3 GetAimPoint()
-    {
-        Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
-        if (Physics.Raycast(ray, out RaycastHit hit, 100f, aimLayerMask))
-        {
-            //if (aimTarget != null)
-            //    aimTarget.position = hit.point;
+ 
 
-            return hit.point;
-        }
-
-        return ray.origin + ray.direction * 100f;
-    }
-
-    //private void HitImpact()
-    //{
-    //    RaycastHit hit;
-    //    if (!Physics.Raycast(firePoint.position, firePoint.forward, out hit, 100f)) return;
-    //    GameObject impact = Instantiate(bulletHoleEffect, hit.point, Quaternion.LookRotation(hit.normal));
-    //    Destroy(impact, 2f);
-    //}
 
 }
- 

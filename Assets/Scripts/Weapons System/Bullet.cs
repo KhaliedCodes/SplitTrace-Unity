@@ -3,8 +3,10 @@ using UnityEngine;
 public class Bullet : MonoBehaviour
 {
     [Header("Bullet Settings")]
-    [SerializeField] float speed = 20f;
+    [SerializeField] float speed = 40f;
     [SerializeField] float lifetime = 2f;
+    [SerializeField] Transform vfxBlood;
+    [SerializeField] Transform vfxHole;
     //[SerializeField] float damage = 10f;
     RangedWeapon rangedWeapon;
     Rigidbody rb;
@@ -22,14 +24,24 @@ public class Bullet : MonoBehaviour
     {
         IDamagable target = other.GetComponent<IDamagable>();
 
-        if (target != null)
-        {
+        //if (target != null)
+        //{
 
             if (other.CompareTag("Enemy"))
             {
-                target.TakeDamage(rangedWeapon.damage);
+                //target.TakeDamage(rangedWeapon.damage);
+               
+                    Debug.Log("Hit Enemy: " + other.name + " with damage: " );
+                    Transform bloodVFX = Instantiate(vfxBlood, transform.position, Quaternion.identity);
+                    Destroy(bloodVFX.gameObject, 2f);
+                
             }
+        else
+        {
+            //Transform holeVFX = Instantiate(vfxHole, transform.position, Quaternion.identity);
+            //Destroy(holeVFX.gameObject, 2f);
         }
-        Destroy(gameObject);
+        //}
+        //Destroy(gameObject);
     }
 }
