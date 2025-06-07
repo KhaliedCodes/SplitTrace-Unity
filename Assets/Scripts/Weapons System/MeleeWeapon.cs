@@ -17,15 +17,16 @@ public class MeleeWeapon : Weapon
         if (hitbox != null) hitbox.enabled = false;
     }
   
-    public override void Use()
+    public override void Use(Vector3 a)
     {
         StartCoroutine(PerformAttack());
 
     }
     IEnumerator PerformAttack()
     {
+        Debug.Log("Swinging melee weapon...");
+        AudioManager.Instance.PlayAudioClip("Weapons", $"{weaponName}", false);
         hitbox.enabled = true;
-
         yield return new WaitForSeconds(attackDuration);
 
         hitbox.enabled = false;
