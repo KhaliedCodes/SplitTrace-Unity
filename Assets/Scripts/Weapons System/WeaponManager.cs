@@ -54,6 +54,9 @@ public class WeaponManager : MonoBehaviour
 
     public static WeaponManager Instance;
 
+    //TUT Script
+    [SerializeField] TUT WeaponTut;
+
     private void Awake()
     {
 
@@ -181,6 +184,9 @@ public class WeaponManager : MonoBehaviour
     private void OnPickup(InputAction.CallbackContext context)
     {
         TryPickupNearbyWeapon();
+
+        WeaponTut.OnTutorialStart("Weapon");
+
     }
 
     private void TryPickupNearbyWeapon()

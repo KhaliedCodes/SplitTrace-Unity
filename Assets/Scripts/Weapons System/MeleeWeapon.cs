@@ -30,7 +30,6 @@ public class MeleeWeapon : Weapon
         yield return new WaitForSeconds(attackDuration);
 
         hitbox.enabled = false;
-        Debug.Log("Attack finished.");
     }
     public override void Reload()
     {

@@ -82,7 +82,6 @@ public class RangedWeapon : Weapon
                 ammoInMagazine += totalAmmo;
                 totalAmmo = 0;
             }
-            Debug.Log("Reloaded! Current ammo: " + ammoInMagazine);
         }
         else
         {

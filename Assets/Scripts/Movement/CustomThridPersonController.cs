@@ -105,6 +105,10 @@ public class CustomThridPersonController : MonoBehaviour
     private CustomStarterAssetsInputs _input;
     private Dodge _dodge;
     private GameObject _mainCamera;
+    [Header("Enemy Lock-On")]
+    private AutoLookAtNearestEnemy _autoLook;
+    public Transform enemyTarget => _autoLook != null ? _autoLook.currentTarget : null;
+    public bool lockOnToEnemy => _autoLook != null && _autoLook.isLockedOn;
 
     private const float _threshold = 0.01f;
 
@@ -113,6 +117,7 @@ public class CustomThridPersonController : MonoBehaviour
 
     // UI reference for dodge cooldown indicator (optional)
     public UnityEngine.UI.Image dodgeCooldownIndicator;
+ 
 
     private bool IsCurrentDeviceMouse
     {
@@ -151,6 +156,7 @@ public class CustomThridPersonController : MonoBehaviour
         _hasAnimator = TryGetComponent(out _animator);
         _controller = GetComponent<CharacterController>();
         _input = GetComponent<CustomStarterAssetsInputs>();
+        _autoLook = GetComponent<AutoLookAtNearestEnemy>();
         _dodge = GetComponent<Dodge>();
 
 #if ENABLE_INPUT_SYSTEM
@@ -171,6 +177,7 @@ public class CustomThridPersonController : MonoBehaviour
         _hasAnimator = TryGetComponent(out _animator);
 
         _dodge.HandleDodge();
+        // JumpAndGravity();
         GroundedCheck();
 
         // Only run movement logic if not dodging
@@ -296,28 +303,130 @@ public class CustomThridPersonController : MonoBehaviour
         //else
         if (_input.move != Vector2.zero)
         {
-            _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg +
-                              _mainCamera.transform.eulerAngles.y;
-            float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity,
-                RotationSmoothTime);
+            // Different handling depending on whether locked onto an enemy or not
+            Vector3 targetDirection;
 
             // rotate to face input direction relative to camera position
             if (_rotateOnMove)
                 transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
+            if (lockOnToEnemy && enemyTarget != null)
+            {
+                // When locked on to an enemy, ALWAYS face the enemy regardless of movement direction
+                Vector3 lookDirection = enemyTarget.position - transform.position;
+                lookDirection.y = 0f; // Ignore vertical difference
+                Quaternion targetRotation = Quaternion.LookRotation(lookDirection);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10f);
+
+                // Create a movement direction that's perpendicular to the look direction when moving left/right
+                Vector3 forward = transform.forward;    // Points at the enemy since we've rotated to face them
+                Vector3 right = transform.right;        // Perpendicular to forward (strafe direction)
+
+                // Combine the inputs to create a movement vector relative to where the player is facing
+                // For standard Unity input settings:
+                // x = horizontal = left/right
+                // y = vertical = forward/back
+                targetDirection = right * _input.move.x + forward * _input.move.y;
+
+                // Normalize the direction to ensure consistent speed in all directions
+                if (targetDirection.magnitude > 0.1f)
+                {
+                    targetDirection.Normalize();
+                }
+            }
+            else
+            {
+                // Normal movement (not locked on)
+                _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg +
+                                  _mainCamera.transform.eulerAngles.y;
+                float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity,
+                    RotationSmoothTime);
+
+                transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
+
+                // Move in the direction we're facing
+                targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
+            }
+
+            // Apply gravity
+            if (Grounded)
+            {
+                // reset the fall timeout timer
+                _fallTimeoutDelta = FallTimeout;
+
+                // update animator if using character
+                if (_hasAnimator)
+                {
+                    _animator.SetBool(_animIDJump, false);
+                    _animator.SetBool(_animIDFreeFall, false);
+                }
+
+                // stop our velocity dropping infinitely when grounded
+                if (_verticalVelocity < 0.0f)
+                {
+                    _verticalVelocity = -2f;
+                }
+            }
+            else
+            {
+                // fall timeout
+                if (_fallTimeoutDelta >= 0.0f)
+                {
+                    _fallTimeoutDelta -= Time.deltaTime;
+                }
+                else
+                {
+                    // update animator if using character
+                    if (_hasAnimator)
+                    {
+                        _animator.SetBool(_animIDFreeFall, true);
+                    }
+                }
+            }
+
+            // apply gravity over time if under terminal (multiply by delta time twice to linearly speed up over time)
+            if (_verticalVelocity < _terminalVelocity)
+            {
+                _verticalVelocity += Gravity * Time.deltaTime;
+            }
+
+            // move the player
+            _controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) +
+                             new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
+
+            // update animator if using character
+            if (_hasAnimator)
+            {
+                _animator.SetFloat(_animIDSpeed, _animationBlend);
+                _animator.SetFloat(_animIDMotionSpeed, inputMagnitude);
+            }
         }
-
-
-        Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
-
-        // move the player
-        _controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) +
-                         new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
-
-        // update animator if using character
-        if (_hasAnimator)
+        else
         {
-            _animator.SetFloat(_animIDSpeed, _animationBlend);
-            _animator.SetFloat(_animIDMotionSpeed, inputMagnitude);
+            // Handle vertical movement/gravity when not moving horizontally
+            if (Grounded)
+            {
+                if (_verticalVelocity < 0.0f)
+                {
+                    _verticalVelocity = -2f;
+                }
+            }
+            else
+            {
+                if (_verticalVelocity < _terminalVelocity)
+                {
+                    _verticalVelocity += Gravity * Time.deltaTime;
+                }
+
+                // Only apply vertical velocity when not moving horizontally
+                _controller.Move(new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
+            }
+
+            // Update animator
+            if (_hasAnimator)
+            {
+                _animator.SetFloat(_animIDSpeed, 0);
+                _animator.SetFloat(_animIDMotionSpeed, 0);
+            }
         }
     }
 
