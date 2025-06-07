@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody), typeof(BoxCollider), typeof(Weapon))]
+//[RequireComponent(typeof(Rigidbody), typeof(BoxCollider), typeof(Weapon))]
 public class PickupableWeapon : MonoBehaviour
 {
     private Rigidbody rb;

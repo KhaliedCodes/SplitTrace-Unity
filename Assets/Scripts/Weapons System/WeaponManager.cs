@@ -1,8 +1,10 @@
-using System;
+﻿using Cinemachine;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Animations.Rigging;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+
 
 public class WeaponManager : MonoBehaviour
 {
@@ -16,29 +18,65 @@ public class WeaponManager : MonoBehaviour
     [SerializeField] Image rangedIconUI;
     [SerializeField] Image meleeIconUI;
 
+    [Header("Cinemachine Cameras")]
+    [SerializeField] CinemachineVirtualCamera aimCamera;
+
+    [Header("Aiming UI")]
+    [SerializeField] GameObject defultCrosshairUI;
+    [SerializeField] GameObject aimCrosshairUI;
+    [SerializeField] Transform aimTarget;
+
+
+    [Header("Animation Rig")]
+    [SerializeField] Rig aimRig;
+    [SerializeField] LayerMask aimLayerMask;
+
+    private float aimLayerTargetWeight = 0f;
+    private float aimLayerCurrentWeight = 0f;
+    private float aimLayerSmoothSpeed = 10f;
+    private float lastFireTime = -999f;
+    private float aimRigWight = 1f;
+    private int managerTotalAmmo;
+
+    private CustomThridPersonController playerController;
     private Weapon currentWeapon;
     private RangedWeapon rangedWeapon;
     private MeleeWeapon meleeWeapon;
-    private float lastFireTime = -999f;
-
     private WeaponsInputSystem weaponInputs;
-    PlayerAnimations playerAnimations;
-    int totalAmmo;
+    private PlayerAnimations playerAnimations;
+
+    public Animator animator;
+
+
+    public Vector3 mouseWorldPosition { get; private set; } = Vector3.zero;
+
+    public bool IsAiming { get; private set; }
+
+    public static WeaponManager Instance;
 
     //TUT Script
     [SerializeField] TUT WeaponTut;
 
     private void Awake()
     {
-        
+
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+
+        playerController = GetComponent<CustomThridPersonController>();
         weaponInputs = new WeaponsInputSystem();
         weaponInputs.Enable();
         weaponInputs.WeaponsActions.Reload.performed += OnReload;
-        weaponInputs.WeaponsActions.Shoot.performed += OnShoot;
         weaponInputs.WeaponsActions.SwitchWeapon.performed += OnSwitchWeapon;
         weaponInputs.WeaponsActions.Unequip.performed += OnUnequip;
         weaponInputs.WeaponsActions.Drop.performed += OnDrop;
         weaponInputs.WeaponsActions.Pickup.performed += OnPickup;
+        weaponInputs.WeaponsActions.Shoot.performed += ctx => OnShoot(true);
+        weaponInputs.WeaponsActions.Shoot.canceled += ctx => OnShoot(false);
+        weaponInputs.WeaponsActions.Aim.performed += ctx => SetAim(true);
+        weaponInputs.WeaponsActions.Aim.canceled += ctx => SetAim(false);
     }
 
     private void Start()
@@ -47,39 +85,89 @@ public class WeaponManager : MonoBehaviour
         meleeIconUI.enabled = false;
         ammoText.enabled = false;
         playerAnimations = GetComponent<PlayerAnimations>();
+        animator = GetComponent<Animator>();
     }
 
     private void Update()
     {
-        AmmoUI();
+        
+        aimLayerCurrentWeight = Mathf.Lerp(aimLayerCurrentWeight, aimLayerTargetWeight, Time.deltaTime * aimLayerSmoothSpeed);
+        animator.SetLayerWeight(1, aimLayerCurrentWeight);
+
+        aimRig.weight = Mathf.Lerp(aimRig.weight, aimRigWight, Time.deltaTime * 20);
+        //aimLayerTargetWeight = currentWeapon &&currentWeapon == rangedWeapon ? 1f : 0f;
+        UpdateAnimatorRangedType();
+
+        Vector2 screenCenterPoint = new Vector2(Screen.width / 2, Screen.height / 2);
+        Ray ray = Camera.main.ScreenPointToRay(screenCenterPoint);
+        if (Physics.Raycast(ray, out RaycastHit hit, 999f, aimLayerMask))
+        {
+            aimTarget.position = hit.point;
+
+            mouseWorldPosition = hit.point;
+        }
+        else
+        {
+            mouseWorldPosition = ray.origin + ray.direction * 100f;
+        }
+
+
+        if (IsAiming)
+        {
+            Vector3 worldAimTarget = mouseWorldPosition;
+            worldAimTarget.y = transform.position.y;
+            Vector3 aimDirection = (worldAimTarget - transform.position).normalized;
+            transform.forward = Vector3.Lerp(transform.forward, aimDirection, Time.deltaTime * 20f);
+            playerController.SetRotateOnMove(false);
+            aimRig.weight = 1f; 
+        }
+        else
+        {
+            playerController.SetRotateOnMove(true);
+            aimRig.weight = 0f; 
+
+        }
     }
+
+
 
     private void OnReload(InputAction.CallbackContext context)
     {
         currentWeapon?.Reload();
+        AmmoUI();
     }
 
-    private void OnShoot(InputAction.CallbackContext context)
+    private void OnShoot(bool IsShooting)
     {
-        currentWeapon?.Use();
+        if (!currentWeapon) return;
+
         if (currentWeapon != null && currentWeapon is MeleeWeapon weapon)
         {
             if (Time.time < lastFireTime + weapon.attackDuration) return;
             playerAnimations.SetAnimation("Attack");
             lastFireTime = Time.time;
+
         }
+        else
+        {
+            animator.SetBool("Shoot", IsShooting);
+        }
+        animator.SetTrigger("Aim");
+        currentWeapon?.Use(mouseWorldPosition);
+        AmmoUI();
+
     }
 
     private void OnSwitchWeapon(InputAction.CallbackContext context)
     {
-      
-        if (currentWeapon == rangedWeapon && meleeWeapon != null)
+
+        if (currentWeapon == rangedWeapon && meleeWeapon != null && IsAiming == false)
             SwitchWeapon(meleeWeapon);
         else if (currentWeapon == meleeWeapon && rangedWeapon != null)
             SwitchWeapon(rangedWeapon);
         else if (currentWeapon == null && rangedWeapon != null)
             SwitchWeapon(rangedWeapon);
-        
+
 
     }
 
@@ -89,7 +177,9 @@ public class WeaponManager : MonoBehaviour
     }
     private void OnDrop(InputAction.CallbackContext context)
     {
+        if(!IsAiming)
         DropCurrentWeapon();
+        AmmoUI();
     }
     private void OnPickup(InputAction.CallbackContext context)
     {
@@ -157,15 +247,21 @@ public class WeaponManager : MonoBehaviour
             rangedWeapon = rw;
             rangedIconUI.sprite = rw.weaponIcon;
             rangedIconUI.enabled = true;
+
+            rw.UpdateAmmoNumber(managerTotalAmmo);
+            managerTotalAmmo = 0;
+            
+
         }
         else if (newWeapon is MeleeWeapon mw)
         {
             meleeWeapon = mw;
             meleeIconUI.sprite = mw.weaponIcon;
             meleeIconUI.enabled = true;
+            
         }
-
         SwitchWeapon(newWeapon);
+        AmmoUI();
     }
 
 
@@ -182,6 +278,7 @@ public class WeaponManager : MonoBehaviour
         {
             currentWeapon.Equip();
         }
+        AmmoUI();
     }
 
     public void UnequipWeapon()
@@ -193,29 +290,85 @@ public class WeaponManager : MonoBehaviour
         }
     }
 
+    private bool HasRangedEquipped(out RangedWeapon rw)
+    {
+        rw = currentWeapon as RangedWeapon;
+        return rw != null;
+    }
     public void UpdateAmmo(int amount)
     {
-
-        totalAmmo += amount;
+        managerTotalAmmo += amount;
+        Debug.Log($"Collected ammo: {amount}, Stored: {managerTotalAmmo}");
+        if (HasRangedEquipped(out RangedWeapon rw))
+        {
+             rw = (RangedWeapon)currentWeapon;
+            rw.UpdateAmmoNumber(managerTotalAmmo);
+            managerTotalAmmo = 0;
+            AmmoUI();
+        }
 
     }
+
 
     public void AmmoUI()
     {
-
-        if (currentWeapon != null)
+        if (currentWeapon is RangedWeapon rw)
         {
-            if (currentWeapon.weaponType == WeaponType.Ranged)
-            {
-                ammoText.enabled = true;
-                RangedWeapon rw = (RangedWeapon)currentWeapon;
-                ammoText.text = $"Current Ammo: {rw.ammoInMagazine} / {rw.totalAmmo}";
-            }
-            else 
-            {
-                ammoText.enabled = false;
-            }
+            ammoText.enabled = true;
+            ammoText.text = $"Current Ammo: {rw.ammoInMagazine} / {rw.totalAmmo + managerTotalAmmo}";
+            defultCrosshairUI.SetActive(!IsAiming);
+            Debug.Log("in ranged");
         }
- 
+        else
+        {
+            Debug.Log("in melee");
+            ammoText.enabled = false;
+            defultCrosshairUI.SetActive(false);
+        }
     }
+
+
+
+    private void SetAim(bool isAiming)
+    {
+        if (HasRangedEquipped(out RangedWeapon rw))
+        {
+            IsAiming = isAiming;
+            
+            aimCamera.Priority = isAiming ? 20 : 5;
+            defultCrosshairUI.SetActive(!isAiming);
+            aimCrosshairUI.SetActive(isAiming);
+
+            aimLayerTargetWeight = isAiming ? 1f : 0f;
+            animator.SetBool("IsAiming", isAiming);
+            animator.SetInteger("RangedType", (int)((RangedWeapon)currentWeapon).rangedType);
+         
+      
+        }
+        else
+        {
+            //defultCrosshairUI.SetActive(false);
+            animator.SetBool("IsAiming", false);
+            animator.SetInteger("RangedType", 0);
+        }
+
+    }
+
+    private void UpdateAnimatorRangedType()
+    {
+        int rangedTypeValue = 0;
+
+        if (HasRangedEquipped(out RangedWeapon rw))
+        {
+            if (rangedWeapon.rangedType == 1)
+                rangedTypeValue = 1;
+            else if (rangedWeapon.rangedType == 2)
+                rangedTypeValue = 2;
+        }
+
+        animator.SetInteger("RangedType", rangedTypeValue);
+    }
+
+
+    
 }

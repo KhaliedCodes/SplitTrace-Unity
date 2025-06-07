@@ -1,4 +1,4 @@
-using StarterAssets;
+﻿using StarterAssets;
 using UnityEngine;
 using System.Collections;
 using UnityEngine.InputSystem;
@@ -113,6 +113,7 @@ public class CustomThridPersonController : MonoBehaviour
     private const float _threshold = 0.01f;
 
     private bool _hasAnimator;
+    private bool _rotateOnMove = true;
 
     // UI reference for dodge cooldown indicator (optional)
     public UnityEngine.UI.Image dodgeCooldownIndicator;
@@ -246,6 +247,7 @@ public class CustomThridPersonController : MonoBehaviour
         // Cinemachine will follow this target
         CinemachineCameraTarget.transform.rotation = Quaternion.Euler(_cinemachineTargetPitch + CameraAngleOverride,
             _cinemachineTargetYaw, 0.0f);
+
     }
 
     private void Move()
@@ -288,13 +290,15 @@ public class CustomThridPersonController : MonoBehaviour
         // normalise input direction
         Vector3 inputDirection = new Vector3(_input.move.x, 0.0f, _input.move.y).normalized;
 
-        // note: Vector2's != operator uses approximation so is not floating point error prone, and is cheaper than magnitude
-        // if there is a move input rotate player when the player is moving
+   
         if (_input.move != Vector2.zero)
         {
             // Different handling depending on whether locked onto an enemy or not
             Vector3 targetDirection;
 
+            // rotate to face input direction relative to camera position
+            //if (_rotateOnMove)
+            //    transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
             if (lockOnToEnemy && enemyTarget != null)
             {
                 // When locked on to an enemy, ALWAYS face the enemy regardless of movement direction
@@ -456,5 +460,10 @@ public class CustomThridPersonController : MonoBehaviour
         {
             AudioSource.PlayClipAtPoint(LandingAudioClip, transform.TransformPoint(_controller.center), FootstepAudioVolume);
         }
+    }
+
+    public void SetRotateOnMove(bool rotate)
+    {
+        _rotateOnMove = rotate;
     }
 }

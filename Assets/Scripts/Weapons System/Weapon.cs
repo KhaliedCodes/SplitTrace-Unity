@@ -20,7 +20,7 @@ public abstract class Weapon : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    public abstract void Use();
+    public abstract void Use(Vector3 aim);
     public abstract void Reload();
 
 }
