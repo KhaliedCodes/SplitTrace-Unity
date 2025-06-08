@@ -8,6 +8,7 @@ public class AttackState : IEnemyStates
         if (enemy.Player != null)
         {
             enemy.transform.LookAt(enemy.Player.transform);
+
         }
     }
 

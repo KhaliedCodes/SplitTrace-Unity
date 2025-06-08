@@ -6,7 +6,7 @@ public class IdleState : IEnemyStates
 
     public void EnterState(IEnemy enemy)
     {
-        enemy.Animator.SetBool("IsMoving", true);
+        enemy.Animator.SetFloat("speed", 1f);
         enemy.NavMeshAgent.speed = enemy.MoveSpeed;
         _waypointTimer = 0;
 
@@ -49,7 +49,7 @@ public class IdleState : IEnemyStates
 
     public void ExitState(IEnemy enemy)
     {
-        enemy.Animator.SetBool("IsMoving", false);
+        enemy.Animator.SetFloat("speed", 0f);
     }
 
 
