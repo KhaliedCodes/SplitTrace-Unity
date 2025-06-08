@@ -33,6 +33,7 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+       
         if (isInDialogue)
         {
             if (Keyboard.current.escapeKey.wasPressedThisFrame)
@@ -141,36 +142,41 @@ public class PlayerController : MonoBehaviour
     {
         if (other.tag == "Health")
         {
-            thereExistItem = true;
+            
             CallingUIHint();
-            if (collectingProcess)
+            if (Input.GetKey(KeyCode.C))
             {
                 gameObject.GetComponent<PlayerHealth>().UpdateNumberOfHealthItem();
                 other.gameObject.SetActive(false);
+                AudioManager.Instance.PlayAudioClip("SFX", "CollectSound", false);
                 HideUIHint();
+              
             }
         }
         if (other.tag == "Ammo")
         {
-            thereExistItem = true;
+           
             CallingUIHint();
-            if (collectingProcess)
+            if (Input.GetKey(KeyCode.C))
             {
                 gameObject.GetComponent<WeaponManager>().UpdateAmmo(other.gameObject.GetComponent<AmmoItem>().ItemAmount);
                 other.gameObject.SetActive(false);
+                AudioManager.Instance.PlayAudioClip("SFX", "CollectSound", false);
                 HideUIHint();
+               
             }
         }
         if (other.tag == "Log") {
 
-            thereExistItem = true;
+           
             CallingUIHint();
-            if (collectingProcess)
+            if (Input.GetKey(KeyCode.C))
             {
                 gameObject.GetComponent<LogsSystem>().Logs.Add(other.gameObject.GetComponent<LogItem>());
                 other.gameObject.SetActive(false);
+                AudioManager.Instance.PlayAudioClip("SFX", "CollectSound", false);
                 HideUIHint();
-                collectingProcess = false;
+               
             }
         }
 
