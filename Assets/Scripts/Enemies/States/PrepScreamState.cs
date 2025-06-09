@@ -6,7 +6,10 @@ public class PrepScreamState : IEnemyStates
     {
         enemy.Animator.Play("ChargeScream");
         enemy.NavMeshAgent.isStopped = true;
-        enemy.ChangeState(new ScreamState());
+     if (enemy is Enemy Scream)
+        {
+            Scream.StartScreamAfterDelay(2f);
+        }
     }
 
     public void UpdateState(IEnemy enemy)

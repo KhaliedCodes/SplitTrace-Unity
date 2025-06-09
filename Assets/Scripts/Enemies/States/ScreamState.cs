@@ -1,18 +1,20 @@
 using UnityEngine;
-
 public class ScreamState : IEnemyStates
 {
     private float _timer;
     private bool _screamed;
 
+    private const int AttackLayerIndex = 1; // Index of the AttackLayer
     public void EnterState(IEnemy enemy)
     {
+        
         enemy.Animator.Play("Scream");
         enemy.NavMeshAgent.isStopped = true;
 
         if (enemy is Enemy e)
         {
-            e.StunArea.gameObject.SetActive(true);
+            e.Animator.SetLayerWeight(AttackLayerIndex, 0f);
+            e.StunArea.GetComponent<SphereCollider>().enabled = true;
         }
 
         _timer = 2f;
@@ -36,7 +38,9 @@ public class ScreamState : IEnemyStates
 
         if (enemy is Enemy e)
         {
-            e.StunArea.gameObject.SetActive(false);
+            // e.StunArea.gameObject.SetActive(false);
+             e.Animator.SetLayerWeight(AttackLayerIndex, 1f);
+            e.StunArea.GetComponent<SphereCollider>().enabled = false;
         }
     }
 }

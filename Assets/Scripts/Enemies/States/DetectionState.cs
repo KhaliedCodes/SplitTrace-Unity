@@ -66,7 +66,7 @@ public class DetectionState : IEnemyStates
 
     public void ExitState(IEnemy enemy)
     {
-        enemy.Animator.SetFloat("speed", 0f);
+        enemy.Animator.SetFloat("speed", 1f);
         isSearching = false;
     }
 }
