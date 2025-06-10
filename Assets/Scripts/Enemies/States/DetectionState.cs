@@ -37,6 +37,7 @@ public class DetectionState : IEnemyStates
 
             if (enemy.IsPlayerInAttackRange && enemy.HasLineOfSight())
             {
+                enemy.Animator.SetBool("attack",true);
                 enemy.ChangeState(new AttackState());
             }
         }

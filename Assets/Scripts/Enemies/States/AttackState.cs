@@ -10,7 +10,7 @@ public class AttackState : IEnemyStates
 
         if (enemy.Player != null)
         {
-            enemy.Animator.SetFloat("speed", 0f);
+            //enemy.Animator.SetFloat("speed", 0f);
             enemy.transform.LookAt(enemy.Player.transform);
         }
     }
@@ -56,6 +56,7 @@ public class AttackState : IEnemyStates
     public void ExitState(IEnemy enemy)
     {
         enemy.NavMeshAgent.isStopped = false;
+        enemy.Animator.SetBool("attack", false);
         //ResetAttackLayerWeight(enemy);
     }
 
