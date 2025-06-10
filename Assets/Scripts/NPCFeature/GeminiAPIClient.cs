@@ -31,9 +31,20 @@ public class GeminiAPIClient : MonoBehaviour
     public enum ResponseMimeType { PlainText, Json }
 
     private const string BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models/";
-    private const string CHOICE_PROMPT = "Based on our chat history provide 3-4 appropriate dialogue choices for the player. " +
-                                       "Format your response as a JSON array of strings, like: [\"Choice 1\", \"Choice 2\", \"Choice 3\"]. " +
-                                       "Keep choices concise and relevant to the conversation context. " + "two of the choices must be extremely aggressive";
+ private const string CHOICE_PROMPT = @"
+    Based on our chat history AND the overall story context provided (including story progress, discovered clues, and the NPC's personality), generate 3-4 appropriate dialogue choices for the player.
+
+    Your primary goal is to make the choices reflect the NPC's current emotional state and their potential to become an enemy based on the narrative.
+
+    - If the story context or chat history indicates rising tension, hostility, or if the NPC has been accused or cornered, **two of the choices must be extremely aggressive, accusatory, or threatening.**
+    - If the context is neutral or positive, provide a balanced mix of choices (e.g., inquisitive, friendly, neutral). You can include one slightly provocative choice to allow the player to steer the conversation towards conflict if they wish.
+    - If the NPC is revealing a secret or is in a vulnerable state, provide choices that allow the player to be compassionate, exploit the vulnerability, or ask for more details.
+
+    ALWAYS format your response as a single, clean JSON array of strings. The choices must be concise and directly relevant to the last thing the NPC said.
+
+    Example for a tense situation: [""I know you're lying to me."", ""Tell me the truth, or else!"", ""What are you not telling me?"", ""I'll find out on my own.""]
+    Example for a neutral situation: [""Can you tell me more about that?"", ""What do you think about the recent events?"", ""I'm not sure I trust you."", ""I have to go now.""]
+";
 
     [Header("API Configuration")]
     [SerializeField] private string _modelName = "gemini-2.0-flash";
