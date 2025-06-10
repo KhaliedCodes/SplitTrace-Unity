@@ -51,6 +51,17 @@ public class AttackState : IEnemyStates
            // ResetAttackLayerWeight(enemy);
              enemy.Animator.SetBool("attack", false);
         }
+        
+        if (enemy.IsPlayerInAttackRange && enemy.HasLineOfSight())
+        {
+            float distanceToPlayer = Vector3.Distance(enemy.transform.position, enemy.Player.transform.position);
+            if (distanceToPlayer <= enemy.NavMeshAgent.stoppingDistance)
+            {
+                enemy.Animator.SetFloat("speed", 0f);
+            }
+        }
+
+
     }
 
     public void ExitState(IEnemy enemy)
