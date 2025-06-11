@@ -19,7 +19,6 @@ public class PlayerCamera : MonoBehaviour
 
         Plane[] frustumPlanes = GeometryUtility.CalculateFrustumPlanes(Camera.main);
         HashSet<GameObject> visibleThisFrame = new HashSet<GameObject>();
-
         foreach (Collider candidate in candidates)
         {
             GameObject obj = candidate.gameObject;
@@ -35,7 +34,15 @@ public class PlayerCamera : MonoBehaviour
             //     if (hit.collider != candidate)
             //         continue; // Occluded
             // }
+            if (obj.CompareTag("MovingObjectPosition"))
+            {
+                visibleThisFrame.Add(obj);
+                obj.GetComponent<MovingObjectPosition>().IsVisibleToCamera = true;
+            }
             if (obj.CompareTag("MovingObject"))
+                visibleThisFrame.Add(obj);
+
+            if (obj.CompareTag("ClueObject"))
                 visibleThisFrame.Add(obj);
             if (!currentlyVisible.Contains(obj))
             {
@@ -51,11 +58,33 @@ public class PlayerCamera : MonoBehaviour
             {
                 // Debug.Log("Exited View: " + obj.name);
                 // Call exit logic: e.g., obj.GetComponent<MyComponent>()?.OnExitedView();
-                obj.GetComponent<MovingObject>().MoveToNewPosition();
+                if (obj.CompareTag("MovingObject"))
+                    obj.GetComponent<MovingObject>().MoveToNewPosition();
+
+                if (obj.CompareTag("MovingObjectPosition"))
+                {
+                    obj.GetComponent<MovingObjectPosition>().IsVisibleToCamera = false;
+                }
+
             }
         }
 
         currentlyVisible = visibleThisFrame;
+    }
+
+    public void HighlightVisibleObjects()
+    {
+        foreach (GameObject obj in currentlyVisible)
+        {
+            if (obj.CompareTag("ClueObject"))
+            {
+                ClueObject clue = obj.GetComponent<ClueObject>();
+                if (clue != null)
+                {
+                    clue.SetHighlighted(true);
+                }
+            }
+        }
     }
     bool IsVisibleToCamera(Transform target)
     {

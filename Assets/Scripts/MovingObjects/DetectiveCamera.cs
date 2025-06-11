@@ -24,15 +24,17 @@ public class DetectiveCamera : MonoBehaviour
     }
 
 
-    void ChangeCamera()
+    public void ChangeCamera()
     {
         if (activeCamera == defaultCamera)
         {
             setCameraPriority(defaultCamera, detectiveCamera);
+            CameraManager.Instance.CurrentCameraMode = CameraMode.Detective;
         }
         else if (activeCamera == detectiveCamera)
         {
             setCameraPriority(detectiveCamera, defaultCamera);
+            CameraManager.Instance.CurrentCameraMode = CameraMode.Default;
         }
         else
         {
