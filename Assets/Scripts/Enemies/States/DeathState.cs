@@ -7,7 +7,7 @@ public class DeathState : IEnemyStates
         enemy.Animator.Play("Die");
         enemy.NavMeshAgent.speed = 0;
         enemy.NavMeshAgent.isStopped = true;
-        GameObject.Destroy(enemy.transform.gameObject, 2f);
+        GameObject.Destroy(enemy.transform.gameObject, 5f);
     }
     public void UpdateState(IEnemy enemy)
     {

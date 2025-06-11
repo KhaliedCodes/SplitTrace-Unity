@@ -12,6 +12,7 @@ public class PlayerDamageEffector : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
+            AudioManager.Instance.PlayOneShotAtPosition("Enemy", "Attack", transform.position);
             other.GetComponent<PlayerHealth>().TakeDamage(enemy.attackDamage);
         }
     }

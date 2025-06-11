@@ -15,6 +15,8 @@ public class ScreamState : IEnemyStates
         {
             e.Animator.SetLayerWeight(AttackLayerIndex, 0f);
             e.StunArea.GetComponent<SphereCollider>().enabled = true;
+
+            AudioManager.Instance.PlayOneShotAtPosition("Enemy", "Scream", e.transform.position);
         }
 
         _timer = 2f;
