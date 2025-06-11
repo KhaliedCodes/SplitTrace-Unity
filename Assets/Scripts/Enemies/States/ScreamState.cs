@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem.XR;
 public class ScreamState : IEnemyStates
 {
     private float _timer;
@@ -14,8 +15,8 @@ public class ScreamState : IEnemyStates
         if (enemy is Enemy e)
         {
             e.Animator.SetLayerWeight(AttackLayerIndex, 0f);
-            e.StunArea.GetComponent<SphereCollider>().enabled = true;
-
+            //e.StunArea.GetComponent<SphereCollider>().enabled = true;
+            e.StunArea.controller?.Stun(e.StunArea.stunDuration);
             AudioManager.Instance.PlayOneShotAtPosition("Enemy", "Scream", e.transform.position);
         }
 
@@ -42,7 +43,7 @@ public class ScreamState : IEnemyStates
         {
             // e.StunArea.gameObject.SetActive(false);
              e.Animator.SetLayerWeight(AttackLayerIndex, 1f);
-            e.StunArea.GetComponent<SphereCollider>().enabled = false;
+           // e.StunArea.GetComponent<SphereCollider>().enabled = false;
         }
     }
 }
