@@ -1,5 +1,4 @@
 using UnityEngine;
-
 public class PlayerDamageEffector : MonoBehaviour
 {
     private Enemy enemy;
