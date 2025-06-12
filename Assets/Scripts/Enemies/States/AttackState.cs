@@ -2,11 +2,15 @@
 
 public class AttackState : IEnemyStates
 {
+    private const int AttackLayerIndex = 1; // Index of the AttackLayer
+
     public void EnterState(IEnemy enemy)
     {
         enemy.NavMeshAgent.isStopped = true;
+
         if (enemy.Player != null)
         {
+            //enemy.Animator.SetFloat("speed", 0f);
             enemy.transform.LookAt(enemy.Player.transform);
         }
     }
@@ -17,35 +21,58 @@ public class AttackState : IEnemyStates
 
         if (!enemy.IsPlayerInAttackRange && enemy.IsPlayerInDetectionRange)
         {
+           // ResetAttackLayerWeight(enemy);
             enemy.ChangeState(new DetectionState());
             return;
         }
 
         if (!enemy.IsPlayerInDetectionRange || !enemy.HasLineOfSight())
         {
+          //  ResetAttackLayerWeight(enemy);
             enemy.ChangeState(new IdleState());
             return;
         }
 
         if (enemy.CanAttack())
         {
-            enemy.Animator.SetTrigger("attack");
+            enemy.Animator.SetBool("attack", true);
 
-            // Handle ranged attack if it's a RangedEnemy
+            // Set AttackLayer weight to 1 to enable the default Attack animation
+            enemy.Animator.SetLayerWeight(AttackLayerIndex, 1f);
+
             if (enemy is RangedEnemy rangedEnemy)
             {
                 rangedEnemy.ShootProjectile();
             }
-            // Melee attack would be handled via animation events
-            if (enemy is Enemy meleeEnemy)
+        }
+        else
+        {
+            // Reset the layer weight if not attacking
+           // ResetAttackLayerWeight(enemy);
+             enemy.Animator.SetBool("attack", false);
+        }
+        
+        if (enemy.IsPlayerInAttackRange && enemy.HasLineOfSight())
+        {
+            float distanceToPlayer = Vector3.Distance(enemy.transform.position, enemy.Player.transform.position);
+            if (distanceToPlayer <= enemy.NavMeshAgent.stoppingDistance)
             {
-                meleeEnemy.animator.Play("Attack");
+                enemy.Animator.SetFloat("speed", 0f);
             }
         }
+
+
     }
 
     public void ExitState(IEnemy enemy)
     {
         enemy.NavMeshAgent.isStopped = false;
+        enemy.Animator.SetBool("attack", false);
+        //ResetAttackLayerWeight(enemy);
+    }
+
+    private void ResetAttackLayerWeight(IEnemy enemy)
+    {
+        enemy.Animator.SetLayerWeight(AttackLayerIndex, 0f);
     }
 }
