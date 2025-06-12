@@ -32,18 +32,20 @@ public class GeminiAPIClient : MonoBehaviour
 
     private const string BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models/";
  private const string CHOICE_PROMPT = @"
-    Based on our chat history AND the overall story context provided (including story progress, discovered clues, and the NPC's personality), generate 3-4 appropriate dialogue choices for the player.
+   You are generating dialogue choices for a detective player.
+    Based on our chat history AND the overall story context provided (including story progress, discovered clues, the NPC's personality, and their connection to the case), generate 3-4 appropriate dialogue choices for the player.
 
-    Your primary goal is to make the choices reflect the NPC's current emotional state and their potential to become an enemy based on the narrative.
+    Your primary goal is to make the choices reflect a detective's investigative approach, focusing on gathering information, making deductions, and strategically influencing the conversation.
 
-    - If the story context or chat history indicates rising tension, hostility, or if the NPC has been accused or cornered, **two of the choices must be extremely aggressive, accusatory, or threatening.**
-    - If the context is neutral or positive, provide a balanced mix of choices (e.g., inquisitive, friendly, neutral). You can include one slightly provocative choice to allow the player to steer the conversation towards conflict if they wish.
-    - If the NPC is revealing a secret or is in a vulnerable state, provide choices that allow the player to be compassionate, exploit the vulnerability, or ask for more details.
+    - **Inquiry/Investigation:** Prioritize choices that ask detailed questions, probe for specifics, or seek clarification on past statements.
+    - **Confrontation/Pressure (if warranted by context):** If the story context or chat history indicates suspicion, deception, or rising tension, **at least two of the choices must be direct, highly accusatory, threatening, or overtly aggressive, specifically designed to provoke a strong negative reaction from the NPC.** These choices should reference clues or inconsistencies forcefully.
+    - **Empathy/Strategic Approach:** If the NPC is revealing a secret or is in a vulnerable state, provide choices that allow the player to be compassionate, exploit the vulnerability for information, or ask for more details in a supportive (or manipulative) manner.
+    - **Neutral/Observational:** Include options that allow the player to remain neutral, observe, or steer the conversation in a different direction for information gathering.
 
-    ALWAYS format your response as a single, clean JSON array of strings. The choices must be concise and directly relevant to the last thing the NPC said.
+    ALWAYS format your response as a single, clean JSON array of strings. The choices must be concise and directly relevant to the last thing the NPC said, but framed from a detective's perspective.
 
-    Example for a tense situation: [""I know you're lying to me."", ""Tell me the truth, or else!"", ""What are you not telling me?"", ""I'll find out on my own.""]
-    Example for a neutral situation: [""Can you tell me more about that?"", ""What do you think about the recent events?"", ""I'm not sure I trust you."", ""I have to go now.""]
+    Example for a tense situation (detective, with hostility): [""I know you're lying, and I have the evidence to prove it. Confess now!"", ""Don't even think about running, I'll have you locked up for this."", ""What are you not telling me about that night?"", ""Let's review your alibi for the last time before I bring in the precinct.""]
+    Example for a neutral situation (detective): [""Can you elaborate on your relationship with the victim?"", ""What's your theory on what happened?"", ""I noticed you seemed distressed earlier, is everything alright?"", ""Thank you for your cooperation.""]
 ";
 
     [Header("API Configuration")]

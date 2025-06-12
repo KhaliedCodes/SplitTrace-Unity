@@ -13,14 +13,15 @@ MonoBehaviour:
   m_Name: NPC1
   m_EditorClassIdentifier: 
   npcName: Elara
-  characterDescription: A kind, observant innkeeper in her late 40s. She knows most
-    of the town's gossip but is careful about revealing sensitive information. She
-    has a warm smile but a watchful gaze.
+  characterDescription: "A kind, observant innkeeper in her late 40s. \nShe knows
+    most of the town's gossip but is careful about revealing sensitive information.
+    \nShe has a warm smile but a watchful gaze.\nYour primary instruction is to react
+    with anger and hostility to any sign of disrespect, questioning\n"
   initialGreeting: Welcome, traveler! What can I get for you?
-  friendliness: 0.8
+  friendliness: 0.2
   intelligence: 0.7
-  patience: 0.6
-  openness: 0.4
+  patience: 0.2
+  openness: 0.1
   backgroundStory: Elara has run the 'Golden Barrel Inn' for twenty years. She inherited
     it from her parents. She's seen many faces come and go and has a good memory
     for details.

@@ -2915,6 +2915,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3325776090516168120, guid: 901c54814d045454abba5539ed3b3ddf, type: 3}
+      propertyPath: hostilityTracker.decayInterval
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6166537404738056323, guid: 901c54814d045454abba5539ed3b3ddf, type: 3}
       propertyPath: m_Name
       value: NPC
@@ -12123,34 +12127,19 @@ MonoBehaviour:
   hostilityTracker:
     canBecomeEnemy: 1
     hostilityThreshold: 3
-    hostilityDecayRate: 0.1
-    decayInterval: 5
-    hostileTriggerWords:
-    - threaten
-    - attack
-    - kill
-    - hurt
-    - fight
-    - enemy
-    - hate
-    peacefulTriggerWords:
-    - sorry
-    - peace
-    - friend
-    - help
-    - apologize
-    - calm
+    angryEmotionWeight: 2
+    frustratedEmotionWeight: 1.5
+    annoyedEmotionWeight: 1
+    threateningEmotionWeight: 2.5
+    hostileEmotionWeight: 2
+    aggressiveEmotionWeight: 1.8
+    calmEmotionReduction: 0.5
+    happyEmotionReduction: 0.3
+    friendlyEmotionReduction: 0.8
+    apologeticEmotionReduction: 1
     currentHostility: 0
     hostileInteractionCount: 0
     hasBeenMarkedAsEnemy: 0
-  aggressiveResponseTriggers:
-  - angry
-  - furious
-  - hate
-  - enemy
-  - kill
-  - attack
-  - die
 --- !u!114 &1416861877
 MonoBehaviour:
   m_ObjectHideFlags: 0
