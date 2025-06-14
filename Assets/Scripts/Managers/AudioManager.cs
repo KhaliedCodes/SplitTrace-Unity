@@ -100,4 +100,28 @@ public class AudioManager : MonoBehaviour
     {
         return audioSources.Find(source => !source.isPlaying);
     }
+
+    public void PlayOneShotAtPosition(string category, string clipName, Vector3 position, float spatialBlend = 1f)
+    {
+        AudioClip clip = audioClipsSO.GetAudioClip(category, clipName);
+
+        if (clip == null)
+        {
+            Debug.LogWarning($"Audio clip '{clipName}' in category '{category}' not found!");
+            return;
+        }
+
+        GameObject tempGO = new GameObject("TempAudio");
+        tempGO.transform.position = position;
+
+        AudioSource audioSource = tempGO.AddComponent<AudioSource>();
+        audioSource.clip = clip;
+        audioSource.spatialBlend = spatialBlend; // 3D sound
+        audioSource.minDistance = 1f;
+        audioSource.maxDistance = 20f;
+        audioSource.Play();
+
+        Destroy(tempGO, clip.length);
+    }
+
 }

@@ -6,11 +6,10 @@ public class AttackState : IEnemyStates
 
     public void EnterState(IEnemy enemy)
     {
-        enemy.NavMeshAgent.isStopped = true;
+      //  enemy.NavMeshAgent.isStopped = true;
 
         if (enemy.Player != null)
         {
-            //enemy.Animator.SetFloat("speed", 0f);
             enemy.transform.LookAt(enemy.Player.transform);
         }
     }
@@ -21,14 +20,12 @@ public class AttackState : IEnemyStates
 
         if (!enemy.IsPlayerInAttackRange && enemy.IsPlayerInDetectionRange)
         {
-           // ResetAttackLayerWeight(enemy);
             enemy.ChangeState(new DetectionState());
             return;
         }
 
         if (!enemy.IsPlayerInDetectionRange || !enemy.HasLineOfSight())
         {
-          //  ResetAttackLayerWeight(enemy);
             enemy.ChangeState(new IdleState());
             return;
         }
@@ -47,11 +44,10 @@ public class AttackState : IEnemyStates
         }
         else
         {
-            // Reset the layer weight if not attacking
-           // ResetAttackLayerWeight(enemy);
              enemy.Animator.SetBool("attack", false);
         }
-        
+
+        // this is to ensure the enemy stops moving when player in near place according to the NavMesh Stopping Distance
         if (enemy.IsPlayerInAttackRange && enemy.HasLineOfSight())
         {
             float distanceToPlayer = Vector3.Distance(enemy.transform.position, enemy.Player.transform.position);

@@ -477,6 +477,10 @@ public class CustomThridPersonController : MonoBehaviour
             StartCoroutine(RecoverFromStun(duration));
         }
     }
+    public void Unstun()
+    {
+       StartCoroutine(RecoverFromStun(0f));
+    }
     private IEnumerator RecoverFromStun(float duration)
     {
         yield return new WaitForSeconds(duration);
