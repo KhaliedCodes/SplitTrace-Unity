@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 8354922244301252109}
   - component: {fileID: 5907803521261968}
   - component: {fileID: 6084878660872631786}
+  - component: {fileID: 4083090280214944357}
   m_Layer: 0
   m_Name: pPlane2
   m_TagString: Untagged
@@ -86,3 +87,24 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &4083090280214944357
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1088685230706283324}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 100.00002, y: 1.7107548, z: 99.99999}
+  m_Center: {x: -1.2156075e-14, y: 0.8554079, z: -0.000011444092}
