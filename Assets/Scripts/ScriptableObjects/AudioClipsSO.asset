@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7dcb70fa932c8a84781375634a3b5f6f, type: 3}
+  m_Name: AudioClipsSO
+  m_EditorClassIdentifier: 
+  audioCategories:
+  - category: Enemy
+    audioClips:
+    - clipName: PreScream
+      audioClip: {fileID: 8300000, guid: 9aba26b254654c74cbabd6f8e0e54fbf, type: 3}
+    - clipName: Scream
+      audioClip: {fileID: 8300000, guid: 4892b4c5e71752d4aaf21f21412fdb8f, type: 3}
+    - clipName: Attack
+      audioClip: {fileID: 8300000, guid: 23700f5b4826ede4ebaff745ae749cfd, type: 3}

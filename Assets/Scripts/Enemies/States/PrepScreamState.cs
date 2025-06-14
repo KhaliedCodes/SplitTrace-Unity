@@ -4,11 +4,14 @@ public class PrepScreamState : IEnemyStates
 {
     public void EnterState(IEnemy enemy)
     {
-        enemy.Animator.Play("ChargeScream");
+       
         enemy.NavMeshAgent.isStopped = true;
      if (enemy is Enemy Scream)
         {
+            enemy.Animator.Play("ChargeScream");
+            AudioManager.Instance.PlayOneShotAtPosition("Enemy", "PreScream", Scream.transform.position);
             Scream.StartScreamAfterDelay(2f);
+
         }
     }
 
