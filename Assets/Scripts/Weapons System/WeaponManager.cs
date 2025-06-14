@@ -45,7 +45,8 @@ public class WeaponManager : MonoBehaviour
     private WeaponsInputSystem weaponInputs;
     private PlayerAnimations playerAnimations;
 
-    public Animator animator;
+     public Animator animator;
+    private int hashAttackCount = Animator.StringToHash("AttackCount");
 
 
     public Vector3 mouseWorldPosition { get; private set; } = Vector3.zero;
@@ -73,14 +74,15 @@ public class WeaponManager : MonoBehaviour
         weaponInputs.WeaponsActions.Unequip.performed += OnUnequip;
         weaponInputs.WeaponsActions.Drop.performed += OnDrop;
         weaponInputs.WeaponsActions.Pickup.performed += OnPickup;
-        weaponInputs.WeaponsActions.Shoot.performed += ctx => OnShoot(true);
-        weaponInputs.WeaponsActions.Shoot.canceled += ctx => OnShoot(false);
+        weaponInputs.WeaponsActions.Shoot.performed += OnShoot;
+        weaponInputs.WeaponsActions.Shoot.canceled += ctx => animator.SetBool("Shoot", false);
         weaponInputs.WeaponsActions.Aim.performed += ctx => SetAim(true);
         weaponInputs.WeaponsActions.Aim.canceled += ctx => SetAim(false);
     }
 
     private void Start()
     {
+        animator.SetLayerWeight(0, 1f); 
         rangedIconUI.enabled = false;
         meleeIconUI.enabled = false;
         ammoText.enabled = false;
@@ -100,14 +102,17 @@ public class WeaponManager : MonoBehaviour
 
         Vector2 screenCenterPoint = new Vector2(Screen.width / 2, Screen.height / 2);
         Ray ray = Camera.main.ScreenPointToRay(screenCenterPoint);
-        if (Physics.Raycast(ray, out RaycastHit hit, 999f, aimLayerMask))
+        if (Physics.Raycast(ray, out RaycastHit hit, 999f))
         {
             aimTarget.position = hit.point;
 
             mouseWorldPosition = hit.point;
+
         }
         else
         {
+            //Debug.Log($"mouseWorldPosition"+ mouseWorldPosition);
+
             mouseWorldPosition = ray.origin + ray.direction * 100f;
         }
 
@@ -127,6 +132,7 @@ public class WeaponManager : MonoBehaviour
             aimRig.weight = 0f; 
 
         }
+
     }
 
 
@@ -137,24 +143,31 @@ public class WeaponManager : MonoBehaviour
         AmmoUI();
     }
 
-    private void OnShoot(bool IsShooting)
+    private void OnShoot(InputAction.CallbackContext context)
     {
         if (!currentWeapon) return;
 
-        if (currentWeapon != null && currentWeapon is MeleeWeapon weapon)
+        if (currentWeapon is MeleeWeapon me)
         {
-            if (Time.time < lastFireTime + weapon.attackDuration) return;
-            playerAnimations.SetAnimation("Attack");
-            lastFireTime = Time.time;
+            //if (Time.time < lastFireTime + weapon.attackDuration) return;
+            ////playerAnimations.SetAnimation("Attack");
 
+            //lastFireTime = Time.time;
+
+            if (animator.GetCurrentAnimatorStateInfo(0).IsTag("MeleeAttack"))
+                return;
+
+            animator.SetTrigger("Attack");
+            AttackCount = me.meleeType;
+            currentWeapon.Use();
         }
-        else
+        else if (currentWeapon is RangedWeapon)
         {
-            animator.SetBool("Shoot", IsShooting);
+            animator.SetBool("Shoot", true);
+            currentWeapon.Use(mouseWorldPosition);
+            AmmoUI();
         }
-        animator.SetTrigger("Aim");
-        currentWeapon?.Use(mouseWorldPosition);
-        AmmoUI();
+
 
     }
 
@@ -317,11 +330,11 @@ public class WeaponManager : MonoBehaviour
             ammoText.enabled = true;
             ammoText.text = $"Current Ammo: {rw.ammoInMagazine} / {rw.totalAmmo + managerTotalAmmo}";
             defultCrosshairUI.SetActive(!IsAiming);
-            Debug.Log("in ranged");
+ 
         }
         else
         {
-            Debug.Log("in melee");
+
             ammoText.enabled = false;
             defultCrosshairUI.SetActive(false);
         }
@@ -370,5 +383,11 @@ public class WeaponManager : MonoBehaviour
     }
 
 
-    
+    public int AttackCount
+    {
+        get => animator.GetInteger(hashAttackCount);
+        set => animator.SetInteger(hashAttackCount, value);
+    }
+
+
 }

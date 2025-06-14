@@ -7,10 +7,14 @@ public class Bullet : MonoBehaviour
     [SerializeField] float lifetime = 2f;
     [SerializeField] Transform vfxBlood;
     [SerializeField] Transform vfxHole;
-    //[SerializeField] float damage = 10f;
-    RangedWeapon rangedWeapon;
+    [SerializeField] float damage = 10f;
     Rigidbody rb;
 
+
+    public void init(float damage)
+    {
+        this.damage = damage;
+    }
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -23,25 +27,24 @@ public class Bullet : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         IDamagable target = other.GetComponent<IDamagable>();
+        Debug.Log("Hit the enemy");
+        if (target != null)
+        {
 
-        //if (target != null)
-        //{
+            Debug.Log("the tag is : " + other.tag);
+            Debug.Log(other.tag == "Enemy");
 
-            if (other.CompareTag("Enemy"))
+            if (other.tag == "Enemy")
             {
-                //target.TakeDamage(rangedWeapon.damage);
-               
-                    Debug.Log("Hit Enemy: " + other.name + " with damage: " );
+                Debug.Log("Hit Enemy: " + other.name + " with damage: ");
+                target.TakeDamage(damage);
+
                     Transform bloodVFX = Instantiate(vfxBlood, transform.position, Quaternion.identity);
                     Destroy(bloodVFX.gameObject, 2f);
                 
             }
-        else
-        {
-            //Transform holeVFX = Instantiate(vfxHole, transform.position, Quaternion.identity);
-            //Destroy(holeVFX.gameObject, 2f);
+       
         }
-        //}
         //Destroy(gameObject);
     }
 }

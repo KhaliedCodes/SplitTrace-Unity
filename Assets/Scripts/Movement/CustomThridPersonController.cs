@@ -297,8 +297,8 @@ public class CustomThridPersonController : MonoBehaviour
             Vector3 targetDirection;
 
             // rotate to face input direction relative to camera position
-            //if (_rotateOnMove)
-            //    transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
+           
+                
             if (lockOnToEnemy && enemyTarget != null)
             {
                 // When locked on to an enemy, ALWAYS face the enemy regardless of movement direction
@@ -331,7 +331,10 @@ public class CustomThridPersonController : MonoBehaviour
                 float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity,
                     RotationSmoothTime);
 
-                transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
+                if (_rotateOnMove)
+                {
+                    transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
+                }
 
                 // Move in the direction we're facing
                 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;

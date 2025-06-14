@@ -130,7 +130,7 @@ public class Enemy : MonoBehaviour, IEnemy, IDamagable
 
         if (Physics.Raycast(transform.position + Vector3.up * 1.5f, direction, out RaycastHit hit, distance))
         {
-            Debug.Log(hit.collider.tag);
+            //Debug.Log(hit.collider.tag);
 
             if (hit.collider.CompareTag("Player"))
             { 

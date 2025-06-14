@@ -2,12 +2,19 @@ using System.Collections;
 using StarterAssets;
 using UnityEngine;
 
+public enum MeleeType
+{
+    None = 0,
+    Sword = 1,
+    Axe = 2,
+}
 public class MeleeWeapon : Weapon
 {
   public int damage;
   public float attackRange;
   public Collider hitbox;
   public float attackDuration = 0.3f;
+  public int meleeType;
 
 
 

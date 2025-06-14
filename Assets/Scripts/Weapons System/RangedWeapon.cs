@@ -56,6 +56,7 @@ public class RangedWeapon : Weapon
                 lastFireTime = Time.time;
             
                 Bullet bullet = Instantiate(bulletPrefab, firePoint.position, Quaternion.LookRotation(direction, Vector3.up));
+            bullet.init(damage);
             Debug.Log("Fired! Remaining ammo: " + ammoInMagazine);
             StartCoroutine(ActivateMuzzleFlash());
             AudioManager.Instance.PlayAudioClip("Weapons", $"{weaponName}", false);
