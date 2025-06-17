@@ -27,7 +27,7 @@ public class NPCController : MonoBehaviour
         interactionTrigger.isTrigger = true;
         
         dialogueManager = FindFirstObjectByType<DialogueManager>();
-        geminiAccessor = GetComponent<GeminiAccessor>() ?? gameObject.AddComponent<GeminiAccessor>();
+        geminiAccessor = FindFirstObjectByType<GeminiAccessor>();
         
         if (personality != null)
             geminiAccessor.ConfigureWithPersonality(personality);
