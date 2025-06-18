@@ -2,8 +2,13 @@ using UnityEngine;
 using UnityEngine.AI;
 using System.Collections.Generic;
 
+
+
 public class RangedEnemy : MonoBehaviour, IEnemy, IDamagable
 {
+    [Header("EnemyType")]
+    [SerializeField] private EnemyType enemyType = EnemyType.Normal;
+
     [Header("Stats")]
     [SerializeField] private float health = 100;
     [SerializeField] private float Maxhealth = 100;
@@ -25,6 +30,7 @@ public class RangedEnemy : MonoBehaviour, IEnemy, IDamagable
     public GameObject projectilePrefab;
     public GameObject StunprojectilePrefab;
     public bool CanStun = false;
+    [SerializeField] private Transform FirePoint;
     [SerializeField] private float stunCooldown = 5f; 
     private float _lastStunTime = -Mathf.Infinity;
 
@@ -186,7 +192,7 @@ public class RangedEnemy : MonoBehaviour, IEnemy, IDamagable
 
         Vector3 direction = (player.transform.position - transform.position).normalized;
 
-        if (CanStun && Time.time >= _lastStunTime + stunCooldown)
+        if (enemyType == EnemyType.Stun && CanStun && Time.time >= _lastStunTime + stunCooldown)
         {
             ShootStunProjectile(direction);
             CanStun = false;

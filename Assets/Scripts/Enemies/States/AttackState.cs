@@ -35,7 +35,7 @@ public class AttackState : IEnemyStates
             enemy.Animator.SetBool("attack", true);
 
             // Set AttackLayer weight to 1 to enable the default Attack animation
-            enemy.Animator.SetLayerWeight(AttackLayerIndex, 1f);
+           // enemy.Animator.SetLayerWeight(AttackLayerIndex, 1f);
 
             if (enemy is RangedEnemy rangedEnemy)
             {
@@ -69,6 +69,6 @@ public class AttackState : IEnemyStates
 
     private void ResetAttackLayerWeight(IEnemy enemy)
     {
-        enemy.Animator.SetLayerWeight(AttackLayerIndex, 0f);
+      //  enemy.Animator.SetLayerWeight(AttackLayerIndex, 0f);
     }
 }
