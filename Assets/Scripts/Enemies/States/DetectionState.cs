@@ -50,8 +50,11 @@ public class DetectionState : IEnemyStates
                 if (enemy is RangedEnemy)
                 {
                     enemy.Animator.SetBool("Detect", false);
+                    //RangedEnemy renemy = enemy as RangedEnemy;
+                    //renemy.LookAtPlayer();
                 }
                 enemy.Animator.SetBool("Shoot",true);
+
                 enemy.ChangeState(new AttackState());
             }
         }

@@ -2078,6 +2078,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -4372093788385109707, guid: 628c0c98c8dd93446aad5ef82f5d8d24, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 628c0c98c8dd93446aad5ef82f5d8d24, type: 3}
       propertyPath: m_Name
       value: ShooterEnemy
@@ -2085,6 +2089,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 628c0c98c8dd93446aad5ef82f5d8d24, type: 3}
       propertyPath: m_Layer
       value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 628c0c98c8dd93446aad5ef82f5d8d24, type: 3}
+      propertyPath: m_TagString
+      value: Enemy
       objectReference: {fileID: 0}
     - target: {fileID: 5866666021909216657, guid: 628c0c98c8dd93446aad5ef82f5d8d24, type: 3}
       propertyPath: m_Controller
@@ -6952,7 +6960,6 @@ MonoBehaviour:
   projectilePrefab: {fileID: 4954223955266911571, guid: 0ee78e782619af24ebe8546ea38f1908, type: 3}
   StunprojectilePrefab: {fileID: 0}
   CanStun: 0
-  FirePoint: {fileID: 748085068}
   stunCooldown: 5
   waypoints:
   - {fileID: 1545684426}
@@ -6963,7 +6970,7 @@ MonoBehaviour:
   _currentWaypointIndex: 0
   _detectionChecker: {fileID: 1209713496}
   _attackChecker: {fileID: 1001139059}
-  RayCastY: 0
+  RayCastY: 2
   _lastKnownPlayerPosition: {x: 0, y: 0, z: 0}
 --- !u!54 &1306194943
 Rigidbody:

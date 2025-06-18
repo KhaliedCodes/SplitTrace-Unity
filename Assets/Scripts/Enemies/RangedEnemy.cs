@@ -30,7 +30,6 @@ public class RangedEnemy : MonoBehaviour, IEnemy, IDamagable
     public GameObject projectilePrefab;
     public GameObject StunprojectilePrefab;
     public bool CanStun = false;
-    [SerializeField] private Transform FirePoint;
     [SerializeField] private float stunCooldown = 5f; 
     private float _lastStunTime = -Mathf.Infinity;
 
@@ -95,6 +94,7 @@ public class RangedEnemy : MonoBehaviour, IEnemy, IDamagable
         {
            _attackChecker.Initialize(attackRange, this);
         }
+        navMeshAgent.GetComponent<NavMeshAgent>().stoppingDistance = attackRange;
     }
 
     private void Start()
@@ -114,6 +114,10 @@ public class RangedEnemy : MonoBehaviour, IEnemy, IDamagable
             if (!CanStun && Time.time >= _lastStunTime + stunCooldown)
             {
                 CanStun = true;
+            }
+            if(_currentState is AttackState )
+            {
+                LookAtPlayer();
             }
         }
     }
@@ -249,6 +253,13 @@ public class RangedEnemy : MonoBehaviour, IEnemy, IDamagable
         }
     }
 
+    public void LookAtPlayer()
+    {
+        Vector3 targetPosition = new Vector3(player.transform.position.x, transform.position.y + 25f, player.transform.position.z);
+        Quaternion targetRotation = Quaternion.LookRotation(targetPosition - transform.position);
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 20f);
+
+    }
 
     public void TakeDamage(float damage)
     {

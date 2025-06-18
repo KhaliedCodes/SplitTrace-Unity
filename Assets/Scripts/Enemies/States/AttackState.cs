@@ -39,6 +39,7 @@ public class AttackState : IEnemyStates
 
             if (enemy is RangedEnemy rangedEnemy)
             {
+               // rangedEnemy.LookAtPlayer();
                 rangedEnemy.ShootProjectile();
             }
         }
