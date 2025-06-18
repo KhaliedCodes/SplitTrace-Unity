@@ -1,14 +1,13 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class MovingObject : MonoBehaviour
 {
-    [SerializeField] private List<Transform> PositionsToMoveTo = new();
-
+    [SerializeField] private List<MovingObjectPosition> PositionsToMoveTo = new();
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-
     }
 
     // Update is called once per frame
@@ -27,17 +26,32 @@ public class MovingObject : MonoBehaviour
         }
 
         // Move the object to the first position in the list
-        Transform targetPosition = PositionsToMoveTo[Random.Range(0, PositionsToMoveTo.Count)];
-        while (!CheckNewPositionAvailable(targetPosition.position))
+        MovingObjectPosition targetPosition = PositionsToMoveTo[Random.Range(0, PositionsToMoveTo.Count)]; ;
+        bool availableToMove = false;
+        for (int i = 0;  i < 3; i++)
         {
-            targetPosition = PositionsToMoveTo[Random.Range(0, PositionsToMoveTo.Count)];
+            if (!CheckNewPositionAvailable(targetPosition))
+            {
+                targetPosition = PositionsToMoveTo[Random.Range(0, PositionsToMoveTo.Count)];
+                availableToMove = false;
+            }
+            else
+            {
+                availableToMove = true;
+                break;
+            }
+        };
+        if(!availableToMove)
+        {
+            Debug.LogWarning("No available positions to move to after checking 3 times.");
+            return;
         }
-        transform.position = targetPosition.position;
+        transform.position = targetPosition.transform.position;
     }
     
 
-    bool CheckNewPositionAvailable(Vector3 NewPosition)
+    bool CheckNewPositionAvailable(MovingObjectPosition NewPosition)
     {
-        return NewPosition != transform.position;
+        return NewPosition.transform.position != transform.position && NewPosition.IsVisibleToCamera == false;
     }
 }

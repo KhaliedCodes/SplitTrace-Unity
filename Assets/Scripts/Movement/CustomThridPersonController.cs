@@ -512,5 +512,4 @@ public class CustomThridPersonController : MonoBehaviour
         GetComponent<PlayerInput>().enabled = true; // Disable input during stun
 
     }
-
 }

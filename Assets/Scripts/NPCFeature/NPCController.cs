@@ -14,6 +14,7 @@ public class NPCController : MonoBehaviour
     private DialogueManager dialogueManager;
     private GeminiAccessor geminiAccessor;
     private PlayerController nearbyPlayer;
+    private Animator npcAnimator;
     
     private bool isInteracting;
     private bool waitingForChoices = false;
@@ -25,17 +26,26 @@ public class NPCController : MonoBehaviour
         interactionTrigger = gameObject.AddComponent<SphereCollider>();
         interactionTrigger.radius = interactionRadius;
         interactionTrigger.isTrigger = true;
-        
+
         dialogueManager = FindFirstObjectByType<DialogueManager>();
-        geminiAccessor = GetComponent<GeminiAccessor>() ?? gameObject.AddComponent<GeminiAccessor>();
-        
+        geminiAccessor = FindFirstObjectByType<GeminiAccessor>();
+
         if (personality != null)
             geminiAccessor.ConfigureWithPersonality(personality);
 
         geminiAccessor.OnResponseProcessed += HandleAIResponse;
         geminiAccessor.OnChoicesReceived += HandleChoicesReceived;
-        
+
         hostilityTracker.Initialize();
+        
+        if (npcAnimator == null)
+        {
+            npcAnimator = GetComponent<Animator>();
+        }
+        else
+        {
+            Debug.Log($"[{NPCName}] No Animator found on NPC. Dialogue animations will not work.");
+        }
     }
 
     private void Update() 
@@ -85,6 +95,7 @@ public class NPCController : MonoBehaviour
 
         isInteracting = true;
         dialogueManager.StartDialogue(this, personality?.initialGreeting ?? "Hello there!");
+        npcAnimator?.SetBool("inDialogue", true);
     }
 
     public void SendPlayerChoice(string choiceText, int choiceIndex)
@@ -136,30 +147,6 @@ public class NPCController : MonoBehaviour
             !hostilityTracker.IsEnemy)
         {
             Debug.Log($"[WARNING] {NPCName} is getting very hostile! ({hostilityTracker.CurrentHostility:F1}/{hostilityTracker.hostilityThreshold})");
-        }
-    }
-
-    private string ModifyResponseBasedOnHostility(string originalResponse, string emotion)
-    {
-        float hostilityLevel = hostilityTracker.CurrentHostility;
-        
-        // If hostility is building up, add subtle tension to responses
-        if (hostilityLevel > hostilityTracker.hostilityThreshold * 0.5f && !hostilityTracker.IsEnemy)
-        {
-            // Add some tension indicators
-            string[] tensionPrefixes = 
-            {
-                "Look, ",
-                "Listen here, ",
-                "I'm starting to get annoyed... ",
-                "You're really pushing it... "
-            };
-            
-            if (Random.Range(0f, 1f) < 0.3f) // 30% chance to add tension
-            {
-                string prefix = tensionPrefixes[Random.Range(0, tensionPrefixes.Length)];
-                return prefix + originalResponse;
-            }
         }
         
         return originalResponse;
@@ -246,12 +233,12 @@ public class NPCController : MonoBehaviour
     {
         isInteracting = false;
         waitingForChoices = false;
-        
         // Don't clear chat history if NPC is hostile - they should remember
         if (!hostilityTracker.IsEnemy)
         {
             geminiAccessor?.ClearChatHistory();
         }
+         npcAnimator?.SetBool("inDialogue", false);
     }
 
     public void EndInteraction()
