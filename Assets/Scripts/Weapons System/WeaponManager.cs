@@ -88,6 +88,7 @@ public class WeaponManager : MonoBehaviour
         ammoText.enabled = false;
         playerAnimations = GetComponent<PlayerAnimations>();
         animator = GetComponent<Animator>();
+
     }
 
     private void Update()
@@ -102,7 +103,7 @@ public class WeaponManager : MonoBehaviour
 
         Vector2 screenCenterPoint = new Vector2(Screen.width / 2, Screen.height / 2);
         Ray ray = Camera.main.ScreenPointToRay(screenCenterPoint);
-        if (Physics.Raycast(ray, out RaycastHit hit, 999f))
+        if (Physics.Raycast(ray, out RaycastHit hit, 999f , aimLayerMask))
         {
             aimTarget.position = hit.point;
 
@@ -116,7 +117,7 @@ public class WeaponManager : MonoBehaviour
             mouseWorldPosition = ray.origin + ray.direction * 100f;
         }
 
-
+      
         if (IsAiming)
         {
             Vector3 worldAimTarget = mouseWorldPosition;

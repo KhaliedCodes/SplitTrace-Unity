@@ -1,5 +1,4 @@
 using UnityEngine;
-
 public class PlayerDamageEffector : MonoBehaviour
 {
     private Enemy enemy;
@@ -13,6 +12,7 @@ public class PlayerDamageEffector : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
+            AudioManager.Instance.PlayOneShotAtPosition("Enemy", "Attack", transform.position);
             other.GetComponent<PlayerHealth>().TakeDamage(enemy.attackDamage);
         }
     }

@@ -117,7 +117,11 @@ public class CustomThridPersonController : MonoBehaviour
 
     // UI reference for dodge cooldown indicator (optional)
     public UnityEngine.UI.Image dodgeCooldownIndicator;
- 
+
+    // Stunning 
+    public bool Stunned = false;
+    private float defaultMoveSpeed;
+    private float defaultSprintSpeed;
 
     private bool IsCurrentDeviceMouse
     {
@@ -147,6 +151,9 @@ public class CustomThridPersonController : MonoBehaviour
         {
             dodgeTrail.emitting = false;
         }
+
+        defaultMoveSpeed = MoveSpeed;
+        defaultSprintSpeed = SprintSpeed;
     }
 
     private void Start()
@@ -290,15 +297,24 @@ public class CustomThridPersonController : MonoBehaviour
         // normalise input direction
         Vector3 inputDirection = new Vector3(_input.move.x, 0.0f, _input.move.y).normalized;
 
-   
+
+        // note: Vector2's != operator uses approximation so is not floating point error prone, and is cheaper than magnitude
+        // if there is a move input rotate player when the player is moving
+
+        //if (WeaponManager.Instance != null && WeaponManager.Instance.IsAiming)
+        //{
+        //    // 👇 Directly face camera forward
+        //    float cameraY = _mainCamera.transform.eulerAngles.y ;
+        //    float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, cameraY, ref _rotationVelocity, RotationSmoothTime);
+        //    transform.rotation = Quaternion.Euler(5.0f, rotation, 0.0f);
+        //}
+
         if (_input.move != Vector2.zero)
         {
             // Different handling depending on whether locked onto an enemy or not
             Vector3 targetDirection;
 
-            // rotate to face input direction relative to camera position
-           
-                
+            // rotate to face input direction relative to camera position         
             if (lockOnToEnemy && enemyTarget != null)
             {
                 // When locked on to an enemy, ALWAYS face the enemy regardless of movement direction
@@ -418,7 +434,7 @@ public class CustomThridPersonController : MonoBehaviour
             if (_hasAnimator)
             {
                 _animator.SetFloat(_animIDSpeed, 0);
-                _animator.SetFloat(_animIDMotionSpeed, 0);
+                _animator.SetFloat(_animIDMotionSpeed, 1);
             }
         }
     }
@@ -469,4 +485,32 @@ public class CustomThridPersonController : MonoBehaviour
     {
         _rotateOnMove = rotate;
     }
+
+    public void Stun(float duration)
+    {
+        if (!Stunned)
+        {
+            Stunned = true;
+            MoveSpeed = 0;
+            SprintSpeed = 0;
+            GetComponent<Animator>()?.SetBool("Stun", true);
+            GetComponent<PlayerInput>().enabled = false; // Disable input during stun
+            StartCoroutine(RecoverFromStun(duration));
+        }
+    }
+    public void Unstun()
+    {
+       StartCoroutine(RecoverFromStun(0f));
+    }
+    private IEnumerator RecoverFromStun(float duration)
+    {
+        yield return new WaitForSeconds(duration);
+        MoveSpeed = defaultMoveSpeed;
+        SprintSpeed = defaultSprintSpeed;
+        GetComponent<Animator>()?.SetBool("Stun", false);
+        Stunned = false;
+        GetComponent<PlayerInput>().enabled = true; // Disable input during stun
+
+    }
+
 }

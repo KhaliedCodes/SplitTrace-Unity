@@ -3920,8 +3920,6 @@ GameObject:
   - component: {fileID: 2805150321586182606}
   - component: {fileID: 5636651533981504643}
   - component: {fileID: 8984171461895827434}
-  - component: {fileID: 3124213470409598237}
-  - component: {fileID: 6312527473240127471}
   m_Layer: 8
   m_Name: PlayerArmature
   m_TagString: Player
@@ -4154,6 +4152,7 @@ MonoBehaviour:
   CameraAngleOverride: 0
   LockCameraPosition: 0
   dodgeCooldownIndicator: {fileID: 0}
+  Stunned: 0
 --- !u!114 &6367832325412569174
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4202,6 +4201,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   animator: {fileID: 0}
+  WeaponTut: {fileID: 0}
 --- !u!114 &45135520253005622
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4240,7 +4240,6 @@ MonoBehaviour:
     m_Bits: 4294967295
   interactionPromptText: {fileID: 4283872746331454519}
   interactionPrompt: {fileID: 8543744451201344693}
-  interactionCooldown: 0.5
 --- !u!114 &2805150321586182606
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4281,109 +4280,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb89e493067ea274395d1a64f679798d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &3124213470409598237
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5466088289640815489}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fff0960ef4ea6e04eac66b4a7fd2189d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_RigLayers:
-  - m_Rig: {fileID: 2390934761157342484}
-    m_Active: 1
-  m_Effectors: []
---- !u!114 &6312527473240127471
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5466088289640815489}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b2d8418b0b9634b1892b0268dd9c2743, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  boneShape: 1
-  drawBones: 1
-  drawTripods: 0
-  boneSize: 1
-  tripodSize: 1
-  boneColor: {r: 0, g: 0, b: 1, a: 0.5}
-  m_Transforms:
-  - {fileID: 7828094363102551121}
-  - {fileID: 7507366650818468593}
-  - {fileID: 2141257166463829233}
-  - {fileID: 4400272579581032868}
-  - {fileID: 1057644383073469726}
-  - {fileID: 6714420670253069384}
-  - {fileID: 3598151209484064593}
-  - {fileID: 8774744326444543247}
-  - {fileID: 7220643746017068046}
-  - {fileID: 5089445097066108383}
-  - {fileID: 1558372172127139167}
-  - {fileID: 6323662033268004735}
-  - {fileID: 6892377061325590755}
-  - {fileID: 7216156007727624200}
-  - {fileID: 7217102133903755034}
-  - {fileID: 7065623963107183619}
-  - {fileID: 8925170039895074901}
-  - {fileID: 4909082036832255435}
-  - {fileID: 6528489934904355068}
-  - {fileID: 3427840920847173153}
-  - {fileID: 5267296878849646678}
-  - {fileID: 3824562849474088065}
-  - {fileID: 2915401080694566749}
-  - {fileID: 1766211000446037958}
-  - {fileID: 8442470078362749586}
-  - {fileID: 5033507289048606598}
-  - {fileID: 5000634984258086139}
-  - {fileID: 5584846348851578525}
-  - {fileID: 3564593957455340712}
-  - {fileID: 5110367589655921710}
-  - {fileID: 350824775653030087}
-  - {fileID: 8437295212481865582}
-  - {fileID: 2175558029631596959}
-  - {fileID: 4816225263668420296}
-  - {fileID: 8983330735776297846}
-  - {fileID: 4595256953442350487}
-  - {fileID: 3220919634431966971}
-  - {fileID: 2254142755193349584}
-  - {fileID: 3875409576772510838}
-  - {fileID: 2806923550331780388}
-  - {fileID: 3903107612740729733}
-  - {fileID: 4195373415828305333}
-  - {fileID: 3941882258458068985}
-  - {fileID: 2871935440421507100}
-  - {fileID: 6241637622477576102}
-  - {fileID: 8025023468958135929}
-  - {fileID: 3161614396158077809}
-  - {fileID: 3820410984201240254}
-  - {fileID: 7573405266960921914}
-  - {fileID: 2955325089930895997}
-  - {fileID: 5748714332118263861}
-  - {fileID: 4644405103864246126}
-  - {fileID: 6581907780813351186}
-  - {fileID: 4007306564432475406}
-  - {fileID: 2264697298180225559}
-  - {fileID: 1099283788876247605}
-  - {fileID: 6174821690571800282}
-  - {fileID: 4354604692078907100}
-  - {fileID: 7788562166449852790}
-  - {fileID: 384769058519632214}
-  - {fileID: 7945437040134730319}
-  - {fileID: 7990960664633555899}
-  - {fileID: 1134691280431652378}
-  - {fileID: 3253263374179802685}
-  - {fileID: 5319577190362811138}
-  - {fileID: 5539725022821031051}
-  - {fileID: 2016981850971236094}
-  - {fileID: 7331841568702877264}
 --- !u!1 &5478341131761747521
 GameObject:
   m_ObjectHideFlags: 0
@@ -4597,7 +4493,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8185189376229184860}
   m_Layer: 0
-  m_Name: NestedParentArmature_Unpack
+  m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4748,16 +4644,13 @@ MonoBehaviour:
   chatHistoryText: {fileID: 4283872746331454519}
   scrollRect: {fileID: 3877974181797383304}
   npcPortrait: {fileID: 3623489233824716928}
-  playerInputField: {fileID: 2121204712083154790}
-  sendButton: {fileID: 737097762621667118}
   endConversationButton: {fileID: 265719615941562923}
+  choiceButtonParent: {fileID: 0}
+  choiceButtonPrefab: {fileID: 0}
+  maxChoices: 4
   typingSpeed: 0.05
   typingSoundEffect: {fileID: 0}
   useTypewriterEffect: 1
-  neutralExpression: {fileID: 1573701562, guid: 1708623bd21f1f84d8495f2ed28de371, type: 3}
-  happyExpression: {fileID: 1573701562, guid: 1708623bd21f1f84d8495f2ed28de371, type: 3}
-  sadExpression: {fileID: 1573701562, guid: 1708623bd21f1f84d8495f2ed28de371, type: 3}
-  angryExpression: {fileID: 1573701562, guid: 1708623bd21f1f84d8495f2ed28de371, type: 3}
 --- !u!1 &6401507811903706367
 GameObject:
   m_ObjectHideFlags: 0

@@ -23,6 +23,11 @@ public class RangedEnemy : MonoBehaviour, IEnemy, IDamagable
     public NavMeshAgent navMeshAgent;
     public Animator animator;
     public GameObject projectilePrefab;
+    public GameObject StunprojectilePrefab;
+    public bool CanStun = false;
+    [SerializeField] private float stunCooldown = 5f; 
+    private float _lastStunTime = -Mathf.Infinity;
+
 
     [Header("Patrol Settings")]
     public List<Transform> waypoints;
@@ -99,6 +104,11 @@ public class RangedEnemy : MonoBehaviour, IEnemy, IDamagable
         if (!IsDead)
         {
             _currentState?.UpdateState(this);
+
+            if (!CanStun && Time.time >= _lastStunTime + stunCooldown)
+            {
+                CanStun = true;
+            }
         }
     }
 
@@ -146,18 +156,60 @@ public class RangedEnemy : MonoBehaviour, IEnemy, IDamagable
          return Time.time > _lastAttackTime + attackCooldown;
     }
 
+    //public void ShootProjectile()
+    //{
+    //    if (!CanAttack() || projectilePrefab == null || player == null) return;
+
+    //    Vector3 direction = (player.transform.position - transform.position).normalized;
+    //    GameObject projectile = Instantiate(
+    //        projectilePrefab,
+    //        transform.position + Vector3.up * 0.5f,
+    //        Quaternion.LookRotation(direction)
+    //    );
+
+    //    // Pass the damage to the bullet
+    //    if (projectile.TryGetComponent<EnemyBulletEffector>(out var bulletEffector))
+    //    {
+    //        bulletEffector.DamageAmount = attackDamage;
+    //    }
+
+    //    if (projectile.TryGetComponent<Rigidbody>(out var rb))
+    //    {
+    //        rb.linearVelocity = direction * 20f;
+    //    }
+
+    //    _lastAttackTime = Time.time;
+    //}
     public void ShootProjectile()
     {
-        if (!CanAttack() || projectilePrefab == null || player == null) return;
+        if (!CanAttack() || player == null) return;
 
         Vector3 direction = (player.transform.position - transform.position).normalized;
+
+        if (CanStun && Time.time >= _lastStunTime + stunCooldown)
+        {
+            ShootStunProjectile(direction);
+            CanStun = false;
+            _lastStunTime = Time.time;
+        }
+        else
+        {
+            ShootNormalProjectile(direction);
+        }
+
+        _lastAttackTime = Time.time;
+    }
+
+    private void ShootNormalProjectile(Vector3 direction)
+    {
+        if (projectilePrefab == null) return;
+
         GameObject projectile = Instantiate(
             projectilePrefab,
             transform.position + Vector3.up * 0.5f,
             Quaternion.LookRotation(direction)
         );
 
-        // Pass the damage to the bullet
         if (projectile.TryGetComponent<EnemyBulletEffector>(out var bulletEffector))
         {
             bulletEffector.DamageAmount = attackDamage;
@@ -167,9 +219,30 @@ public class RangedEnemy : MonoBehaviour, IEnemy, IDamagable
         {
             rb.linearVelocity = direction * 20f;
         }
-
-        _lastAttackTime = Time.time;
     }
+
+    private void ShootStunProjectile(Vector3 direction)
+    {
+        if (StunprojectilePrefab == null) return;
+
+        GameObject projectile = Instantiate(
+            StunprojectilePrefab,
+            transform.position + Vector3.up * 0.5f,
+            Quaternion.LookRotation(direction)
+        );
+
+        if (projectile.TryGetComponent<EnemyBulletEffector>(out var bulletEffector))
+        {
+            bulletEffector.DamageAmount = attackDamage;
+            // Optional: Set additional stun properties here if needed.
+        }
+
+        if (projectile.TryGetComponent<Rigidbody>(out var rb))
+        {
+            rb.linearVelocity = direction * 20f;
+        }
+    }
+
 
     public void TakeDamage(float damage)
     {

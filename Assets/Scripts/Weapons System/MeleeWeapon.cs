@@ -10,11 +10,12 @@ public enum MeleeType
 }
 public class MeleeWeapon : Weapon
 {
-  public int damage;
-  public float attackRange;
-  public Collider hitbox;
-  public float attackDuration = 0.3f;
-  public int meleeType;
+    [SerializeField] float damage;
+    [SerializeField] float attackRange;
+    [SerializeField] Collider hitbox;
+    [SerializeField] float attackDuration = 0.3f;
+    [SerializeField] public int meleeType;
+    [SerializeField] MeleeHitbox meleeHitbox;
 
 
 
@@ -23,7 +24,11 @@ public class MeleeWeapon : Weapon
         weaponType = WeaponType.Melee;
         if (hitbox != null) hitbox.enabled = false;
     }
-  
+    private void Start()
+    {
+
+    }
+
     public override void Use(Vector3 a)
     {
         StartCoroutine(PerformAttack());
@@ -34,6 +39,7 @@ public class MeleeWeapon : Weapon
         Debug.Log("Swinging melee weapon...");
         AudioManager.Instance.PlayAudioClip("Weapons", $"{weaponName}", false);
         hitbox.enabled = true;
+        meleeHitbox.init(damage);
         yield return new WaitForSeconds(attackDuration);
 
         hitbox.enabled = false;
