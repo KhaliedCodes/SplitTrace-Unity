@@ -21,6 +21,11 @@ public class PhotoCapture : MonoBehaviour
         {
             StartCoroutine(CapturePhoto());
         }
+
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            HidePhoto();
+        }
     }
 
     IEnumerator CapturePhoto()
@@ -37,8 +42,16 @@ public class PhotoCapture : MonoBehaviour
 
     void ShowPhoto()
     {
+        photoDisplayArea.gameObject.SetActive(true);
         Sprite photoSprite = Sprite.Create(screenCapture, new Rect(0, 0, screenCapture.width, screenCapture.height), new Vector2(0.5f, 0.5f), 100.0f);
         photoDisplayArea.sprite = photoSprite;
+
+    }
+
+
+    void HidePhoto()
+    {
+        photoDisplayArea.gameObject.SetActive(false);
 
     }
 }

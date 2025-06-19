@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class PlayerAnimations : MonoBehaviour
@@ -15,6 +16,7 @@ public class PlayerAnimations : MonoBehaviour
         if (animator) animator.SetTrigger(anim);
         
     }
+   
 
 
 }

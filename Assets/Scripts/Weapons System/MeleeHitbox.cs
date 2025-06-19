@@ -2,22 +2,25 @@ using UnityEngine;
 
 public class MeleeHitbox : MonoBehaviour
 {
-    int Damage;
+    [SerializeField] float damage = 10f;
 
-    private void Start()
+    public void init(float damage)
     {
-        Damage = GetComponentInParent<MeleeWeapon>().damage; 
-           
+        this.damage = damage;
     }
+
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Enemy"))
+        if (other.gameObject.tag == "Enemy")
         {
-            var enemyHealth = other.GetComponent<IDamagable>();
+            IDamagable target = other.GetComponent<IDamagable>();
 
-            if (enemyHealth == null) return;
+            if (target != null)
+            {
+                target.TakeDamage(damage);
+                Debug.Log("Hit " + other.name + " for " + damage + " damage.");
 
-            enemyHealth.TakeDamage(Damage);
+            }
         }
     }
 }
