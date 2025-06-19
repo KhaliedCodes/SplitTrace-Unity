@@ -12,7 +12,7 @@ public class NPCController : MonoBehaviour
     
     private SphereCollider interactionTrigger;
     private DialogueManager dialogueManager;
-    private GeminiAccessor geminiAccessor;
+    private GeminiAccessor geminiAccessor; // This will be this NPC's own instance
     private PlayerController nearbyPlayer;
     private Animator npcAnimator;
     
@@ -28,7 +28,13 @@ public class NPCController : MonoBehaviour
         interactionTrigger.isTrigger = true;
 
         dialogueManager = FindFirstObjectByType<DialogueManager>();
-        geminiAccessor = FindFirstObjectByType<GeminiAccessor>();
+        
+        //Create a dedicated GeminiAccessor for this NPC instead of finding a shared one
+        geminiAccessor = gameObject.GetComponent<GeminiAccessor>();
+        if (geminiAccessor == null)
+        {
+            geminiAccessor = gameObject.AddComponent<GeminiAccessor>();
+        }
 
         if (personality != null)
             geminiAccessor.ConfigureWithPersonality(personality);
