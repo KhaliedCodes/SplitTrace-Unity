@@ -148,8 +148,6 @@ public class NPCController : MonoBehaviour
         {
             Debug.Log($"[WARNING] {NPCName} is getting very hostile! ({hostilityTracker.CurrentHostility:F1}/{hostilityTracker.hostilityThreshold})");
         }
-        
-        return originalResponse;
     }
 
     private void HandleChoicesReceived(List<string> choices)

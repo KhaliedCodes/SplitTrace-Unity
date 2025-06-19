@@ -25,14 +25,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3434918007437143637}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.32, y: -1.45, z: 0}
+  m_LocalRotation: {x: 1, y: 0, z: 0, w: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4353211293980481342}
   m_Father: {fileID: 3886822569138969206}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 180, y: 0, z: 0}
 --- !u!65 &2535283949719231684
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -179,6 +179,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62942e7a42febc04895612e17acd85e0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  damage: 10
 --- !u!1 &8877400049735660608
 GameObject:
   m_ObjectHideFlags: 0
@@ -234,8 +235,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.2214396, y: 0.11174464, z: 0.9346045}
-  m_Center: {x: -0.0025055408, y: 0.0133859515, z: 0.30478495}
+  m_Size: {x: 0.02, y: 0.02, z: 0.02}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &7077028825463157346
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -282,8 +283,9 @@ MonoBehaviour:
   damage: 4
   attackRange: 0
   hitbox: {fileID: 8635689310174514198}
-  attackDuration: 0.3
-  meleeType: 0
+  attackDuration: 1
+  meleeType: 1
+  meleeHitbox: {fileID: 7196915105256133707}
 --- !u!114 &7899230583090820846
 MonoBehaviour:
   m_ObjectHideFlags: 0
