@@ -37,6 +37,11 @@ public class DetectionState : IEnemyStates
         // If player reference is lost, do nothing
         if (enemy.Player == null) return;
 
+        if (enemy.IsProvoked)
+        {
+            enemy.transform.LookAt(enemy.Player.transform.position);
+        }
+
         if (enemy.HasLineOfSight() || enemy.IsProvoked)
         {
             // Player visible: pursue

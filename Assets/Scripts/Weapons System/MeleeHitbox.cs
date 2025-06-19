@@ -2,11 +2,22 @@ using UnityEngine;
 
 public class MeleeHitbox : MonoBehaviour
 {
+    int Damage;
+
+    private void Start()
+    {
+        Damage = GetComponentInParent<MeleeWeapon>().damage; 
+           
+    }
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Enemy"))
         {
-            Debug.Log("Enemy hit with melee!");           
+            var enemyHealth = other.GetComponent<IDamagable>();
+
+            if (enemyHealth == null) return;
+
+            enemyHealth.TakeDamage(Damage);
         }
     }
 }

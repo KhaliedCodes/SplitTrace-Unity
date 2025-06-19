@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class MeleeWeapon : Weapon
 {
-  public int damage;
-  public float attackRange;
-  public Collider hitbox;
-  public float attackDuration = 0.3f;
+    public int damage;
+    public float attackRange;
+    public Collider hitbox;
+    public float attackDuration = 0.3f;
 
 
 
@@ -16,7 +16,7 @@ public class MeleeWeapon : Weapon
         weaponType = WeaponType.Melee;
         if (hitbox != null) hitbox.enabled = false;
     }
-  
+
     public override void Use()
     {
         StartCoroutine(PerformAttack());
