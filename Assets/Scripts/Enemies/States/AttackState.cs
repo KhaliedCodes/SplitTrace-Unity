@@ -18,8 +18,11 @@ public class AttackState : IEnemyStates
     {
         if (enemy.Player == null) return;
 
+        float distanceToPlayer = Vector3.Distance(enemy.transform.position, enemy.Player.transform.position);
+
         if (!enemy.IsPlayerInAttackRange && enemy.IsPlayerInDetectionRange)
         {
+            enemy.NavMeshAgent.isStopped = false;
             enemy.ChangeState(new DetectionState());
             return;
         }
@@ -28,6 +31,18 @@ public class AttackState : IEnemyStates
         {
             enemy.ChangeState(new IdleState());
             return;
+        }
+
+        if (distanceToPlayer <= enemy.NavMeshAgent.stoppingDistance)
+        {
+            enemy.NavMeshAgent.isStopped = true;
+            enemy.Animator.SetFloat("speed", 0f);
+        }
+        else
+        {
+            enemy.NavMeshAgent.isStopped = false;
+            enemy.NavMeshAgent.SetDestination(enemy.Player.transform.position); // Chase again
+            enemy.Animator.SetFloat("speed", 1);
         }
 
         if (enemy.CanAttack())
@@ -39,7 +54,7 @@ public class AttackState : IEnemyStates
 
             if (enemy is RangedEnemy rangedEnemy)
             {
-               // rangedEnemy.LookAtPlayer();
+                rangedEnemy.LookAtPlayer();
                 rangedEnemy.ShootProjectile();
             }
         }
@@ -51,7 +66,6 @@ public class AttackState : IEnemyStates
         // this is to ensure the enemy stops moving when player in near place according to the NavMesh Stopping Distance
         if (enemy.IsPlayerInAttackRange && enemy.HasLineOfSight())
         {
-            float distanceToPlayer = Vector3.Distance(enemy.transform.position, enemy.Player.transform.position);
             if (distanceToPlayer <= enemy.NavMeshAgent.stoppingDistance)
             {
                 enemy.Animator.SetFloat("speed", 0f);
@@ -64,12 +78,20 @@ public class AttackState : IEnemyStates
     public void ExitState(IEnemy enemy)
     {
         enemy.NavMeshAgent.isStopped = false;
-        enemy.Animator.SetBool("attack", false);
+        if (enemy is Enemy)
+        {
+            enemy.Animator.SetBool("attack", false); 
+        }
+        if (enemy is RangedEnemy)
+        {
+            enemy.Animator.SetBool("Shoot", false);
+        }
         //ResetAttackLayerWeight(enemy);
     }
 
-    private void ResetAttackLayerWeight(IEnemy enemy)
-    {
-      //  enemy.Animator.SetLayerWeight(AttackLayerIndex, 0f);
-    }
+    //private void ResetAttackLayerWeight(IEnemy enemy)
+    //{
+    //    //  enemy.Animator.SetLayerWeight(AttackLayerIndex, 0f);
+   
+    //}
 }

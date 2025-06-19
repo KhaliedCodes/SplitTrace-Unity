@@ -24,6 +24,7 @@ public class RangedDetectionChecker : MonoBehaviour
         {
             _enemy.SetPlayerInDetectionRange(false);
             _enemy.player = null;
+            _enemy.IsProvoked = false;
         }
     }
 

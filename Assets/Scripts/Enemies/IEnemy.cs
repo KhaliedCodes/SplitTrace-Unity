@@ -7,6 +7,7 @@ public interface IEnemy
     //Stats
     float MoveSpeed { get; set; }
     Transform transform { get; }
+    bool IsProvoked { get; set; }
     float DetectionRange { get; set; }
     float AttackRange { get; set; }
     float AttackCooldown { get; set; }

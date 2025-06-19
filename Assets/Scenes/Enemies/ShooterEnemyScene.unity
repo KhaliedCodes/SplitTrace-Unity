@@ -2107,7 +2107,7 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 628c0c98c8dd93446aad5ef82f5d8d24, type: 3}
       insertIndex: 2
       addedObject: {fileID: 1001139058}
-    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 628c0c98c8dd93446aad5ef82f5d8d24, type: 3}
+    - targetCorrespondingSourceObject: {fileID: -639763325267172598, guid: 628c0c98c8dd93446aad5ef82f5d8d24, type: 3}
       insertIndex: -1
       addedObject: {fileID: 748085068}
     m_AddedComponents:
@@ -3556,13 +3556,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 748085067}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.1389999, z: 0.662}
+  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0.091, y: 0.338, z: 0.082}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1306194941}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Father: {fileID: 968456707}
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
 --- !u!1 &765535634
 GameObject:
   m_ObjectHideFlags: 0
@@ -4557,6 +4557,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &968456707 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -639763325267172598, guid: 628c0c98c8dd93446aad5ef82f5d8d24, type: 3}
+  m_PrefabInstance: {fileID: 339548773}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &989281861
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6944,6 +6949,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyType: 0
+  enemyRace: 0
   health: 100
   Maxhealth: 100
   moveSpeed: 2.5
@@ -6957,6 +6963,7 @@ MonoBehaviour:
   player: {fileID: 0}
   navMeshAgent: {fileID: 1306194945}
   animator: {fileID: 1306194946}
+  gunPoint: {fileID: 748085068}
   projectilePrefab: {fileID: 4954223955266911571, guid: 0ee78e782619af24ebe8546ea38f1908, type: 3}
   StunprojectilePrefab: {fileID: 0}
   CanStun: 0
@@ -6968,9 +6975,11 @@ MonoBehaviour:
   - {fileID: 1246866531}
   waypointStopTime: 2
   _currentWaypointIndex: 0
+  _isProvoked: 0
   _detectionChecker: {fileID: 1209713496}
   _attackChecker: {fileID: 1001139059}
   RayCastY: 2
+  fieldOfViewAngle: 200
   _lastKnownPlayerPosition: {x: 0, y: 0, z: 0}
 --- !u!54 &1306194943
 Rigidbody:
@@ -7036,7 +7045,7 @@ NavMeshAgent:
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
-  m_StoppingDistance: 7
+  m_StoppingDistance: 0
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1

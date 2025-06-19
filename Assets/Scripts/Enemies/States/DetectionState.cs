@@ -37,7 +37,7 @@ public class DetectionState : IEnemyStates
         // If player reference is lost, do nothing
         if (enemy.Player == null) return;
 
-        if (enemy.HasLineOfSight())
+        if (enemy.HasLineOfSight() || enemy.IsProvoked)
         {
             // Player visible: pursue
             isSearching = false;
