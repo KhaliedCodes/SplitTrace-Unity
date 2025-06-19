@@ -231,7 +231,6 @@ public class NPCController : MonoBehaviour
     {
         isInteracting = false;
         waitingForChoices = false;
-
         // Don't clear chat history if NPC is hostile - they should remember
         if (!hostilityTracker.IsEnemy)
         {

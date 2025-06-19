@@ -1,10 +1,10 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody), typeof(BoxCollider), typeof(Weapon))]
+//[RequireComponent(typeof(Rigidbody), typeof(BoxCollider), typeof(Weapon))]
 public class PickupableWeapon : MonoBehaviour
 {
     private Rigidbody rb;
-    private BoxCollider boxCollider;
+    public BoxCollider boxCollider;
     private Weapon weapon;
 
     public bool IsEquipped { get; private set; } = false;
@@ -12,7 +12,7 @@ public class PickupableWeapon : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
-        boxCollider = GetComponent<BoxCollider>();
+        //boxCollider = GetComponent<BoxCollider>();
         weapon = GetComponent<Weapon>();
         SetPhysicsState(false);
     }
