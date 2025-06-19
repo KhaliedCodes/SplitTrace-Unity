@@ -11,14 +11,13 @@ public class GeminiAccessor : MonoBehaviour
     private StoryContextManager storyContext; // Automatically retrieved from StoryContextHolder
 
     private NPCPersonality npcPersonality;
-    private Animator npcAnimator;
+
 
     public event Action<string, string> OnResponseProcessed;
     public event Action<List<string>> OnChoicesReceived;
 
     private void Start()
     {
-        npcAnimator = GetComponent<Animator>();
         geminiAPI = geminiAPI ?? gameObject.AddComponent<GeminiAPIClient>();
         geminiAPI.OnResponseReceived += ProcessResponse;
         
