@@ -136,7 +136,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &228878654
 RectTransform:
   m_ObjectHideFlags: 0
@@ -574,7 +574,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1074941095
 Transform:
   m_ObjectHideFlags: 0
@@ -1081,6 +1081,10 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: 0.07999992
       objectReference: {fileID: 0}
+    - target: {fileID: 8069234810086863428, guid: f29f4c94d7809244888f328a8690b316, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8185189376229184860, guid: f29f4c94d7809244888f328a8690b316, type: 3}
       propertyPath: m_LocalPosition.x
       value: 1.1470566
@@ -1433,6 +1437,7 @@ MonoBehaviour:
   mainCamera: {fileID: 1403091908}
   detectiveCamera: {fileID: 716938690}
   defaultCamera: {fileID: 545590805}
+  photoDisplayArea: {fileID: 228878655}
 --- !u!1 &1795587265
 GameObject:
   m_ObjectHideFlags: 0
