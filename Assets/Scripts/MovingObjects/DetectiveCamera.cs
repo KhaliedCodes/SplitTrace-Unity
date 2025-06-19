@@ -1,5 +1,6 @@
 using Cinemachine;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class DetectiveCamera : MonoBehaviour
 {
@@ -7,6 +8,7 @@ public class DetectiveCamera : MonoBehaviour
     [SerializeField] Camera mainCamera;
     [SerializeField] CinemachineVirtualCamera detectiveCamera;
     [SerializeField] CinemachineVirtualCamera defaultCamera;
+    [SerializeField] private Image photoDisplayArea;
     int activeCameraPriorityModifier = 31331;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -19,6 +21,7 @@ public class DetectiveCamera : MonoBehaviour
     {
         if(Input.GetKeyDown(KeyCode.C))
         {
+            photoDisplayArea?.gameObject.SetActive(false);
             ChangeCamera();
         }
     }
