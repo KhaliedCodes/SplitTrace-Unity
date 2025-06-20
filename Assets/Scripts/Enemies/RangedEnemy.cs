@@ -2,8 +2,18 @@ using UnityEngine;
 using UnityEngine.AI;
 using System.Collections.Generic;
 
+enum EnemyRace
+{
+    Human,
+    Creature
+}
+
 public class RangedEnemy : MonoBehaviour, IEnemy, IDamagable
 {
+    [Header("EnemyType")]
+    [SerializeField] private EnemyType enemyType = EnemyType.Normal;
+    [SerializeField] private EnemyRace enemyRace = EnemyRace.Human;
+ 
     [Header("Stats")]
     [SerializeField] private float health = 100;
     [SerializeField] private float Maxhealth = 100;
@@ -22,6 +32,7 @@ public class RangedEnemy : MonoBehaviour, IEnemy, IDamagable
     public GameObject player;
     public NavMeshAgent navMeshAgent;
     public Animator animator;
+    public Transform gunPoint;
     public GameObject projectilePrefab;
     public GameObject StunprojectilePrefab;
     public bool CanStun = false;
@@ -33,6 +44,7 @@ public class RangedEnemy : MonoBehaviour, IEnemy, IDamagable
     public List<Transform> waypoints;
     public float waypointStopTime = 2f;
     public int _currentWaypointIndex = 0;
+    public bool _isProvoked = false;
 
     // Private variables
     private float _lastAttackTime;
@@ -44,17 +56,21 @@ public class RangedEnemy : MonoBehaviour, IEnemy, IDamagable
     private bool _playerInAttackRange;
 
     [SerializeField] float RayCastY;
+    [SerializeField] private float fieldOfViewAngle = 90f; // degrees
+
 
     [SerializeField] private Vector3 _lastKnownPlayerPosition;
     private bool _isSearching = false;
     private float _searchStartTime;
     private float _searchDuration = 4f;
 
+
     [Header("IEnemy Linking")]
     public float Health { get => health; set => health = value; }
     public float MaxHealth { get => Maxhealth; set => Maxhealth = value; }
     public float MoveSpeed { get => moveSpeed; set => moveSpeed = value; }
     public new Transform transform => base.transform;
+    public bool IsProvoked { get => _isProvoked; set => _isProvoked = value; }
     public float DetectionRange { get => detectionRange; set => detectionRange = value; }
     public float AttackRange { get => attackRange; set => attackRange = value; }
     public float AttackCooldown { get => attackCooldown; set => attackCooldown = value; }
@@ -89,6 +105,7 @@ public class RangedEnemy : MonoBehaviour, IEnemy, IDamagable
         {
            _attackChecker.Initialize(attackRange, this);
         }
+        navMeshAgent.GetComponent<NavMeshAgent>().stoppingDistance = attackRange;
     }
 
     private void Start()
@@ -109,6 +126,10 @@ public class RangedEnemy : MonoBehaviour, IEnemy, IDamagable
             {
                 CanStun = true;
             }
+            //if(_currentState is AttackState )
+            //{
+            //    LookAtPlayer();
+            //}
         }
     }
 
@@ -131,23 +152,26 @@ public class RangedEnemy : MonoBehaviour, IEnemy, IDamagable
 
     public bool HasLineOfSight()
     {
-        if (!player) return false;
 
-        Vector3 origin = transform.position + Vector3.up * RayCastY; 
-        Vector3 direction = (player.transform.position + new Vector3(0,1,0) - origin).normalized;
-        float distance = Vector3.Distance(origin, player.transform.position);
+            if (!player) return false;
 
-        Debug.DrawRay(origin, direction * distance, Color.red);
+            Vector3 origin = transform.position + Vector3.up * RayCastY;
+            Vector3 direction = (player.transform.position + new Vector3(0, 1, 0) - origin).normalized;
+            float distance = Vector3.Distance(origin, player.transform.position);
 
-        if (Physics.Raycast(origin, direction, out RaycastHit hit, distance))
-        {
-            if (hit.collider.gameObject == player)
+            float angle = Vector3.Angle(transform.forward, direction);
+            if (angle > fieldOfViewAngle * 0.5f) return false;
+
+            if (Physics.Raycast(origin, direction, out RaycastHit hit, distance))
             {
+                if (hit.collider.gameObject == player)
+                {
+                _lastKnownPlayerPosition = player.transform.position;
                 return true;
+                }
             }
-        }
 
-        return false;
+            return false; 
     }
 
 
@@ -180,13 +204,38 @@ public class RangedEnemy : MonoBehaviour, IEnemy, IDamagable
 
     //    _lastAttackTime = Time.time;
     //}
+    //public void ShootProjectile()
+    //{
+    //    if (!CanAttack() || player == null) return;
+
+    //    Vector3 direction = (player.transform.position - transform.position).normalized;
+
+    //    if (enemyType == EnemyType.Stun && CanStun && Time.time >= _lastStunTime + stunCooldown)
+    //    {
+    //        ShootStunProjectile(direction);
+    //        CanStun = false;
+    //        _lastStunTime = Time.time;
+    //    }
+    //    else
+    //    {
+    //        ShootNormalProjectile(direction);
+    //    }
+
+    //    _lastAttackTime = Time.time;
+    //}
     public void ShootProjectile()
     {
         if (!CanAttack() || player == null) return;
 
-        Vector3 direction = (player.transform.position - transform.position).normalized;
+        Vector3 toPlayer = (player.transform.position - transform.position).normalized;
+        float angle = Vector3.Angle(transform.forward, toPlayer);
+        if (angle > 10f) return;
 
-        if (CanStun && Time.time >= _lastStunTime + stunCooldown)
+        transform.rotation = Quaternion.Euler(0, transform.eulerAngles.y +35f, 0);
+
+        Vector3 direction = toPlayer;
+
+        if (enemyType == EnemyType.Stun && CanStun && Time.time >= _lastStunTime + stunCooldown)
         {
             ShootStunProjectile(direction);
             CanStun = false;
@@ -200,13 +249,14 @@ public class RangedEnemy : MonoBehaviour, IEnemy, IDamagable
         _lastAttackTime = Time.time;
     }
 
+
     private void ShootNormalProjectile(Vector3 direction)
     {
         if (projectilePrefab == null) return;
 
         GameObject projectile = Instantiate(
             projectilePrefab,
-            transform.position + Vector3.up * 0.5f,
+            gunPoint.position,
             Quaternion.LookRotation(direction)
         );
 
@@ -227,7 +277,7 @@ public class RangedEnemy : MonoBehaviour, IEnemy, IDamagable
 
         GameObject projectile = Instantiate(
             StunprojectilePrefab,
-            transform.position + Vector3.up * 0.5f,
+            gunPoint != null ? gunPoint.position : transform.position + Vector3.up * 0.5f,
             Quaternion.LookRotation(direction)
         );
 
@@ -243,10 +293,31 @@ public class RangedEnemy : MonoBehaviour, IEnemy, IDamagable
         }
     }
 
+    public void LookAtPlayer()
+    {
+        if (player == null) return;
+
+        Vector3 direction = (player.transform.position - transform.position);
+        direction.y = 0;
+
+        if (direction != Vector3.zero)
+        {
+            Quaternion lookRotation = Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 10f);
+        }
+    }
 
     public void TakeDamage(float damage)
     {
         health -= damage;
+
+        if (!_isProvoked && !IsDead)
+        {
+            _isProvoked = true;
+            LastKnownPlayerPosition = player.transform.position;
+            ChangeState(new DetectionState());
+        }
+
         if (IsDead) Die();
     }
 
@@ -323,6 +394,28 @@ public class RangedEnemy : MonoBehaviour, IEnemy, IDamagable
             UnityEditor.Handles.Label(transform.position + Vector3.up * 2f,
                                     $"State: {stateName}\nHealth: {health}", style);
         }
+
+        // 6. Field of View Visualization
+        Gizmos.color = Color.cyan;
+        Vector3 origin = transform.position + Vector3.up * RayCastY;
+        Vector3 forward = transform.forward * detectionRange;
+
+        Quaternion leftRotation = Quaternion.Euler(0, -fieldOfViewAngle * 0.5f, 0);
+        Quaternion rightRotation = Quaternion.Euler(0, fieldOfViewAngle * 0.5f, 0);
+
+        Vector3 leftDir = leftRotation * transform.forward * detectionRange;
+        Vector3 rightDir = rightRotation * transform.forward * detectionRange;
+
+        Gizmos.DrawRay(origin, forward);
+        Gizmos.DrawRay(origin, leftDir);
+        Gizmos.DrawRay(origin, rightDir);
+
+        // Optional: Draw arc with handles if needed (in Editor only)
+#if UNITY_EDITOR
+        UnityEditor.Handles.color = new Color(0, 1, 1, 0.2f);
+        UnityEditor.Handles.DrawSolidArc(origin, Vector3.up, leftDir.normalized, fieldOfViewAngle, detectionRange);
+#endif
+
     }
 
     void DrawArrow(Vector3 pos, Vector3 direction, float length, float angleDegrees)
