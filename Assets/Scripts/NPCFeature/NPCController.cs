@@ -1,5 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using UnityEngine.AI;
 
 public class NPCController : MonoBehaviour
 {
@@ -9,13 +11,20 @@ public class NPCController : MonoBehaviour
 
     [Header("Enemy Conversion")]
     [SerializeField] private HostilityTracker hostilityTracker;
-    
+
+    [Header("Enemy trun into hostile NPC")]
+    [SerializeField] private RuntimeAnimatorController hostileAnimatorController;
+    private RangedEnemy rangedEnemy;
+
     private SphereCollider interactionTrigger;
     private DialogueManager dialogueManager;
+    private GeminiAPIClient geminiAPI; // Optional, can be null if not using Gemini
+    private NPCController npcController; // Reference to this NPC's controller for interactions
     private GeminiAccessor geminiAccessor; // This will be this NPC's own instance
+    private NavMeshAgent npcNavMeshAgent; // Optional, can be null if not using NavMesh
     private PlayerController nearbyPlayer;
     private Animator npcAnimator;
-    
+    private Rigidbody npcRigidbody;
     private bool isInteracting;
     private bool waitingForChoices = false;
 
@@ -28,7 +37,7 @@ public class NPCController : MonoBehaviour
         interactionTrigger.isTrigger = true;
 
         dialogueManager = FindFirstObjectByType<DialogueManager>();
-        
+
         //Create a dedicated GeminiAccessor for this NPC instead of finding a shared one
         geminiAccessor = gameObject.GetComponent<GeminiAccessor>();
         if (geminiAccessor == null)
@@ -43,7 +52,7 @@ public class NPCController : MonoBehaviour
         geminiAccessor.OnChoicesReceived += HandleChoicesReceived;
 
         hostilityTracker.Initialize();
-        
+
         if (npcAnimator == null)
         {
             npcAnimator = GetComponent<Animator>();
@@ -52,8 +61,45 @@ public class NPCController : MonoBehaviour
         {
             Debug.Log($"[{NPCName}] No Animator found on NPC. Dialogue animations will not work.");
         }
-    }
 
+        rangedEnemy = GetComponent<RangedEnemy>();
+        if (rangedEnemy == null)
+        {
+            Debug.LogWarning($"[{NPCName}] No RangedEnemy component found. This NPC will not become hostile.");
+        }
+        geminiAPI = GetComponent<GeminiAPIClient>();
+        if (geminiAPI == null)
+        {
+            Debug.LogWarning($"[{NPCName}] No GeminiAPIClient component found. This NPC will not use Gemini for dialogue.");
+        }
+        geminiAccessor = GetComponent<GeminiAccessor>();
+        if (geminiAccessor == null)
+        {
+            geminiAccessor = gameObject.AddComponent<GeminiAccessor>();
+        }
+        npcController = GetComponent<NPCController>();
+        if (npcController == null)
+        {
+            Debug.LogWarning($"[{NPCName}] No NPCController component found. This NPC will not handle interactions properly.");
+        }
+        npcRigidbody = GetComponent<Rigidbody>();
+        if (npcRigidbody == null)
+        {
+            Debug.LogWarning($"[{NPCName}] No Rigidbody found. This NPC may not interact with physics correctly.");
+        }
+        npcNavMeshAgent = GetComponent<NavMeshAgent>();
+        if (npcNavMeshAgent == null)
+        {
+            Debug.LogWarning($"[{NPCName}] No NavMeshAgent found. This NPC will not navigate the environment.");
+        }
+
+    }
+    private void Start()
+    {
+        npcRigidbody.isKinematic = true; // Prevent physics interactions during dialogue
+        npcNavMeshAgent.enabled = false; // Disable navigation during dialogue
+       
+    }
     private void Update() 
     {
         // Optional: Display hostility status in debug mode
@@ -207,27 +253,47 @@ public class NPCController : MonoBehaviour
         }
         return false;
     }
-
     private void ConvertToEnemy()
     {
         Debug.Log($"[ENEMY CONVERSION] {NPCName} has become hostile due to aggressive AI responses!");
-        
+
         // Generate context-appropriate hostile response
-        string[] conversionMessages = 
+        string[] conversionMessages =
         {
-            $"The way {NPCName} just spoke shows their true hostile nature!",
-            $"{NPCName}'s aggressive response reveals they are not to be trusted!",
-            $"That hostile outburst from {NPCName} shows they've become an enemy!",
-            $"{NPCName} has shown their true colors with that aggressive response!"
-        };
-        
+        $"The way {NPCName} just spoke shows their true hostile nature!",
+        $"{NPCName}'s aggressive response reveals they are not to be trusted!",
+        $"That hostile outburst from {NPCName} shows they've become an enemy!",
+        $"{NPCName} has shown their true colors with that aggressive response!"
+    };
+
         string message = conversionMessages[Random.Range(0, conversionMessages.Length)];
         dialogueManager?.DisplayNPCDialogue($"{message} {{\"emotion\":\"angry\"}}");
-        
-        // End dialogue after a short delay
-        Invoke(nameof(EndHostileDialogue), 3f);
-    }
 
+        // Schedule end of hostile dialogue
+        Invoke(nameof(EndHostileDialogue), 3f);
+
+        // Switch behaviors and appearance
+        if (rangedEnemy != null) rangedEnemy.enabled = true;
+        if (npcAnimator != null && hostileAnimatorController != null)
+            npcAnimator.runtimeAnimatorController = hostileAnimatorController;
+
+        // Disable interaction systems
+        if (geminiAccessor != null) geminiAccessor.enabled = false;
+        if (geminiAPI != null) geminiAPI.enabled = false;
+        if (npcController != null) npcController.enabled = false;
+
+        // Change layer to "Enemy" (make sure it exists in Unity's layer settings)
+        int enemyLayer = LayerMask.NameToLayer("Enemy");
+        if (enemyLayer != -1)
+            gameObject.layer = enemyLayer;
+        else
+            Debug.LogWarning("Layer 'Enemy' not found. Please define it in Project Settings > Tags and Layers.");
+
+        npcRigidbody.isKinematic = false; // Allow physics interactions now that NPC is hostile
+        npcNavMeshAgent.enabled = true; // Enable navigation for hostile NPC
+        interactionTrigger.enabled = false; // Disable interaction trigger to prevent further dialogue
+    
+}
     private void EndHostileDialogue()
     {
         dialogueManager?.EndDialogue();
