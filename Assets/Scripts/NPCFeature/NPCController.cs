@@ -32,6 +32,7 @@ public class NPCController : MonoBehaviour
 
     private void Awake()
     {
+        gameObject.tag = "NPC"; // Ensure NPCs have the "NPC" tag by default
         interactionTrigger = gameObject.AddComponent<SphereCollider>();
         interactionTrigger.radius = interactionRadius;
         interactionTrigger.isTrigger = true;
@@ -292,7 +293,7 @@ public class NPCController : MonoBehaviour
         npcRigidbody.isKinematic = false; // Allow physics interactions now that NPC is hostile
         npcNavMeshAgent.enabled = true; // Enable navigation for hostile NPC
         interactionTrigger.enabled = false; // Disable interaction trigger to prevent further dialogue
-    
+        gameObject.tag = "Enemy"; // Change tag to "Enemy" for gameplay purposes
 }
     private void EndHostileDialogue()
     {
