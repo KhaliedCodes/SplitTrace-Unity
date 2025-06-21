@@ -1,5 +1,3 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using static AudioClipsSO;
@@ -8,11 +6,11 @@ public class AudioManager : MonoBehaviour
 {
     public static AudioManager Instance;
     [SerializeField] private int maxSimultaneousAudios = 5;
-
     private List<AudioSource> audioSources;
     public AudioClipsSO audioClipsSO;
 
-    AudioClipData audioClipData;
+    private float currentVolume = 1f; // Default volume
+
     private void Awake()
     {
         if (Instance == null)
@@ -20,6 +18,10 @@ public class AudioManager : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
             InitializeAudioSources();
+
+            // Load saved volume or use default
+            currentVolume = PlayerPrefs.GetFloat("MusicVolume", 1f);
+            UpdateVolume(currentVolume);
         }
         else
         {
@@ -32,7 +34,9 @@ public class AudioManager : MonoBehaviour
         audioSources = new List<AudioSource>();
         for (int i = 0; i < maxSimultaneousAudios; i++)
         {
-            audioSources.Add(gameObject.AddComponent<AudioSource>());
+            AudioSource source = gameObject.AddComponent<AudioSource>();
+            source.volume = currentVolume;
+            audioSources.Add(source);
         }
     }
 
@@ -45,15 +49,18 @@ public class AudioManager : MonoBehaviour
             Debug.LogWarning($"Audio clip '{clipName}' in category '{category}' not found!");
             return;
         }
-        AudioSource availableAudioSource = GetAvailableAudioSource();
 
+        AudioSource availableAudioSource = GetAvailableAudioSource();
         if (availableAudioSource == null)
         {
             Debug.LogWarning("No available audio sources. Cannot play audio.");
             return;
         }
+
+        availableAudioSource.Stop();
         availableAudioSource.clip = clip;
         availableAudioSource.loop = loop;
+        availableAudioSource.volume = currentVolume;
         availableAudioSource.Play();
     }
 
@@ -68,16 +75,16 @@ public class AudioManager : MonoBehaviour
         }
 
         AudioSource availableAudioSource = GetAvailableAudioSource();
-
         if (availableAudioSource == null)
         {
             Debug.LogWarning("No available audio sources. Cannot play audio.");
             return null;
         }
-        availableAudioSource.Stop();
 
+        availableAudioSource.Stop();
         availableAudioSource.clip = clip;
         availableAudioSource.loop = loop;
+        availableAudioSource.volume = currentVolume;
         availableAudioSource.Play();
 
         return availableAudioSource;
@@ -104,7 +111,6 @@ public class AudioManager : MonoBehaviour
     public void PlayOneShotAtPosition(string category, string clipName, Vector3 position, float spatialBlend = 1f)
     {
         AudioClip clip = audioClipsSO.GetAudioClip(category, clipName);
-
         if (clip == null)
         {
             Debug.LogWarning($"Audio clip '{clipName}' in category '{category}' not found!");
@@ -116,7 +122,8 @@ public class AudioManager : MonoBehaviour
 
         AudioSource audioSource = tempGO.AddComponent<AudioSource>();
         audioSource.clip = clip;
-        audioSource.spatialBlend = spatialBlend; // 3D sound
+        audioSource.volume = currentVolume;
+        audioSource.spatialBlend = spatialBlend;
         audioSource.minDistance = 1f;
         audioSource.maxDistance = 20f;
         audioSource.Play();
@@ -124,4 +131,15 @@ public class AudioManager : MonoBehaviour
         Destroy(tempGO, clip.length);
     }
 
+    public void UpdateVolume(float newVolume)
+    {
+        currentVolume = newVolume;
+        PlayerPrefs.SetFloat("MusicVolume", newVolume);
+        PlayerPrefs.Save();
+
+        foreach (var source in audioSources)
+        {
+            source.volume = newVolume;
+        }
+    }
 }
