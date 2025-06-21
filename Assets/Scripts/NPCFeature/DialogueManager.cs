@@ -98,7 +98,6 @@ public class DialogueManager : MonoBehaviour
         Bounce,
         Shake,
         Pulse,
-        Typewriter
     }
 
     private void Awake()
