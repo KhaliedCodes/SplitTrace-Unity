@@ -831,6 +831,30 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 849327987617072035, guid: 3c60b37144e6a574d8d81390f64ca679, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -0.000015258789
+      objectReference: {fileID: 0}
+    - target: {fileID: 849327987617072035, guid: 3c60b37144e6a574d8d81390f64ca679, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0.00000033975084
+      objectReference: {fileID: 0}
+    - target: {fileID: 1410368920954935457, guid: 3c60b37144e6a574d8d81390f64ca679, type: 3}
+      propertyPath: HealAmount
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1410368920954935457, guid: 3c60b37144e6a574d8d81390f64ca679, type: 3}
+      propertyPath: healthBarFill
+      value: 
+      objectReference: {fileID: 1329779833}
+    - target: {fileID: 1410368920954935457, guid: 3c60b37144e6a574d8d81390f64ca679, type: 3}
+      propertyPath: HealthItemsAmount
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1410368920954935457, guid: 3c60b37144e6a574d8d81390f64ca679, type: 3}
+      propertyPath: healthCounterText
+      value: 
+      objectReference: {fileID: 1331228502}
     - target: {fileID: 1717319077981560287, guid: 3c60b37144e6a574d8d81390f64ca679, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -922,6 +946,20 @@ PrefabInstance:
     - target: {fileID: 7892411445087158865, guid: 3c60b37144e6a574d8d81390f64ca679, type: 3}
       propertyPath: m_Name
       value: HealthCount
+      objectReference: {fileID: 0}
+    - target: {fileID: 8619246207346513929, guid: 3c60b37144e6a574d8d81390f64ca679, type: 3}
+      propertyPath: m_text
+      value: 'Press(E) To Collect Item
+
+'
+      objectReference: {fileID: 0}
+    - target: {fileID: 8619246207346513929, guid: 3c60b37144e6a574d8d81390f64ca679, type: 3}
+      propertyPath: m_fontSize
+      value: 24.76
+      objectReference: {fileID: 0}
+    - target: {fileID: 8619246207346513929, guid: 3c60b37144e6a574d8d81390f64ca679, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 24.76
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

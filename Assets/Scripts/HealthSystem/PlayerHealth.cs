@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,6 +9,7 @@ public class PlayerHealth : MonoBehaviour, IDamagable
     [SerializeField] private Image healthBarFill;
     [SerializeField] int HealthItemsAmount = 0;
     [SerializeField] float HealAmount = 10f;
+    [SerializeField] TextMeshProUGUI healthCounterText;
 
     public float Health { get; set; }
     public int _HealthItemsAmount { get => HealthItemsAmount;}
@@ -15,7 +17,7 @@ public class PlayerHealth : MonoBehaviour, IDamagable
 
     private void Start()
     {
-        Health = MaxHealth;
+        Health = 50f;
         UpdateHealthUI();
     }
 
@@ -39,7 +41,7 @@ public class PlayerHealth : MonoBehaviour, IDamagable
     private void UpdateHealthUI()
     {
         if (healthBarFill != null)
-            healthBarFill.transform.localScale = new Vector3(Health / MaxHealth, 1, 1);
+            healthBarFill.fillAmount = Health / MaxHealth;
     }
 
     private void Die()
@@ -52,6 +54,7 @@ public class PlayerHealth : MonoBehaviour, IDamagable
     {
         //Update health number Who player have
         HealthItemsAmount += i;
+        UpdateHealthCounterUI();
 
     }
 
@@ -64,6 +67,7 @@ public class PlayerHealth : MonoBehaviour, IDamagable
                 Health += HealAmount;
                 HealthItemsAmount -= 1;
                 UpdateHealthUI();
+                UpdateHealthCounterUI();
                 Debug.Log("You Heal yourself");
 
             }
@@ -73,6 +77,9 @@ public class PlayerHealth : MonoBehaviour, IDamagable
             Debug.Log("Health is Full");
         }
 
+    }
+    public void UpdateHealthCounterUI() {
+        healthCounterText.text = HealthItemsAmount.ToString();
     }
    
 }
