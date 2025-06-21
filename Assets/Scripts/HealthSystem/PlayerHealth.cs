@@ -10,6 +10,7 @@ public class PlayerHealth : MonoBehaviour, IDamagable
     [SerializeField] float HealAmount = 10f;
 
     public float Health { get; set; }
+    public int _HealthItemsAmount { get => HealthItemsAmount;}
     public float MaxHealth { get => maxHealth; set => maxHealth = value; }
 
     private void Start()
@@ -47,13 +48,14 @@ public class PlayerHealth : MonoBehaviour, IDamagable
         // TODO: Handle death animation, game over screen, etc.
     }
 
-    public void UpdateNumberOfHealthItem()
+    public void UpdateNumberOfHealthItem(int i)
     {
         //Update health number Who player have
-        HealthItemsAmount += 1;
+        HealthItemsAmount += i;
+
     }
 
-    void IncreaseHealth()
+    public  void IncreaseHealth()
     {
         if (Health < 100f)
         {
@@ -62,8 +64,15 @@ public class PlayerHealth : MonoBehaviour, IDamagable
                 Health += HealAmount;
                 HealthItemsAmount -= 1;
                 UpdateHealthUI();
+                Debug.Log("You Heal yourself");
+
             }
+            Debug.Log("you don`t have Health Item");
+        }
+        else {
+            Debug.Log("Health is Full");
         }
 
     }
+   
 }

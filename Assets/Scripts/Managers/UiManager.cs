@@ -1,5 +1,8 @@
 using TMPro;
+using UnityEditor.Search;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class UiManager : MonoBehaviour
 {
@@ -12,10 +15,18 @@ public class UiManager : MonoBehaviour
     [SerializeField] private GameObject TutCollider;
 
     private bool isTutorialActive = false;
+    [Header("PauseMenuVariables")]
+    [SerializeField] private GameObject pauseMenuPanel;
+    [Header("CollectPanel")]
+    [SerializeField] private GameObject CollectPanel;
 
+    [Header("HealthVariables")]
+    [SerializeField]Image _healthBar;
+    [SerializeField]TextMeshProUGUI _healthCount;
 
     private void Awake()
     {
+
         if (Instance == null)
         {
             Instance = this;
@@ -33,8 +44,8 @@ public class UiManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Return))
         {
             HideTutorial();
-        } 
-        
+        }
+
         if (Input.GetKeyDown(KeyCode.Delete))
         {
             ResetTutorials();
@@ -84,8 +95,61 @@ public class UiManager : MonoBehaviour
     public void ResetTutorials()
     {
         Debug.Log("Prefs Reset");
-        PlayerPrefs.DeleteAll(); 
+        PlayerPrefs.DeleteAll();
         PlayerPrefs.Save();
     }
 
+    public void ShowPauseMenu()
+    {
+        if (!pauseMenuPanel.activeSelf)
+        {
+            pauseMenuPanel.SetActive(true);
+            Time.timeScale = 0f;
+        }
+        else { 
+            pauseMenuPanel.SetActive(false);
+            Time.timeScale = 1f;
+        } 
+
+    }
+    public void DisablePauseMenu()
+    {
+        pauseMenuPanel.SetActive(false);
+
+    }
+
+    public void ContinueGame()
+    {
+        pauseMenuPanel.SetActive(false);
+    }
+    public void BackToMainMenu()
+    {
+        SceneManager.LoadScene("MainMenuGold");
+    }
+    public void ExitGame()
+    {
+        Application.Quit();
+    }
+    public void ShowPanelCollecting()
+    {
+        CollectPanel.SetActive(true);
+
+    }
+    public void HidePanelCollecting()
+    {
+        CollectPanel.SetActive(false);
+    }
+    public void UpdateHealthCount(int count) {
+        _healthCount.text = count.ToString();
+    }
+    public void UpdateHealthBar(float value)
+    {
+        _healthBar.fillAmount = value;
+    }
+
+    public void IncreaseHealth()
+    {
+
+    }
+    
 }
