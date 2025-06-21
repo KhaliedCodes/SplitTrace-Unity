@@ -98,7 +98,6 @@ public class DialogueManager : MonoBehaviour
         Bounce,
         Shake,
         Pulse,
-        Rainbow,
         Typewriter
     }
 
