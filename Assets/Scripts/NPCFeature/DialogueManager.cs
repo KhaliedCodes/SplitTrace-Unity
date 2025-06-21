@@ -36,6 +36,11 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private float textWaveAmplitude = 5f;
     [SerializeField] private float textWaveFrequency = 3f;
     
+    [Header("Choice Button Text Styling")]
+    [SerializeField] private DialogueTextStyle choiceButtonTextStyle;
+    [SerializeField] private DialogueTextStyle choiceButtonHoverStyle;
+    [SerializeField] private bool useChoiceButtonAnimations = false;
+    
     private PlayerController playerController;
     private NPCController currentNPC;
     private Coroutine typingCoroutine;
@@ -132,6 +137,29 @@ public class DialogueManager : MonoBehaviour
             narrativeTextStyle.primaryColor = new Color(0.7f, 0.7f, 0.7f); // Gray
             narrativeTextStyle.fontStyle = FontStyles.Italic;
         }
+        
+        // Initialize choice button text styles
+        if (choiceButtonTextStyle == null)
+        {
+            choiceButtonTextStyle = new DialogueTextStyle();
+            choiceButtonTextStyle.primaryColor = new Color(1f, 0.9f, 0.7f); // Light orange
+            choiceButtonTextStyle.useOutline = true;
+            choiceButtonTextStyle.outlineColor = new Color(0.4f, 0.2f, 0.1f); // Dark brown outline
+            choiceButtonTextStyle.fontSize = 16f;
+            choiceButtonTextStyle.fontStyle = FontStyles.Normal;
+        }
+        
+        if (choiceButtonHoverStyle == null)
+        {
+            choiceButtonHoverStyle = new DialogueTextStyle();
+            choiceButtonHoverStyle.primaryColor = new Color(1f, 1f, 0.8f); // Bright yellow
+            choiceButtonHoverStyle.useOutline = true;
+            choiceButtonHoverStyle.outlineColor = new Color(0.6f, 0.4f, 0.1f); // Golden outline
+            choiceButtonHoverStyle.fontSize = 18f;
+            choiceButtonHoverStyle.fontStyle = FontStyles.Bold;
+            choiceButtonHoverStyle.useGlow = true;
+            choiceButtonHoverStyle.glowColor = new Color(1f, 1f, 0.6f);
+        }
     }
 
     private void Start()
@@ -162,6 +190,12 @@ public class DialogueManager : MonoBehaviour
         {
             UpdateTextAnimations();
         }
+        
+        // Update choice button animations
+        if (useChoiceButtonAnimations)
+        {
+            UpdateChoiceButtonAnimations();
+        }
     }
 
     private void UpdateTextAnimations()
@@ -169,6 +203,24 @@ public class DialogueManager : MonoBehaviour
         if (dialogueText != null && npcTextStyle.enableTextAnimation)
         {
             ApplyTextAnimation(dialogueText, npcTextStyle);
+        }
+    }
+
+    private void UpdateChoiceButtonAnimations()
+    {
+        if (choiceButtonTextStyle.enableTextAnimation)
+        {
+            foreach (Button button in choiceButtons)
+            {
+                if (button.gameObject.activeSelf)
+                {
+                    TextMeshProUGUI buttonText = button.GetComponentInChildren<TextMeshProUGUI>();
+                    if (buttonText != null)
+                    {
+                        ApplyTextAnimation(buttonText, choiceButtonTextStyle);
+                    }
+                }
+            }
         }
     }
 
@@ -378,6 +430,73 @@ public class DialogueManager : MonoBehaviour
         return style;
     }
 
+    // Create preset styles specifically for choice buttons
+    public DialogueTextStyle CreateChoiceButtonPresetStyle(string presetName)
+    {
+        var style = new DialogueTextStyle();
+        
+        switch (presetName.ToLower())
+        {
+            case "elegant":
+                style.primaryColor = new Color(0.9f, 0.8f, 0.6f); // Elegant gold
+                style.useOutline = true;
+                style.outlineColor = new Color(0.3f, 0.2f, 0.1f);
+                style.fontStyle = FontStyles.Italic;
+                style.characterSpacing = 1f;
+                break;
+                
+            case "modern":
+                style.primaryColor = new Color(0.2f, 0.8f, 1f); // Modern cyan
+                style.useOutline = false;
+                style.useShadow = true;
+                style.shadowColor = new Color(0f, 0f, 0f, 0.5f);
+                style.fontStyle = FontStyles.Normal;
+                break;
+                
+            case "fantasy":
+                style.primaryColor = new Color(0.8f, 0.6f, 1f); // Fantasy purple
+                style.useGlow = true;
+                style.glowColor = new Color(1f, 0.8f, 1f);
+                style.enableTextAnimation = true;
+                style.animationType = TextAnimationType.Pulse;
+                break;
+                
+            case "military":
+                style.primaryColor = new Color(0.6f, 0.8f, 0.4f); // Military green
+                style.fontStyle = FontStyles.Bold;
+                style.useOutline = true;
+                style.outlineColor = new Color(0.2f, 0.3f, 0.1f);
+                style.characterSpacing = 2f;
+                break;
+                
+            case "retro":
+                style.primaryColor = new Color(1f, 0.4f, 0.6f); // Retro pink
+                style.useOutline = true;
+                style.outlineColor = new Color(0.8f, 0.2f, 0.4f);
+                style.enableTextAnimation = true;
+                style.animationType = TextAnimationType.Wave;
+                break;
+        }
+        
+        return style;
+    }
+
+    // Method to apply choice button styling
+    public void SetChoiceButtonTextStyle(DialogueTextStyle style)
+    {
+        choiceButtonTextStyle = style;
+        
+        // Apply to all existing choice buttons
+        foreach (Button button in choiceButtons)
+        {
+            TextMeshProUGUI buttonText = button.GetComponentInChildren<TextMeshProUGUI>();
+            if (buttonText != null)
+            {
+                ApplyTextStyling(buttonText, choiceButtonTextStyle);
+            }
+        }
+    }
+
     private void FindPlayerController()
     {
         playerController = FindFirstObjectByType<PlayerController>();
@@ -494,13 +613,9 @@ public class DialogueManager : MonoBehaviour
             buttonText.textWrappingMode = TextWrappingModes.NoWrap;
             buttonText.overflowMode = TextOverflowModes.Ellipsis;
             buttonText.enableAutoSizing = true;
-            buttonText.fontSizeMin = 16f;
-            buttonText.fontSizeMax = 20f;
+            buttonText.fontSizeMin = 14f;  // Adjusted for button-specific styling
+            buttonText.fontSizeMax = 18f;  // Adjusted for button-specific styling
             buttonText.alignment = TextAlignmentOptions.Left;
-
-            buttonText.fontMaterial.EnableKeyword("OUTLINE_ON");
-            buttonText.outlineColor = new Color32(255, 0, 0, 255); 
-            buttonText.outlineWidth = 0.01f;
 
             RectTransform textRect = buttonText.GetComponent<RectTransform>();
             if (textRect != null)
@@ -511,8 +626,16 @@ public class DialogueManager : MonoBehaviour
                 textRect.offsetMax = new Vector2(-15, -5);
             }
 
-            // Apply player text style to button text
-            ApplyTextStyling(buttonText, playerTextStyle);
+            // Apply choice button specific text styling instead of player style
+            ApplyTextStyling(buttonText, choiceButtonTextStyle);
+
+            // Add hover effect component for choice buttons
+            ChoiceButtonHoverEffect hoverEffect = buttonObj.GetComponent<ChoiceButtonHoverEffect>();
+            if (hoverEffect == null)
+            {
+                hoverEffect = buttonObj.AddComponent<ChoiceButtonHoverEffect>();
+            }
+            hoverEffect.Initialize(buttonText, choiceButtonTextStyle, choiceButtonHoverStyle);
 
             TMPButtonTextColorChanger colorChanger = buttonObj.GetComponent<TMPButtonTextColorChanger>();
             if (colorChanger == null)
@@ -649,8 +772,8 @@ public class DialogueManager : MonoBehaviour
             if (buttonText != null)
             {
                 buttonText.text = $"{i + 1}. {choices[i]}";
-                // Apply player text styling to choices
-                ApplyTextStyling(buttonText, playerTextStyle);
+                // Apply choice button specific text styling
+                ApplyTextStyling(buttonText, choiceButtonTextStyle);
             }
         }
     }
@@ -690,5 +813,101 @@ public class DialogueManager : MonoBehaviour
     public NPCController GetCurrentNPC()
     {
         return currentNPC;
+    }
+}
+
+// Separate component for handling choice button hover effects
+public class ChoiceButtonHoverEffect : MonoBehaviour, UnityEngine.EventSystems.IPointerEnterHandler, UnityEngine.EventSystems.IPointerExitHandler
+{
+    private TextMeshProUGUI buttonText;
+    private DialogueManager.DialogueTextStyle normalStyle;
+    private DialogueManager.DialogueTextStyle hoverStyle;
+    private bool isHovering = false;
+
+    public void Initialize(TextMeshProUGUI text, DialogueManager.DialogueTextStyle normal, DialogueManager.DialogueTextStyle hover)
+    {
+        buttonText = text;
+        normalStyle = normal;
+        hoverStyle = hover;
+    }
+
+    public void OnPointerEnter(UnityEngine.EventSystems.PointerEventData eventData)
+    {
+        if (buttonText != null && hoverStyle != null)
+        {
+            isHovering = true;
+            ApplyHoverStyle();
+        }
+    }
+
+    public void OnPointerExit(UnityEngine.EventSystems.PointerEventData eventData)
+    {
+        if (buttonText != null && normalStyle != null)
+        {
+            isHovering = false;
+            ApplyNormalStyle();
+        }
+    }
+
+    private void ApplyHoverStyle()
+    {
+        if (DialogueManager.Instance != null)
+        {
+            // Use the DialogueManager's ApplyTextStyling method through reflection or make it public
+            ApplyTextStyling(buttonText, hoverStyle);
+        }
+    }
+
+    private void ApplyNormalStyle()
+    {
+        if (DialogueManager.Instance != null)
+        {
+            ApplyTextStyling(buttonText, normalStyle);
+        }
+    }
+
+    // Simplified version of ApplyTextStyling for the hover effect
+    private void ApplyTextStyling(TextMeshProUGUI textComponent, DialogueManager.DialogueTextStyle style)
+    {
+        if (textComponent == null || style == null) return;
+
+        // Apply font
+        if (style.customFont != null)
+            textComponent.font = style.customFont;
+
+        // Apply basic styling
+        textComponent.fontSize = style.fontSize;
+        textComponent.fontStyle = style.fontStyle;
+        textComponent.characterSpacing = style.characterSpacing;
+        textComponent.lineSpacing = style.lineSpacing;
+        textComponent.wordSpacing = style.wordSpacing;
+
+        // Apply colors
+        if (style.useGradient && style.colorGradient != null)
+        {
+            textComponent.enableVertexGradient = true;
+            var gradient = style.colorGradient;
+            textComponent.colorGradient = new VertexGradient(
+                gradient.Evaluate(1f), gradient.Evaluate(1f),
+                gradient.Evaluate(0f), gradient.Evaluate(0f)
+            );
+        }
+        else
+        {
+            textComponent.color = style.primaryColor;
+            textComponent.enableVertexGradient = false;
+        }
+
+        // Apply outline
+        if (style.useOutline)
+        {
+            textComponent.fontMaterial.EnableKeyword("OUTLINE_ON");
+            textComponent.outlineColor = style.outlineColor;
+            textComponent.outlineWidth = style.outlineWidth;
+        }
+        else
+        {
+            textComponent.fontMaterial.DisableKeyword("OUTLINE_ON");
+        }
     }
 }
