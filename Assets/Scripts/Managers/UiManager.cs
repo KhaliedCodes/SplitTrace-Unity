@@ -1,3 +1,4 @@
+using Cinemachine;
 using TMPro;
 using UnityEditor.Search;
 using UnityEngine;
@@ -23,7 +24,7 @@ public class UiManager : MonoBehaviour
     [Header("HealthVariables")]
     [SerializeField]Image _healthBar;
     [SerializeField]TextMeshProUGUI _healthCount;
-
+    [SerializeField] CinemachineBrain CamBrain;
     private void Awake()
     {
 
@@ -105,10 +106,14 @@ public class UiManager : MonoBehaviour
         {
             pauseMenuPanel.SetActive(true);
             Time.timeScale = 0f;
+            CamBrain.m_UpdateMethod = CinemachineBrain.UpdateMethod.ManualUpdate;
+
         }
         else { 
             pauseMenuPanel.SetActive(false);
             Time.timeScale = 1f;
+            CamBrain.m_UpdateMethod = CinemachineBrain.UpdateMethod.SmartUpdate;
+
         } 
 
     }
@@ -121,6 +126,8 @@ public class UiManager : MonoBehaviour
     public void ContinueGame()
     {
         pauseMenuPanel.SetActive(false);
+        Time.timeScale = 1f;
+        CamBrain.m_UpdateMethod = CinemachineBrain.UpdateMethod.SmartUpdate;
     }
     public void BackToMainMenu()
     {
@@ -128,7 +135,13 @@ public class UiManager : MonoBehaviour
     }
     public void ExitGame()
     {
+        
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+
+#else
         Application.Quit();
+#endif
     }
     public void ShowPanelCollecting()
     {
