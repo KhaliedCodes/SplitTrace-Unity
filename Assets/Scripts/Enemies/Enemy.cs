@@ -36,6 +36,7 @@ enum EnemyType
         public float MaxHealth { get => Maxhealth; set => Maxhealth = value; }
         public float MoveSpeed { get => moveSpeed; set => moveSpeed = value; }
         public new Transform transform => base.transform;
+        public bool IsProvoked { get => _isProvoked; set => _isProvoked = value; }
         public float DetectionRange { get => detectionRange; set => detectionRange = value; }
         public List<Transform> Waypoints { get => waypoints; set => waypoints = value; }
         public float WaypointStopTime { get => waypointStopTime; set => waypointStopTime = value; }
@@ -57,8 +58,10 @@ enum EnemyType
         public List<Transform> waypoints;
         public float waypointStopTime = 2f;
         public int _currentWaypointIndex = 0;
+        public bool _isProvoked = false;
 
-        // Private Vars
+
+    // Private Vars
         private float _lastAttackTime;
         private float _lastScreamTime;
         private bool _hasScreamed;
