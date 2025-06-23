@@ -39,7 +39,15 @@ public class DialogueManager : MonoBehaviour
     [Header("Choice Button Text Styling")]
     [SerializeField] private DialogueTextStyle choiceButtonTextStyle;
     [SerializeField] private DialogueTextStyle choiceButtonHoverStyle;
+    [SerializeField] private float choiceButtonFontSizeMin = 22f;
+    [SerializeField] private float choiceButtonFontSizeMax = 24f;
     [SerializeField] private bool useChoiceButtonAnimations = false;
+    [Header("Choice Button Animation Settings")]
+    [SerializeField] private bool enableChoiceButtonTextAnimation = false;
+    [SerializeField] private TextAnimationType choiceButtonAnimationType = TextAnimationType.Pulse;
+    [SerializeField] private float choiceButtonAnimationSpeed = 2f; 
+    [SerializeField] private float choiceButtonAnimationIntensity = 0.5f;
+
     
     private PlayerController playerController;
     private NPCController currentNPC;
@@ -76,7 +84,7 @@ public class DialogueManager : MonoBehaviour
         
         [Header("Font")]
         public TMP_FontAsset customFont;
-        public float fontSize = 18f;
+        public float fontSize = 22f;
         public FontStyles fontStyle = FontStyles.Normal;
         
         [Header("Spacing")]
@@ -112,51 +120,78 @@ public class DialogueManager : MonoBehaviour
 
     private void InitializeDefaultStyles()
     {
-        // Initialize default styles if not set
-        if (npcTextStyle == null)
+        // Create default styles using a helper method to reduce duplication
+        npcTextStyle = npcTextStyle ?? CreateDefaultTextStyle(new Color(0.8f, 0.9f, 1f), new Color(0.2f, 0.2f, 0.4f));
+        playerTextStyle = playerTextStyle ?? CreateDefaultTextStyle(new Color(0.9f, 0.9f, 0.8f), new Color(0.3f, 0.2f, 0.1f));
+        narrativeTextStyle = narrativeTextStyle ?? CreateDefaultTextStyle(new Color(0.7f, 0.7f, 0.7f), Color.black, FontStyles.Italic);
+        choiceButtonTextStyle = choiceButtonTextStyle ?? CreateChoiceButtonDefaultStyle();
+        choiceButtonHoverStyle = choiceButtonHoverStyle ?? CreateChoiceButtonHoverStyle();
+    }
+
+    // Helper method to reduce code duplication in style creation
+    private DialogueTextStyle CreateDefaultTextStyle(Color primaryColor, Color outlineColor, FontStyles fontStyle = FontStyles.Normal)
+    {
+        return new DialogueTextStyle
         {
-            npcTextStyle = new DialogueTextStyle();
-            npcTextStyle.primaryColor = new Color(0.8f, 0.9f, 1f); // Light blue
-            npcTextStyle.useOutline = true;
-            npcTextStyle.outlineColor = new Color(0.2f, 0.2f, 0.4f);
+            primaryColor = primaryColor,
+            useOutline = true,
+            outlineColor = outlineColor,
+            fontStyle = fontStyle
+        };
+    }
+
+    private DialogueTextStyle CreateChoiceButtonDefaultStyle()
+    {
+        return new DialogueTextStyle
+        {
+            primaryColor = new Color(1f, 0.9f, 0.7f),
+            useOutline = true,
+            outlineColor = new Color(0.4f, 0.2f, 0.1f),
+            fontSize = 22f,
+            fontStyle = FontStyles.Normal,
+            enableTextAnimation = false,
+            animationType = TextAnimationType.Pulse,
+            animationSpeed = 2f,
+            animationIntensity = 0.5f
+        };
+    }
+
+    private DialogueTextStyle CreateChoiceButtonHoverStyle()
+    {
+        return new DialogueTextStyle
+        {
+            primaryColor = new Color(1f, 1f, 0.8f),
+            useOutline = true,
+            outlineColor = new Color(0.6f, 0.4f, 0.1f),
+            fontSize = 24f,
+            fontStyle = FontStyles.Bold,
+            useGlow = true,
+            glowColor = new Color(1f, 1f, 0.6f)
+        };
+    }
+
+    private void ApplyAnimationSettingsToChoiceButtons()
+    {
+        if (choiceButtonTextStyle != null)
+        {
+            choiceButtonTextStyle.enableTextAnimation = enableChoiceButtonTextAnimation;
+            choiceButtonTextStyle.animationType = choiceButtonAnimationType;
+            choiceButtonTextStyle.animationSpeed = choiceButtonAnimationSpeed;
+            choiceButtonTextStyle.animationIntensity = choiceButtonAnimationIntensity;
         }
-        
-        if (playerTextStyle == null)
+    }
+
+    private void OnValidate()
+    {
+        // Font size validation
+        choiceButtonFontSizeMax = Mathf.Max(choiceButtonFontSizeMax, choiceButtonFontSizeMin);
+        choiceButtonFontSizeMin = Mathf.Max(choiceButtonFontSizeMin, 8f);
+        choiceButtonFontSizeMax = Mathf.Max(choiceButtonFontSizeMax, 8f);
+
+        // Apply animation settings when values change in inspector
+        if (Application.isPlaying)
         {
-            playerTextStyle = new DialogueTextStyle();
-            playerTextStyle.primaryColor = new Color(0.9f, 0.9f, 0.8f); // Warm white
-            playerTextStyle.useOutline = true;
-            playerTextStyle.outlineColor = new Color(0.3f, 0.2f, 0.1f);
-        }
-        
-        if (narrativeTextStyle == null)
-        {
-            narrativeTextStyle = new DialogueTextStyle();
-            narrativeTextStyle.primaryColor = new Color(0.7f, 0.7f, 0.7f); // Gray
-            narrativeTextStyle.fontStyle = FontStyles.Italic;
-        }
-        
-        // Initialize choice button text styles
-        if (choiceButtonTextStyle == null)
-        {
-            choiceButtonTextStyle = new DialogueTextStyle();
-            choiceButtonTextStyle.primaryColor = new Color(1f, 0.9f, 0.7f); // Light orange
-            choiceButtonTextStyle.useOutline = true;
-            choiceButtonTextStyle.outlineColor = new Color(0.4f, 0.2f, 0.1f); // Dark brown outline
-            choiceButtonTextStyle.fontSize = 16f;
-            choiceButtonTextStyle.fontStyle = FontStyles.Normal;
-        }
-        
-        if (choiceButtonHoverStyle == null)
-        {
-            choiceButtonHoverStyle = new DialogueTextStyle();
-            choiceButtonHoverStyle.primaryColor = new Color(1f, 1f, 0.8f); // Bright yellow
-            choiceButtonHoverStyle.useOutline = true;
-            choiceButtonHoverStyle.outlineColor = new Color(0.6f, 0.4f, 0.1f); // Golden outline
-            choiceButtonHoverStyle.fontSize = 18f;
-            choiceButtonHoverStyle.fontStyle = FontStyles.Bold;
-            choiceButtonHoverStyle.useGlow = true;
-            choiceButtonHoverStyle.glowColor = new Color(1f, 1f, 0.6f);
+            ApplyAnimationSettingsToChoiceButtons();
         }
     }
 
@@ -166,8 +201,8 @@ public class DialogueManager : MonoBehaviour
         endConversationButton?.onClick.AddListener(EndDialogue);
         FindPlayerController();
         InitializeChoiceButtons();
-        
-        // Apply initial styling to text components
+
+        ApplyAnimationSettingsToChoiceButtons();
         ApplyTextStyling(dialogueText, npcTextStyle);
         ApplyTextStyling(npcNameText, npcTextStyle);
     }
@@ -183,13 +218,11 @@ public class DialogueManager : MonoBehaviour
 
         HandleNumberKeySelection();
         
-        // Update text animations
         if (useTextAnimations)
         {
             UpdateTextAnimations();
         }
         
-        // Update choice button animations
         if (useChoiceButtonAnimations)
         {
             UpdateChoiceButtonAnimations();
@@ -222,22 +255,34 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    private void ApplyTextStyling(TextMeshProUGUI textComponent, DialogueTextStyle style)
+    public void ApplyTextStyling(TextMeshProUGUI textComponent, DialogueTextStyle style)
     {
         if (textComponent == null || style == null) return;
 
-        // Apply font
+        // Apply font and basic styling
+        ApplyBasicTextProperties(textComponent, style);
+        
+        // Apply colors and gradients
+        ApplyTextColors(textComponent, style);
+
+        // Apply effects (outline, shadow, glow)
+        ApplyTextEffects(textComponent, style);
+    }
+
+    private void ApplyBasicTextProperties(TextMeshProUGUI textComponent, DialogueTextStyle style)
+    {
         if (style.customFont != null)
             textComponent.font = style.customFont;
 
-        // Apply basic styling
         textComponent.fontSize = style.fontSize;
         textComponent.fontStyle = style.fontStyle;
         textComponent.characterSpacing = style.characterSpacing;
         textComponent.lineSpacing = style.lineSpacing;
         textComponent.wordSpacing = style.wordSpacing;
+    }
 
-        // Apply colors
+    private void ApplyTextColors(TextMeshProUGUI textComponent, DialogueTextStyle style)
+    {
         if (style.useGradient && style.colorGradient != null)
         {
             textComponent.enableVertexGradient = true;
@@ -252,7 +297,10 @@ public class DialogueManager : MonoBehaviour
             textComponent.color = style.primaryColor;
             textComponent.enableVertexGradient = false;
         }
+    }
 
+    private void ApplyTextEffects(TextMeshProUGUI textComponent, DialogueTextStyle style)
+    {
         // Apply outline
         if (style.useOutline)
         {
@@ -299,33 +347,39 @@ public class DialogueManager : MonoBehaviour
             for (int j = 0; j < 4; j++)
             {
                 var originalVertex = vertices[charInfo.vertexIndex + j];
-                
-                switch (style.animationType)
-                {
-                    case TextAnimationType.Wave:
-                        originalVertex.y += Mathf.Sin(Time.time * style.animationSpeed + i * 0.1f) * style.animationIntensity;
-                        break;
-                        
-                    case TextAnimationType.Bounce:
-                        originalVertex.y += Mathf.Abs(Mathf.Sin(Time.time * style.animationSpeed + i * 0.2f)) * style.animationIntensity;
-                        break;
-                        
-                    case TextAnimationType.Shake:
-                        originalVertex.x += Random.Range(-style.animationIntensity, style.animationIntensity);
-                        originalVertex.y += Random.Range(-style.animationIntensity, style.animationIntensity);
-                        break;
-                        
-                    case TextAnimationType.Pulse:
-                        float scale = 1f + Mathf.Sin(Time.time * style.animationSpeed) * style.animationIntensity * 0.1f;
-                        originalVertex = Vector3.Scale(originalVertex, Vector3.one * scale);
-                        break;
-                }
-                
+                originalVertex = ApplyAnimationEffect(originalVertex, style, i);
                 vertices[charInfo.vertexIndex + j] = originalVertex;
             }
         }
         
         textComponent.UpdateVertexData();
+    }
+
+    // Extract animation logic to reduce duplication
+    private Vector3 ApplyAnimationEffect(Vector3 vertex, DialogueTextStyle style, int charIndex)
+    {
+        switch (style.animationType)
+        {
+            case TextAnimationType.Wave:
+                vertex.y += Mathf.Sin(Time.time * style.animationSpeed + charIndex * 0.1f) * style.animationIntensity;
+                break;
+                
+            case TextAnimationType.Bounce:
+                vertex.y += Mathf.Abs(Mathf.Sin(Time.time * style.animationSpeed + charIndex * 0.2f)) * style.animationIntensity;
+                break;
+                
+            case TextAnimationType.Shake:
+                vertex.x += Random.Range(-style.animationIntensity, style.animationIntensity);
+                vertex.y += Random.Range(-style.animationIntensity, style.animationIntensity);
+                break;
+                
+            case TextAnimationType.Pulse:
+                float scale = 1f + Mathf.Sin(Time.time * style.animationSpeed) * style.animationIntensity * 0.1f;
+                vertex = Vector3.Scale(vertex, Vector3.one * scale);
+                break;
+        }
+        
+        return vertex;
     }
 
     public void SetDialogueTextStyle(DialogueTextStyle style, bool isPlayer = false)
@@ -388,98 +442,75 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    // Create preset styles for different dialogue types
+    // Consolidated preset creation with shared logic
     public DialogueTextStyle CreatePresetStyle(string presetName)
     {
-        var style = new DialogueTextStyle();
-        
-        switch (presetName.ToLower())
+        var presets = new Dictionary<string, System.Func<DialogueTextStyle>>
         {
-            case "mysterious":
-                style.primaryColor = new Color(0.6f, 0.4f, 0.8f);
-                style.useGlow = true;
-                style.glowColor = new Color(0.8f, 0.6f, 1f);
-                style.enableTextAnimation = true;
-                style.animationType = TextAnimationType.Wave;
-                break;
-                
-            case "heroic":
-                style.primaryColor = new Color(1f, 0.8f, 0.2f);
-                style.useOutline = true;
-                style.outlineColor = new Color(0.8f, 0.6f, 0f);
-                style.fontStyle = FontStyles.Bold;
-                break;
-                
-            case "villain":
-                style.primaryColor = new Color(0.8f, 0.2f, 0.2f);
-                style.useOutline = true;
-                style.outlineColor = Color.black;
-                style.enableTextAnimation = true;
-                style.animationType = TextAnimationType.Shake;
-                break;
-                
-            case "narrator":
-                style.primaryColor = new Color(0.7f, 0.7f, 0.7f);
-                style.fontStyle = FontStyles.Italic;
-                style.characterSpacing = 2f;
-                break;
-        }
-        
-        return style;
+            ["mysterious"] = () => CreateStyleWithAnimation(new Color(0.6f, 0.4f, 0.8f), new Color(0.8f, 0.6f, 1f), TextAnimationType.Wave, true),
+            ["heroic"] = () => CreateStyledText(new Color(1f, 0.8f, 0.2f), new Color(0.8f, 0.6f, 0f), FontStyles.Bold),
+            ["villain"] = () => CreateStyleWithAnimation(new Color(0.8f, 0.2f, 0.2f), Color.black, TextAnimationType.Shake, false, FontStyles.Normal),
+            ["narrator"] = () => CreateStyledText(new Color(0.7f, 0.7f, 0.7f), Color.black, FontStyles.Italic, 2f)
+        };
+
+        return presets.ContainsKey(presetName.ToLower()) ? presets[presetName.ToLower()]() : new DialogueTextStyle();
     }
 
-    // Create preset styles specifically for choice buttons
     public DialogueTextStyle CreateChoiceButtonPresetStyle(string presetName)
     {
-        var style = new DialogueTextStyle();
-        
-        switch (presetName.ToLower())
+        var presets = new Dictionary<string, System.Func<DialogueTextStyle>>
         {
-            case "elegant":
-                style.primaryColor = new Color(0.9f, 0.8f, 0.6f); // Elegant gold
-                style.useOutline = true;
-                style.outlineColor = new Color(0.3f, 0.2f, 0.1f);
-                style.fontStyle = FontStyles.Italic;
-                style.characterSpacing = 1f;
-                break;
-                
-            case "modern":
-                style.primaryColor = new Color(0.2f, 0.8f, 1f); // Modern cyan
-                style.useOutline = false;
-                style.useShadow = true;
-                style.shadowColor = new Color(0f, 0f, 0f, 0.5f);
-                style.fontStyle = FontStyles.Normal;
-                break;
-                
-            case "fantasy":
-                style.primaryColor = new Color(0.8f, 0.6f, 1f); // Fantasy purple
-                style.useGlow = true;
-                style.glowColor = new Color(1f, 0.8f, 1f);
-                style.enableTextAnimation = true;
-                style.animationType = TextAnimationType.Pulse;
-                break;
-                
-            case "military":
-                style.primaryColor = new Color(0.6f, 0.8f, 0.4f); // Military green
-                style.fontStyle = FontStyles.Bold;
-                style.useOutline = true;
-                style.outlineColor = new Color(0.2f, 0.3f, 0.1f);
-                style.characterSpacing = 2f;
-                break;
-                
-            case "retro":
-                style.primaryColor = new Color(1f, 0.4f, 0.6f); // Retro pink
-                style.useOutline = true;
-                style.outlineColor = new Color(0.8f, 0.2f, 0.4f);
-                style.enableTextAnimation = true;
-                style.animationType = TextAnimationType.Wave;
-                break;
+            ["elegant"] = () => CreateStyledText(new Color(0.9f, 0.8f, 0.6f), new Color(0.3f, 0.2f, 0.1f), FontStyles.Italic, 1f),
+            ["modern"] = () => CreateStyledText(new Color(0.2f, 0.8f, 1f), Color.clear, FontStyles.Normal, 0f, true),
+            ["fantasy"] = () => CreateStyleWithAnimation(new Color(0.8f, 0.6f, 1f), new Color(1f, 0.8f, 1f), TextAnimationType.Pulse, true),
+            ["military"] = () => CreateStyledText(new Color(0.6f, 0.8f, 0.4f), new Color(0.2f, 0.3f, 0.1f), FontStyles.Bold, 2f),
+            ["retro"] = () => CreateStyleWithAnimation(new Color(1f, 0.4f, 0.6f), new Color(0.8f, 0.2f, 0.4f), TextAnimationType.Wave, false)
+        };
+
+        return presets.ContainsKey(presetName.ToLower()) ? presets[presetName.ToLower()]() : new DialogueTextStyle();
+    }
+
+    // Helper methods to reduce duplication in preset creation
+    private DialogueTextStyle CreateStyledText(Color primaryColor, Color outlineColor, FontStyles fontStyle = FontStyles.Normal, float characterSpacing = 0f, bool useShadow = false)
+    {
+        var style = new DialogueTextStyle
+        {
+            primaryColor = primaryColor,
+            fontStyle = fontStyle,
+            characterSpacing = characterSpacing
+        };
+
+        if (outlineColor != Color.clear)
+        {
+            style.useOutline = true;
+            style.outlineColor = outlineColor;
         }
+
+        if (useShadow)
+        {
+            style.useShadow = true;
+            style.shadowColor = new Color(0f, 0f, 0f, 0.5f);
+        }
+
+        return style;
+    }
+
+    private DialogueTextStyle CreateStyleWithAnimation(Color primaryColor, Color glowColor, TextAnimationType animationType, bool useGlow, FontStyles fontStyle = FontStyles.Normal)
+    {
+        var style = CreateStyledText(primaryColor, Color.black, fontStyle);
+        
+        if (useGlow)
+        {
+            style.useGlow = true;
+            style.glowColor = glowColor;
+        }
+        
+        style.enableTextAnimation = true;
+        style.animationType = animationType;
         
         return style;
     }
 
-    // Method to apply choice button styling
     public void SetChoiceButtonTextStyle(DialogueTextStyle style)
     {
         choiceButtonTextStyle = style;
@@ -511,7 +542,12 @@ public class DialogueManager : MonoBehaviour
         }
 
         SetupChoiceButtonParentLayout();
+        ClearExistingChoiceButtons();
+        CreateChoiceButtons();
+    }
 
+    private void ClearExistingChoiceButtons()
+    {
         foreach (Transform child in choiceButtonParent)
         {
             if (Application.isPlaying)
@@ -520,12 +556,14 @@ public class DialogueManager : MonoBehaviour
                 DestroyImmediate(child.gameObject);
         }
         choiceButtons.Clear();
+    }
 
+    private void CreateChoiceButtons()
+    {
         for (int i = 0; i < maxChoices; i++)
         {
             GameObject buttonObj = Instantiate(choiceButtonPrefab, choiceButtonParent);
             buttonObj.name = $"ChoiceButton_{i}";
-
             SetupDynamicScalingButton(buttonObj, i);
             buttonObj.SetActive(false);
         }
@@ -567,19 +605,35 @@ public class DialogueManager : MonoBehaviour
 
     private void SetupDynamicScalingButton(GameObject buttonObj, int index)
     {
+        Button buttonComponent = EnsureButtonComponent(buttonObj);
+        ConfigureButtonLayout(buttonObj);
+        ConfigureButtonText(buttonObj);
+        SetupButtonComponents(buttonObj);
+        
+        choiceButtons.Add(buttonComponent);
+        int choiceIndex = index;
+        buttonComponent.onClick.AddListener(() => OnChoiceSelected(choiceIndex));
+    }
+
+    private Button EnsureButtonComponent(GameObject buttonObj)
+    {
         Button buttonComponent = buttonObj.GetComponent<Button>();
         if (buttonComponent == null)
         {
             Debug.LogWarning($"Button component missing on {buttonObj.name}, adding one automatically");
             buttonComponent = buttonObj.AddComponent<Button>();
-            
+
             Image buttonImage = buttonObj.GetComponent<Image>();
             if (buttonImage != null)
             {
                 buttonComponent.targetGraphic = buttonImage;
             }
         }
+        return buttonComponent;
+    }
 
+    private void ConfigureButtonLayout(GameObject buttonObj)
+    {
         ContentSizeFitter sizeFitter = buttonObj.GetComponent<ContentSizeFitter>();
         if (sizeFitter != null)
         {
@@ -604,15 +658,18 @@ public class DialogueManager : MonoBehaviour
         layoutElement.flexibleWidth = 1;
         layoutElement.minHeight = 45f;
         layoutElement.preferredHeight = 45f;
+    }
 
+    private void ConfigureButtonText(GameObject buttonObj)
+    {
         TextMeshProUGUI buttonText = buttonObj.GetComponentInChildren<TextMeshProUGUI>();
         if (buttonText != null)
         {
             buttonText.textWrappingMode = TextWrappingModes.NoWrap;
             buttonText.overflowMode = TextOverflowModes.Ellipsis;
             buttonText.enableAutoSizing = true;
-            buttonText.fontSizeMin = 14f;  // Adjusted for button-specific styling
-            buttonText.fontSizeMax = 18f;  // Adjusted for button-specific styling
+            buttonText.fontSizeMin = choiceButtonFontSizeMin;
+            buttonText.fontSizeMax = choiceButtonFontSizeMax;
             buttonText.alignment = TextAlignmentOptions.Left;
 
             RectTransform textRect = buttonText.GetComponent<RectTransform>();
@@ -620,14 +677,23 @@ public class DialogueManager : MonoBehaviour
             {
                 textRect.anchorMin = Vector2.zero;
                 textRect.anchorMax = Vector2.one;
-                textRect.offsetMin = new Vector2(15, 5); 
+                textRect.offsetMin = new Vector2(15, 5);
                 textRect.offsetMax = new Vector2(-15, -5);
             }
 
-            // Apply choice button specific text styling instead of player style
             ApplyTextStyling(buttonText, choiceButtonTextStyle);
+        }
+        else
+        {
+            Debug.LogError($"Choice button prefab is missing TextMeshProUGUI component! Button: {buttonObj.name}");
+        }
+    }
 
-            // Add hover effect component for choice buttons
+    private void SetupButtonComponents(GameObject buttonObj)
+    {
+        TextMeshProUGUI buttonText = buttonObj.GetComponentInChildren<TextMeshProUGUI>();
+        if (buttonText != null)
+        {
             ChoiceButtonHoverEffect hoverEffect = buttonObj.GetComponent<ChoiceButtonHoverEffect>();
             if (hoverEffect == null)
             {
@@ -642,15 +708,6 @@ public class DialogueManager : MonoBehaviour
             }
             colorChanger.text = buttonText;
         }
-        else
-        {
-            Debug.LogError($"Choice button prefab is missing TextMeshProUGUI component! Button: {buttonObj.name}");
-        }
-
-        choiceButtons.Add(buttonComponent);
-
-        int choiceIndex = index; 
-        buttonComponent.onClick.AddListener(() => OnChoiceSelected(choiceIndex));
     }
 
     public void StartDialogue(NPCController npc, string initialMessage)
@@ -678,16 +735,23 @@ public class DialogueManager : MonoBehaviour
         npcNameText.text = npc.NPCName;
         isDialogueActive = true;
 
+        ResetDialogueUI();
+        ApplyNPCTextStyling();
+        DisplayStyledDialogue(initialMessage);
+        playerController?.SetInDialogue(true);
+    }
+
+    private void ResetDialogueUI()
+    {
         chatHistoryText.text = "";
         dialogueText.text = "";
         HideAllChoices();
+    }
 
-        // Apply NPC-specific styling
+    private void ApplyNPCTextStyling()
+    {
         ApplyTextStyling(dialogueText, npcTextStyle);
         ApplyTextStyling(npcNameText, npcTextStyle);
-
-        DisplayStyledDialogue(initialMessage);
-        playerController?.SetInDialogue(true);
     }
 
     public void EndDialogue()
@@ -702,9 +766,7 @@ public class DialogueManager : MonoBehaviour
         currentNPC = null;
         
         isDialogueActive = false;
-        chatHistoryText.text = "";
-        dialogueText.text = "";
-        HideAllChoices();
+        ResetDialogueUI();
         
         playerController?.SetInDialogue(false);
         playerController?.EnableControls();
