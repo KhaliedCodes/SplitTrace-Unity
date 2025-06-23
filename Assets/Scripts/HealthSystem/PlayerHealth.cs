@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,13 +9,15 @@ public class PlayerHealth : MonoBehaviour, IDamagable
     [SerializeField] private Image healthBarFill;
     [SerializeField] int HealthItemsAmount = 0;
     [SerializeField] float HealAmount = 10f;
+    [SerializeField] TextMeshProUGUI healthCounterText;
 
     public float Health { get; set; }
+    public int _HealthItemsAmount { get => HealthItemsAmount;}
     public float MaxHealth { get => maxHealth; set => maxHealth = value; }
 
     private void Start()
     {
-        Health = MaxHealth;
+        Health = 50f;
         UpdateHealthUI();
     }
 
@@ -38,7 +41,7 @@ public class PlayerHealth : MonoBehaviour, IDamagable
     private void UpdateHealthUI()
     {
         if (healthBarFill != null)
-            healthBarFill.transform.localScale = new Vector3(Health / MaxHealth, 1, 1);
+            healthBarFill.fillAmount = Health / MaxHealth;
     }
 
     private void Die()
@@ -47,13 +50,15 @@ public class PlayerHealth : MonoBehaviour, IDamagable
         // TODO: Handle death animation, game over screen, etc.
     }
 
-    public void UpdateNumberOfHealthItem()
+    public void UpdateNumberOfHealthItem(int i)
     {
         //Update health number Who player have
-        HealthItemsAmount += 1;
+        HealthItemsAmount += i;
+        UpdateHealthCounterUI();
+
     }
 
-    void IncreaseHealth()
+    public  void IncreaseHealth()
     {
         if (Health < 100f)
         {
@@ -62,8 +67,19 @@ public class PlayerHealth : MonoBehaviour, IDamagable
                 Health += HealAmount;
                 HealthItemsAmount -= 1;
                 UpdateHealthUI();
+                UpdateHealthCounterUI();
+                Debug.Log("You Heal yourself");
+
             }
+            Debug.Log("you don`t have Health Item");
+        }
+        else {
+            Debug.Log("Health is Full");
         }
 
     }
+    public void UpdateHealthCounterUI() {
+        healthCounterText.text = HealthItemsAmount.ToString();
+    }
+   
 }
