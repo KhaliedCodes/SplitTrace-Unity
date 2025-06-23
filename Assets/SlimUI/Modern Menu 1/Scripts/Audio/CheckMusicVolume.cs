@@ -1,15 +1,40 @@
 ﻿using UnityEngine;
-using System.Collections;
+using UnityEngine.UI;
 
-namespace SlimUI.ModernMenu{
-	public class CheckMusicVolume : MonoBehaviour {
-		public void  Start (){
-			// remember volume level from last time
-			GetComponent<AudioSource>().volume = PlayerPrefs.GetFloat("MusicVolume");
-		}
+namespace SlimUI.ModernMenu
+{
+    public class CheckMusicVolume : MonoBehaviour
+    {
+        [SerializeField] private Slider volumeSlider;
 
-		public void UpdateVolume (){
-			GetComponent<AudioSource>().volume = PlayerPrefs.GetFloat("MusicVolume");
-		}
-	}
+        private void Awake()
+        {
+            if (volumeSlider == null)
+            {
+                Debug.LogError("Volume Slider not assigned.");
+                return;
+            }
+
+            float savedVolume = PlayerPrefs.GetFloat("MusicVolume", 1f);
+            volumeSlider.value = savedVolume;
+
+            volumeSlider.onValueChanged.AddListener(HandleSliderChanged);
+        }
+
+        private void HandleSliderChanged(float value)
+        {
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.UpdateVolume(value);
+            }
+
+            PlayerPrefs.SetFloat("MusicVolume", value);
+
+        }
+
+        private void OnDestroy()
+        {
+            volumeSlider.onValueChanged.RemoveListener(HandleSliderChanged);
+        }
+    }
 }

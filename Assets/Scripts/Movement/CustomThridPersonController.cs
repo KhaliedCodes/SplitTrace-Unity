@@ -1,4 +1,4 @@
-using StarterAssets;
+﻿using StarterAssets;
 using UnityEngine;
 using System.Collections;
 using UnityEngine.InputSystem;
@@ -113,6 +113,7 @@ public class CustomThridPersonController : MonoBehaviour
     private const float _threshold = 0.01f;
 
     private bool _hasAnimator;
+    private bool _rotateOnMove = true;
 
     // UI reference for dodge cooldown indicator (optional)
     public UnityEngine.UI.Image dodgeCooldownIndicator;
@@ -161,7 +162,9 @@ public class CustomThridPersonController : MonoBehaviour
 
         _hasAnimator = TryGetComponent(out _animator);
         _controller = GetComponent<CharacterController>();
+           
         _input = GetComponent<CustomStarterAssetsInputs>();
+        
         _autoLook = GetComponent<AutoLookAtNearestEnemy>();
         _dodge = GetComponent<Dodge>();
 
@@ -185,7 +188,9 @@ public class CustomThridPersonController : MonoBehaviour
         _dodge.HandleDodge();
         // JumpAndGravity();
         GroundedCheck();
-
+        if (_input.pause) {
+            Pause();
+        }
         // Only run movement logic if not dodging
         if (!_dodge.isDodging)
         {
@@ -204,7 +209,13 @@ public class CustomThridPersonController : MonoBehaviour
             dodgeCooldownIndicator.fillAmount = 1 - (_dodge.dodgeCooldownTimer / _dodge.dodgeCooldown);
         }
     }
-
+   
+    void Pause() {
+        if (_input.pause) {
+            UiManager.Instance.ShowPauseMenu();
+            _input.pause=false;
+        }
+    }
     private void LateUpdate()
     {
         CameraRotation();
@@ -253,6 +264,7 @@ public class CustomThridPersonController : MonoBehaviour
         // Cinemachine will follow this target
         CinemachineCameraTarget.transform.rotation = Quaternion.Euler(_cinemachineTargetPitch + CameraAngleOverride,
             _cinemachineTargetYaw, 0.0f);
+
     }
 
     private void Move()
@@ -295,13 +307,24 @@ public class CustomThridPersonController : MonoBehaviour
         // normalise input direction
         Vector3 inputDirection = new Vector3(_input.move.x, 0.0f, _input.move.y).normalized;
 
+
         // note: Vector2's != operator uses approximation so is not floating point error prone, and is cheaper than magnitude
         // if there is a move input rotate player when the player is moving
+
+        //if (WeaponManager.Instance != null && WeaponManager.Instance.IsAiming)
+        //{
+        //    // 👇 Directly face camera forward
+        //    float cameraY = _mainCamera.transform.eulerAngles.y ;
+        //    float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, cameraY, ref _rotationVelocity, RotationSmoothTime);
+        //    transform.rotation = Quaternion.Euler(5.0f, rotation, 0.0f);
+        //}
+
         if (_input.move != Vector2.zero)
         {
             // Different handling depending on whether locked onto an enemy or not
             Vector3 targetDirection;
 
+            // rotate to face input direction relative to camera position         
             if (lockOnToEnemy && enemyTarget != null)
             {
                 // When locked on to an enemy, ALWAYS face the enemy regardless of movement direction
@@ -334,7 +357,10 @@ public class CustomThridPersonController : MonoBehaviour
                 float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity,
                     RotationSmoothTime);
 
-                transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
+                if (_rotateOnMove)
+                {
+                    transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
+                }
 
                 // Move in the direction we're facing
                 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
@@ -418,7 +444,7 @@ public class CustomThridPersonController : MonoBehaviour
             if (_hasAnimator)
             {
                 _animator.SetFloat(_animIDSpeed, 0);
-                _animator.SetFloat(_animIDMotionSpeed, 0);
+                _animator.SetFloat(_animIDMotionSpeed, 1);
             }
         }
     }
@@ -463,6 +489,11 @@ public class CustomThridPersonController : MonoBehaviour
         {
             AudioSource.PlayClipAtPoint(LandingAudioClip, transform.TransformPoint(_controller.center), FootstepAudioVolume);
         }
+    }
+
+    public void SetRotateOnMove(bool rotate)
+    {
+        _rotateOnMove = rotate;
     }
 
     public void Stun(float duration)

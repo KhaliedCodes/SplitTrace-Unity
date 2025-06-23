@@ -25,6 +25,7 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private float typingSpeed = 0.05f;
     [SerializeField] private AudioSource typingSoundEffect;
     [SerializeField] private bool useTypewriterEffect = true;
+    
     private PlayerController playerController;
     private NPCController currentNPC;
     private Coroutine typingCoroutine;
@@ -70,174 +71,191 @@ public class DialogueManager : MonoBehaviour
     }
 
     private void InitializeChoiceButtons()
-{
-    if (choiceButtonPrefab == null || choiceButtonParent == null)
     {
-        Debug.LogWarning("Choice button prefab or parent not assigned!");
-        return;
+        if (choiceButtonPrefab == null || choiceButtonParent == null)
+        {
+            Debug.LogWarning("Choice button prefab or parent not assigned!");
+            return;
+        }
+
+        // Configure the parent layout group for better button arrangement
+        SetupChoiceButtonParentLayout();
+
+        // Clear existing buttons
+        foreach (Transform child in choiceButtonParent)
+        {
+            if (Application.isPlaying)
+                Destroy(child.gameObject);
+            else
+                DestroyImmediate(child.gameObject);
+        }
+        choiceButtons.Clear();
+
+        // Create new buttons and store them in the list
+        for (int i = 0; i < maxChoices; i++)
+        {
+            GameObject buttonObj = Instantiate(choiceButtonPrefab, choiceButtonParent);
+            buttonObj.name = $"ChoiceButton_{i}";
+
+            // Configure button for dynamic scaling
+            SetupDynamicScalingButton(buttonObj, i);
+
+            // Initially hide the button
+            buttonObj.SetActive(false);
+        }
     }
 
-    // Configure the parent layout group for better button arrangement
-    SetupChoiceButtonParentLayout();
-
-    // Clear existing buttons
-    foreach (Transform child in choiceButtonParent)
+    private void SetupChoiceButtonParentLayout()
     {
-        if (Application.isPlaying)
-            Destroy(child.gameObject);
-        else
-            DestroyImmediate(child.gameObject);
-    }
-    choiceButtons.Clear();
-
-    // Create new buttons and store them in the list
-    for (int i = 0; i < maxChoices; i++)
-    {
-        GameObject buttonObj = Instantiate(choiceButtonPrefab, choiceButtonParent);
-        buttonObj.name = $"ChoiceButton_{i}";
-
-        // Configure button for dynamic scaling
-        SetupDynamicScalingButton(buttonObj, i);
-
-        // Initially hide the button
-        buttonObj.SetActive(false);
-    }
-}
-
-private void SetupChoiceButtonParentLayout()
-{
-    // Add Vertical Layout Group to parent for better button arrangement
-    VerticalLayoutGroup layoutGroup = choiceButtonParent.GetComponent<VerticalLayoutGroup>();
-    if (layoutGroup == null)
-    {
-        layoutGroup = choiceButtonParent.gameObject.AddComponent<VerticalLayoutGroup>();
-    }
-    
-    // Configure layout group settings
-    layoutGroup.childAlignment = TextAnchor.UpperLeft;
-    layoutGroup.childControlWidth = true;   // Force uniform width
-    layoutGroup.childControlHeight = true;  // Force uniform height
-    layoutGroup.childForceExpandWidth = true;  // Make buttons expand to fill width
-    layoutGroup.childForceExpandHeight = false;
-    layoutGroup.spacing = 0; // Space between buttons
-    layoutGroup.padding = new RectOffset(5, 5, 2, 2); // Left, Right, Top, Bottom padding
-
-    // Add Content Size Fitter to parent if needed
-    ContentSizeFitter parentSizeFitter = choiceButtonParent.GetComponent<ContentSizeFitter>();
-    if (parentSizeFitter == null)
-    {
-        parentSizeFitter = choiceButtonParent.gameObject.AddComponent<ContentSizeFitter>();
-    }
-    parentSizeFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-    parentSizeFitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
-    
-    // Ensure the parent RectTransform is set to stretch horizontally
-    RectTransform parentRect = choiceButtonParent.GetComponent<RectTransform>();
-    if (parentRect != null)
-    {
-        parentRect.anchorMin = new Vector2(0, parentRect.anchorMin.y);
-        parentRect.anchorMax = new Vector2(1, parentRect.anchorMax.y);
-        parentRect.offsetMin = new Vector2(0, parentRect.offsetMin.y);
-        parentRect.offsetMax = new Vector2(0, parentRect.offsetMax.y);
-    }
-}
-
-private void SetupDynamicScalingButton(GameObject buttonObj, int index)
-{
-    // Get or add the Button component
-    Button buttonComponent = buttonObj.GetComponent<Button>();
-    if (buttonComponent == null)
-    {
-        Debug.LogWarning($"Button component missing on {buttonObj.name}, adding one automatically");
-        buttonComponent = buttonObj.AddComponent<Button>();
+        // Add Vertical Layout Group to parent for better button arrangement
+        VerticalLayoutGroup layoutGroup = choiceButtonParent.GetComponent<VerticalLayoutGroup>();
+        if (layoutGroup == null)
+        {
+            layoutGroup = choiceButtonParent.gameObject.AddComponent<VerticalLayoutGroup>();
+        }
         
-        // If there's an Image component, set it as the button's target graphic
-        Image buttonImage = buttonObj.GetComponent<Image>();
-        if (buttonImage != null)
+        // Configure layout group settings
+        layoutGroup.childAlignment = TextAnchor.UpperLeft;
+        layoutGroup.childControlWidth = true;   // Force uniform width
+        layoutGroup.childControlHeight = true;  // Force uniform height
+        layoutGroup.childForceExpandWidth = true;  // Make buttons expand to fill width
+        layoutGroup.childForceExpandHeight = false;
+        layoutGroup.spacing = 0; // Space between buttons
+        layoutGroup.padding = new RectOffset(5, 5, 2, 2); // Left, Right, Top, Bottom padding
+
+        // Add Content Size Fitter to parent if needed
+        ContentSizeFitter parentSizeFitter = choiceButtonParent.GetComponent<ContentSizeFitter>();
+        if (parentSizeFitter == null)
         {
-            buttonComponent.targetGraphic = buttonImage;
+            parentSizeFitter = choiceButtonParent.gameObject.AddComponent<ContentSizeFitter>();
+        }
+        parentSizeFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+        parentSizeFitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
+        
+        // Ensure the parent RectTransform is set to stretch horizontally
+        RectTransform parentRect = choiceButtonParent.GetComponent<RectTransform>();
+        if (parentRect != null)
+        {
+            parentRect.anchorMin = new Vector2(0, parentRect.anchorMin.y);
+            parentRect.anchorMax = new Vector2(1, parentRect.anchorMax.y);
+            parentRect.offsetMin = new Vector2(0, parentRect.offsetMin.y);
+            parentRect.offsetMax = new Vector2(0, parentRect.offsetMax.y);
         }
     }
 
-    // Remove conflicting Content Size Fitter since we're using Layout Group control
-    ContentSizeFitter sizeFitter = buttonObj.GetComponent<ContentSizeFitter>();
-    if (sizeFitter != null)
+    private void SetupDynamicScalingButton(GameObject buttonObj, int index)
     {
-        DestroyImmediate(sizeFitter);
-    }
-
-    // Set up RectTransform to stretch horizontally
-    RectTransform buttonRect = buttonObj.GetComponent<RectTransform>();
-    if (buttonRect != null)
-    {
-        buttonRect.anchorMin = new Vector2(0, 0.5f);
-        buttonRect.anchorMax = new Vector2(1, 0.5f);
-        buttonRect.pivot = new Vector2(0.5f, 0.5f);
-    }
-
-    // Add Layout Element for height control while allowing width to expand
-    LayoutElement layoutElement = buttonObj.GetComponent<LayoutElement>();
-    if (layoutElement == null)
-    {
-        layoutElement = buttonObj.AddComponent<LayoutElement>();
-    }
-    // Remove fixed width constraints to let buttons stretch
-    layoutElement.minWidth = -1; // No minimum width constraint
-    layoutElement.preferredWidth = -1; // No preferred width constraint
-    layoutElement.flexibleWidth = 1; // Allow flexible width expansion
-    layoutElement.minHeight = 45f; // Set consistent height
-    layoutElement.preferredHeight = 45f;
-
-    // Configure text component
-    TextMeshProUGUI buttonText = buttonObj.GetComponentInChildren<TextMeshProUGUI>();
-    if (buttonText != null)
-    {
-        // Text settings for better display
-        buttonText.textWrappingMode = TextWrappingModes.NoWrap;
-        buttonText.overflowMode = TextOverflowModes.Ellipsis;
-        buttonText.enableAutoSizing = true;
-        buttonText.fontSizeMin = 16f;
-        buttonText.fontSizeMax = 20f;
-        buttonText.alignment = TextAlignmentOptions.Left;
-
-        // Outline settings
-        buttonText.fontMaterial.EnableKeyword("OUTLINE_ON");
-        buttonText.outlineColor = new Color32(255, 0, 0, 255); 
-        buttonText.outlineWidth = 0.01f;
-
-        // Ensure text fills the button properly
-        RectTransform textRect = buttonText.GetComponent<RectTransform>();
-        if (textRect != null)
+        // Get or add the Button component
+        Button buttonComponent = buttonObj.GetComponent<Button>();
+        if (buttonComponent == null)
         {
-            textRect.anchorMin = Vector2.zero;
-            textRect.anchorMax = Vector2.one;
-            textRect.offsetMin = new Vector2(15, 5); 
-            textRect.offsetMax = new Vector2(-15, -5);
+            Debug.LogWarning($"Button component missing on {buttonObj.name}, adding one automatically");
+            buttonComponent = buttonObj.AddComponent<Button>();
+            
+            // If there's an Image component, set it as the button's target graphic
+            Image buttonImage = buttonObj.GetComponent<Image>();
+            if (buttonImage != null)
+            {
+                buttonComponent.targetGraphic = buttonImage;
+            }
         }
 
-        TMPButtonTextColorChanger colorChanger = buttonObj.GetComponent<TMPButtonTextColorChanger>();
-        if (colorChanger == null)
+        // Remove conflicting Content Size Fitter since we're using Layout Group control
+        ContentSizeFitter sizeFitter = buttonObj.GetComponent<ContentSizeFitter>();
+        if (sizeFitter != null)
         {
-            colorChanger = buttonObj.AddComponent<TMPButtonTextColorChanger>();
+            DestroyImmediate(sizeFitter);
         }
-        colorChanger.text = buttonText;
-    }
-    else
-    {
-        Debug.LogError($"Choice button prefab is missing TextMeshProUGUI component! Button: {buttonObj.name}");
-    }
 
-    choiceButtons.Add(buttonComponent);
+        // Set up RectTransform to stretch horizontally
+        RectTransform buttonRect = buttonObj.GetComponent<RectTransform>();
+        if (buttonRect != null)
+        {
+            buttonRect.anchorMin = new Vector2(0, 0.5f);
+            buttonRect.anchorMax = new Vector2(1, 0.5f);
+            buttonRect.pivot = new Vector2(0.5f, 0.5f);
+        }
 
-    
-    int choiceIndex = index; 
-    buttonComponent.onClick.AddListener(() => OnChoiceSelected(choiceIndex));
-}
+        // Add Layout Element for height control while allowing width to expand
+        LayoutElement layoutElement = buttonObj.GetComponent<LayoutElement>();
+        if (layoutElement == null)
+        {
+            layoutElement = buttonObj.AddComponent<LayoutElement>();
+        }
+        // Remove fixed width constraints to let buttons stretch
+        layoutElement.minWidth = -1; // No minimum width constraint
+        layoutElement.preferredWidth = -1; // No preferred width constraint
+        layoutElement.flexibleWidth = 1; // Allow flexible width expansion
+        layoutElement.minHeight = 45f; // Set consistent height
+        layoutElement.preferredHeight = 45f;
+
+        // Configure text component
+        TextMeshProUGUI buttonText = buttonObj.GetComponentInChildren<TextMeshProUGUI>();
+        if (buttonText != null)
+        {
+            // Text settings for better display
+            buttonText.textWrappingMode = TextWrappingModes.NoWrap;
+            buttonText.overflowMode = TextOverflowModes.Ellipsis;
+            buttonText.enableAutoSizing = true;
+            buttonText.fontSizeMin = 16f;
+            buttonText.fontSizeMax = 20f;
+            buttonText.alignment = TextAlignmentOptions.Left;
+
+            // Outline settings
+            buttonText.fontMaterial.EnableKeyword("OUTLINE_ON");
+            buttonText.outlineColor = new Color32(255, 0, 0, 255); 
+            buttonText.outlineWidth = 0.01f;
+
+            // Ensure text fills the button properly
+            RectTransform textRect = buttonText.GetComponent<RectTransform>();
+            if (textRect != null)
+            {
+                textRect.anchorMin = Vector2.zero;
+                textRect.anchorMax = Vector2.one;
+                textRect.offsetMin = new Vector2(15, 5); 
+                textRect.offsetMax = new Vector2(-15, -5);
+            }
+
+            TMPButtonTextColorChanger colorChanger = buttonObj.GetComponent<TMPButtonTextColorChanger>();
+            if (colorChanger == null)
+            {
+                colorChanger = buttonObj.AddComponent<TMPButtonTextColorChanger>();
+            }
+            colorChanger.text = buttonText;
+        }
+        else
+        {
+            Debug.LogError($"Choice button prefab is missing TextMeshProUGUI component! Button: {buttonObj.name}");
+        }
+
+        choiceButtons.Add(buttonComponent);
+
+        int choiceIndex = index; 
+        buttonComponent.onClick.AddListener(() => OnChoiceSelected(choiceIndex));
+    }
 
     public void StartDialogue(NPCController npc, string initialMessage)
     {
-        if (npcNameText == null || npc == null || dialoguePanel == null) return;
+        if (npcNameText == null || npc == null || dialoguePanel == null) 
+        {
+            Debug.LogError("DialogueManager: Missing required components or NPC is null!");
+            return;
+        }
 
+        // Verify this is the NPC the player actually wants to talk to
+        if (playerController != null)
+        {
+            NPCController expectedNPC = playerController.GetCurrentInteractable();
+            if (expectedNPC != null && expectedNPC != npc)
+            {
+                Debug.LogWarning($"DialogueManager: Mismatch! Expected {expectedNPC.NPCName} but got {npc.NPCName}");
+                // Use the expected NPC instead
+                npc = expectedNPC;
+            }
+        }
+
+        Debug.Log($"DialogueManager: Starting dialogue with {npc.NPCName}");
+        
         dialoguePanel.SetActive(true);
         currentNPC = npc;
         npcNameText.text = npc.NPCName;
@@ -252,24 +270,24 @@ private void SetupDynamicScalingButton(GameObject buttonObj, int index)
     }
 
     public void EndDialogue()
-{
-   
-    if (!isDialogueActive) return;
-    
-    dialoguePanel.SetActive(false);
-    
-   
-    currentNPC?.OnDialogueEnded(); 
-    currentNPC = null;
-    
-    isDialogueActive = false;
-    chatHistoryText.text = "";
-    dialogueText.text = "";
-    HideAllChoices();
-    
-    playerController?.SetInDialogue(false);
-    playerController?.EnableControls();
-}
+    {
+        if (!isDialogueActive) return;
+        
+        Debug.Log($"DialogueManager: Ending dialogue with {currentNPC?.NPCName ?? "unknown NPC"}");
+        
+        dialoguePanel.SetActive(false);
+        
+        currentNPC?.OnDialogueEnded(); 
+        currentNPC = null;
+        
+        isDialogueActive = false;
+        chatHistoryText.text = "";
+        dialogueText.text = "";
+        HideAllChoices();
+        
+        playerController?.SetInDialogue(false);
+        playerController?.EnableControls();
+    }
 
     public void DisplayNPCResponse(string message)
     {
@@ -289,7 +307,6 @@ private void SetupDynamicScalingButton(GameObject buttonObj, int index)
         if (string.IsNullOrEmpty(dialogue)) return;
 
         var (emotion, displayText) = EmotionParser.Parse(dialogue);
-
 
         if (useTypewriterEffect)
         {
@@ -313,6 +330,7 @@ private void SetupDynamicScalingButton(GameObject buttonObj, int index)
         yield return new WaitForSeconds(0.5f);
         currentNPC?.RequestDialogueChoices();
     }
+    
     private IEnumerator TypeDialogue(string text)
     {
         dialogueText.text = "";
@@ -373,5 +391,11 @@ private void SetupDynamicScalingButton(GameObject buttonObj, int index)
         AppendToChatHistory("You", currentChoices[choiceIndex]);
         HideAllChoices();
         currentNPC?.SendPlayerChoice(currentChoices[choiceIndex], choiceIndex);
+    }
+
+    // Public method to get current NPC (for debugging)
+    public NPCController GetCurrentNPC()
+    {
+        return currentNPC;
     }
 }

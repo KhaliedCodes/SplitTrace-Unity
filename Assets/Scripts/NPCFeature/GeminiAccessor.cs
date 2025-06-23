@@ -8,27 +8,43 @@ public class GeminiAccessor : MonoBehaviour
     [SerializeField] private GeminiAPIClient geminiAPI;
     
     [Header("Story Context")]
-    [SerializeField] private StoryContextManager storyContext;
+    private StoryContextManager storyContext; // Automatically retrieved from StoryContextHolder
 
     private NPCPersonality npcPersonality;
-    private Animator npcAnimator;
+
 
     public event Action<string, string> OnResponseProcessed;
     public event Action<List<string>> OnChoicesReceived;
 
     private void Start()
     {
-        npcAnimator = GetComponent<Animator>();
         geminiAPI = geminiAPI ?? gameObject.AddComponent<GeminiAPIClient>();
         geminiAPI.OnResponseReceived += ProcessResponse;
         
-        // Find StoryContextManager if not assigned
-        if (storyContext == null)
+        // Get story context from StoryContextHolder
+        InitializeStoryContext();
+    }
+
+    private void InitializeStoryContext()
+    {
+        // Always get story context from StoryContextHolder (no inspector assignment)
+        if (StoryContextHolder.Instance != null)
         {
-            // Try to find it in a GameObject first
+            storyContext = StoryContextHolder.Instance.GetStoryContext();
+            Debug.Log($"GeminiAccessor on {gameObject.name} got story context from StoryContextHolder");
+        }
+        else
+        {
             StoryContextHolder contextHolder = FindFirstObjectByType<StoryContextHolder>();
             if (contextHolder != null)
+            {
                 storyContext = contextHolder.GetStoryContext();
+                Debug.Log($"GeminiAccessor on {gameObject.name} found StoryContextHolder in scene");
+            }
+            else
+            {
+                Debug.LogWarning($"GeminiAccessor on {gameObject.name} could not find StoryContextHolder in scene");
+            }
         }
     }
 
@@ -51,9 +67,24 @@ public class GeminiAccessor : MonoBehaviour
     public void SetStoryContext(StoryContextManager context)
     {
         storyContext = context;
+        Debug.Log($"GeminiAccessor on {gameObject.name} story context updated");
+        
         // Refresh system instructions with new context
         if (npcPersonality != null)
             ConfigureWithPersonality(npcPersonality);
+    }
+
+    // Public method to manually refresh story context from holder
+    public void RefreshStoryContextFromHolder()
+    {
+        if (StoryContextHolder.Instance != null)
+        {
+            var newContext = StoryContextHolder.Instance.GetStoryContext();
+            if (newContext != storyContext)
+            {
+                SetStoryContext(newContext);
+            }
+        }
     }
 
     public void SendPlayerInput(string input) 
