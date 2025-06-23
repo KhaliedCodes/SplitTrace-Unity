@@ -1,5 +1,9 @@
+using Cinemachine;
 using TMPro;
+using UnityEditor.Search;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class UiManager : MonoBehaviour
 {
@@ -12,10 +16,18 @@ public class UiManager : MonoBehaviour
     [SerializeField] private GameObject TutCollider;
 
     private bool isTutorialActive = false;
+    [Header("PauseMenuVariables")]
+    [SerializeField] private GameObject pauseMenuPanel;
+    [Header("CollectPanel")]
+    [SerializeField] private GameObject CollectPanel;
 
-
+    [Header("HealthVariables")]
+    [SerializeField]Image _healthBar;
+    [SerializeField]TextMeshProUGUI _healthCount;
+    [SerializeField] CinemachineBrain CamBrain;
     private void Awake()
     {
+
         if (Instance == null)
         {
             Instance = this;
@@ -33,8 +45,8 @@ public class UiManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Return))
         {
             HideTutorial();
-        } 
-        
+        }
+
         if (Input.GetKeyDown(KeyCode.Delete))
         {
             ResetTutorials();
@@ -84,8 +96,73 @@ public class UiManager : MonoBehaviour
     public void ResetTutorials()
     {
         Debug.Log("Prefs Reset");
-        PlayerPrefs.DeleteAll(); 
+        PlayerPrefs.DeleteAll();
         PlayerPrefs.Save();
     }
 
+    public void ShowPauseMenu()
+    {
+        if (!pauseMenuPanel.activeSelf)
+        {
+            pauseMenuPanel.SetActive(true);
+            Time.timeScale = 0f;
+            CamBrain.m_UpdateMethod = CinemachineBrain.UpdateMethod.ManualUpdate;
+
+        }
+        else { 
+            pauseMenuPanel.SetActive(false);
+            Time.timeScale = 1f;
+            CamBrain.m_UpdateMethod = CinemachineBrain.UpdateMethod.SmartUpdate;
+
+        } 
+
+    }
+    public void DisablePauseMenu()
+    {
+        pauseMenuPanel.SetActive(false);
+
+    }
+
+    public void ContinueGame()
+    {
+        pauseMenuPanel.SetActive(false);
+        Time.timeScale = 1f;
+        CamBrain.m_UpdateMethod = CinemachineBrain.UpdateMethod.SmartUpdate;
+    }
+    public void BackToMainMenu()
+    {
+        SceneManager.LoadScene("MainMenuGold");
+    }
+    public void ExitGame()
+    {
+        
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+
+#else
+        Application.Quit();
+#endif
+    }
+    public void ShowPanelCollecting()
+    {
+        CollectPanel.SetActive(true);
+
+    }
+    public void HidePanelCollecting()
+    {
+        CollectPanel.SetActive(false);
+    }
+    public void UpdateHealthCount(int count) {
+        _healthCount.text = count.ToString();
+    }
+    public void UpdateHealthBar(float value)
+    {
+        _healthBar.fillAmount = value;
+    }
+
+    public void IncreaseHealth()
+    {
+
+    }
+    
 }

@@ -27,6 +27,14 @@ namespace StarterAssets
         {
             starterAssetsInputs.SprintInput(virtualSprintState);
         }
+        public void VirtualPauseInput(bool virtualPauseState)
+        {
+            starterAssetsInputs.PauseInput(virtualPauseState);
+        }
+        public void VirtualCollectInput(bool virtualCollectState)
+        {
+            starterAssetsInputs.CollectInput(virtualCollectState);
+        }
         
     }
 
