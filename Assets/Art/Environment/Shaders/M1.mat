@@ -57,6 +57,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _MetallicMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _NormalMap:
         m_Texture: {fileID: 2800000, guid: 44ae9357d27823b4eaf0aeecb7f22f82, type: 3}
         m_Scale: {x: 1, y: 1}
@@ -87,20 +91,21 @@ Material:
     - Rim_Power: 0
     - Toon_Ramp_Offset: 0.469
     - Toon_Ramp_Smoothness: 0.235
-    - _Ambient: 0.85
-    - _BrightnessRim: 3.46
-    - _HighlightSharpness: 0
-    - _HighlightThickness: 0.12
+    - _Ambient: 12.03
+    - _BrightnessRim: 2.11
+    - _HighlightSharpness: 0.86
+    - _HighlightThickness: 0.09
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _RimPower: 0.001
-    - _ToonRampOffset: 0.65
-    - _ToonRampOffsetPoint: 0.44
-    - _ToonRampSmoothness: 0
+    - _RimPower: 1.2
+    - _Roughness: 0
+    - _ToonRampOffset: 0.62
+    - _ToonRampOffsetPoint: 0.68
+    - _ToonRampSmoothness: 0.127
     - _Toon_Ramp_Offset_Point: 0.581
     m_Colors:
     - Toon_Ramp_Tint: {r: 0.6509805, g: 0, b: 1, a: 1}
-    - _Color: {r: 0.9666263, g: 1, b: 0.72264147, a: 1}
-    - _ToonRampTint: {r: 1, g: 0, b: 0.8823528, a: 1}
+    - _Color: {r: 0.78113204, g: 0.61071384, b: 0.44657168, a: 1}
+    - _ToonRampTint: {r: 0.8490566, g: 0.024029758, b: 0.5825305, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
