@@ -700,6 +700,8 @@ GameObject:
   - component: {fileID: 7845786516307352532}
   - component: {fileID: 7707886995193125573}
   - component: {fileID: 3458603840634982862}
+  - component: {fileID: 7310474400942166525}
+  - component: {fileID: 976597467935458978}
   m_Layer: 0
   m_Name: Animation_Agree_Gesture_withSkin
   m_TagString: Untagged
@@ -715,7 +717,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8511545014667948750}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0.9993568, z: -0, w: 0.03586172}
+  m_LocalRotation: {x: 0, y: -0.9993569, z: 0, w: 0.03585894}
   m_LocalPosition: {x: -7.6331825, y: 0.955, z: 8.438994}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -792,6 +794,37 @@ MonoBehaviour:
     currentHostility: 0
     hostileInteractionCount: 0
     hasBeenMarkedAsEnemy: 0
+--- !u!114 &7310474400942166525
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8511545014667948750}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c07d5f7b3dca5494db1db9ace46b79fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _modelName: gemini-2.0-flash
+  _apiKey: AIzaSyBlrcA4jL8e8ZBNBdp7haF7-KRLOBzbOXY
+  _responseMimeType: 1
+  _enableChatHistory: 1
+  _maxHistory: 5
+  _chatHistory: []
+--- !u!114 &976597467935458978
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8511545014667948750}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5228b2e02ce0c1a44bcb50da065e9ce8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  geminiAPI: {fileID: 0}
 --- !u!1 &8692799500175924737
 GameObject:
   m_ObjectHideFlags: 0

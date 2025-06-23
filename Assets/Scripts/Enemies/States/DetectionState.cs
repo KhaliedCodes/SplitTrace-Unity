@@ -11,6 +11,11 @@ public class DetectionState : IEnemyStates
         enemy.Animator.SetFloat("speed", 1f);
         enemy.NavMeshAgent.speed = enemy.MoveSpeed * 1.5f;
 
+        if(enemy is RangedEnemy)
+        {
+            enemy.Animator.SetBool("Detect", true);
+        }
+
         isSearching = false;
         searchStartTime = 0f;
     }
@@ -20,14 +25,24 @@ public class DetectionState : IEnemyStates
         // If player left detection zone entirely, return to idle
         if (!enemy.IsPlayerInDetectionRange)
         {
+            if (enemy is RangedEnemy)
+            {
+                enemy.Animator.SetBool("Detect", false);
+            }
             enemy.ChangeState(new IdleState());
+
             return;
         }
 
         // If player reference is lost, do nothing
         if (enemy.Player == null) return;
 
-        if (enemy.HasLineOfSight())
+        if (enemy.IsProvoked)
+        {
+            enemy.transform.LookAt(enemy.Player.transform.position);
+        }
+
+        if (enemy.HasLineOfSight() || enemy.IsProvoked)
         {
             // Player visible: pursue
             isSearching = false;
@@ -37,7 +52,14 @@ public class DetectionState : IEnemyStates
 
             if (enemy.IsPlayerInAttackRange && enemy.HasLineOfSight())
             {
-                enemy.Animator.SetBool("attack",true);
+                if (enemy is RangedEnemy)
+                {
+                    enemy.Animator.SetBool("Detect", false);
+                    //RangedEnemy renemy = enemy as RangedEnemy;
+                    //renemy.LookAtPlayer();
+                }
+                enemy.Animator.SetBool("Shoot",true);
+
                 enemy.ChangeState(new AttackState());
             }
         }
@@ -59,6 +81,10 @@ public class DetectionState : IEnemyStates
                 if (Time.time - searchStartTime >= searchDuration)
                 {
                     // Search expired: go idle
+                    if (enemy is RangedEnemy)
+                    {
+                        enemy.Animator.SetBool("Detect", false);
+                    }
                     enemy.ChangeState(new IdleState());
                 }
             }

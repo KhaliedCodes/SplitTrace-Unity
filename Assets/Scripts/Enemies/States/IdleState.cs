@@ -24,11 +24,12 @@ public class IdleState : IEnemyStates
         enemy.Animator.SetFloat("speed", currentSpeed);
 
         // Check for player entering detection range
-        if (enemy.IsPlayerInDetectionRange && enemy.HasLineOfSight())
+        if (enemy.IsPlayerInDetectionRange && enemy.HasLineOfSight() || enemy.IsProvoked)
         {
             enemy.ChangeState(new DetectionState());
             return;
         }
+
 
         if (enemy.Waypoints != null && enemy.Waypoints.Count > 0)
         {

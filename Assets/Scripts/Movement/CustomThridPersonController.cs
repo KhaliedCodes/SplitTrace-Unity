@@ -162,7 +162,9 @@ public class CustomThridPersonController : MonoBehaviour
 
         _hasAnimator = TryGetComponent(out _animator);
         _controller = GetComponent<CharacterController>();
+           
         _input = GetComponent<CustomStarterAssetsInputs>();
+        
         _autoLook = GetComponent<AutoLookAtNearestEnemy>();
         _dodge = GetComponent<Dodge>();
 
@@ -186,7 +188,9 @@ public class CustomThridPersonController : MonoBehaviour
         _dodge.HandleDodge();
         // JumpAndGravity();
         GroundedCheck();
-
+        if (_input.pause) {
+            Pause();
+        }
         // Only run movement logic if not dodging
         if (!_dodge.isDodging)
         {
@@ -205,7 +209,13 @@ public class CustomThridPersonController : MonoBehaviour
             dodgeCooldownIndicator.fillAmount = 1 - (_dodge.dodgeCooldownTimer / _dodge.dodgeCooldown);
         }
     }
-
+   
+    void Pause() {
+        if (_input.pause) {
+            UiManager.Instance.ShowPauseMenu();
+            _input.pause=false;
+        }
+    }
     private void LateUpdate()
     {
         CameraRotation();
