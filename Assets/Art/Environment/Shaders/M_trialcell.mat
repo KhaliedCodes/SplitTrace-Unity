@@ -51,11 +51,13 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _Ambient: 3.27
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _ToonRampOffset: 0
-    - _ToonRampSmoothness: 0
+    - _ToonRampOffset: 0.5
+    - _ToonRampOffsetPoint: 4.03
+    - _ToonRampSmoothness: 2.01
     m_Colors:
-    - _ToonRampTinting: {r: 1, g: 1, b: 1, a: 0}
+    - _ToonRampTinting: {r: 0.10401748, g: 0.036546785, b: 0.22264141, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

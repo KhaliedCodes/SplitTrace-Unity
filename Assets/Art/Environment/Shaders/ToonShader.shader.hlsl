@@ -1,4 +1,4 @@
-Shader "Toon/Character" {
+Shader "ToonCharacter" {
     Properties{
         _Color("Main Color", Color) = (1,1,1,1)
         _RimLightOffset("Rim Light Offset",  Range(0, 1)) = 0.5
