@@ -1,86 +1,86 @@
 using UnityEngine;
 using UnityEditor;
-using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 
 [CustomEditor(typeof(StoryContextManager))]
 public class StoryContextManagerEditor : Editor
 {
     private StoryContextManager storyContext;
-    private bool[] foldouts = new bool[8]; // For different sections
     
-    // Temporary variables for adding new items
-    private string newClue = "";
-    private string newSuspect = "";
+    // Foldout states
+    private bool showSceneInfo = true;
+    private bool showStoryProgress = true;
+    private bool showClues = true;
+    private bool showSuspects = true;
+    private bool showContradictions = true;
+    private bool showEvidenceConnections = true;
+    private bool showNPCSecrets = true;
+    private bool showKeyEvents = true;
+    private bool showPlayerChoices = true;
+    private bool showDebugTools = false;
+    
+    // Add new item states
+    private bool showAddClue = false;
+    private bool showAddSuspect = false;
+    private bool showAddNPCInfo = false;
+    
+    // New item input fields
+    private string newClueText = "";
+    private string newClueSource = "";
+    private float newClueReliability = 0.5f;
+    private string newSuspectName = "";
+    private string newSuspectDescription = "";
     private string newNPCName = "";
     private string newNPCSecret = "";
-    private string newKeyEvent = "";
-    private string newPlayerChoice = "";
+    private float newNPCReliability = 0.5f;
     
-    // Search/filter variables
-    private string clueFilter = "";
-    private string suspectFilter = "";
-    private string eventFilter = "";
+    // Colors for different reliability levels
+    private Color highReliabilityColor = new Color(0.2f, 0.8f, 0.2f, 0.3f);
+    private Color mediumReliabilityColor = new Color(0.8f, 0.8f, 0.2f, 0.3f);
+    private Color lowReliabilityColor = new Color(0.8f, 0.2f, 0.2f, 0.3f);
     
-    private Vector2 scrollPosition;
-
     private void OnEnable()
     {
         storyContext = (StoryContextManager)target;
-        
-        // Initialize foldouts
-        for (int i = 0; i < foldouts.Length; i++)
-        {
-            foldouts[i] = true;
-        }
     }
-
+    
     public override void OnInspectorGUI()
     {
         serializedObject.Update();
         
-        EditorGUILayout.Space(10);
+        EditorGUILayout.Space();
+        EditorGUILayout.LabelField("Story Context Manager", EditorStyles.boldLabel);
+        EditorGUILayout.Space();
         
-        // Header
-        EditorGUILayout.BeginVertical("box");
-        GUIStyle headerStyle = new GUIStyle(EditorStyles.boldLabel);
-        headerStyle.fontSize = 16;
-        headerStyle.alignment = TextAnchor.MiddleCenter;
-        EditorGUILayout.LabelField("Story Context Manager", headerStyle);
-        EditorGUILayout.EndVertical();
+        // Scene Information Section
+        DrawSceneInformation();
         
-        EditorGUILayout.Space(5);
+        // Story Progress Section
+        DrawStoryProgress();
         
-        scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
+        // Clues Section
+        DrawCluesSection();
         
-        // Current Scene Information
-        DrawCurrentSceneSection();
+        // Suspects Section
+        DrawSuspectsSection();
         
-        // Story Progress
-        DrawStoryProgressSection();
+        // Contradictions Section
+        DrawContradictionsSection();
         
-        // Discovered Clues
-        DrawDiscoveredCluesSection();
+        // Evidence Connections Section
+        DrawEvidenceConnectionsSection();
         
-        // Known Suspects
-        DrawKnownSuspectsSection();
-        
-        // NPC Secrets
+        // NPC Secrets Section
         DrawNPCSecretsSection();
         
-        // Important Events
-        DrawImportantEventsSection();
+        // Key Events Section
+        DrawKeyEventsSection();
         
-        // Player Choices History
+        // Player Choices Section
         DrawPlayerChoicesSection();
         
-        // Context Preview
-        DrawContextPreviewSection();
-        
-        // Utility Buttons
-        DrawUtilitySection();
-        
-        EditorGUILayout.EndScrollView();
+        // Debug Tools Section
+        DrawDebugToolsSection();
         
 //        serializedObject.ApplyModifiedProperties();
         
@@ -89,374 +89,462 @@ public class StoryContextManagerEditor : Editor
             EditorUtility.SetDirty(storyContext);
         }
     }
-
-    private void DrawCurrentSceneSection()
+    
+    private void DrawSceneInformation()
     {
-        foldouts[0] = EditorGUILayout.Foldout(foldouts[0], "Current Scene Information", true);
-        if (foldouts[0])
+        showSceneInfo = EditorGUILayout.Foldout(showSceneInfo, "Current Scene Information", true);
+        if (showSceneInfo)
         {
-            EditorGUILayout.BeginVertical("box");
+            EditorGUI.indentLevel++;
             
             storyContext.currentLocation = EditorGUILayout.TextField("Current Location", storyContext.currentLocation);
             storyContext.currentTime = EditorGUILayout.TextField("Current Time", storyContext.currentTime);
+            storyContext.currentObjective = EditorGUILayout.TextField("Current Objective", storyContext.currentObjective);
             
-            EditorGUILayout.LabelField("Current Objective");
-            storyContext.currentObjective = EditorGUILayout.TextArea(storyContext.currentObjective, GUILayout.Height(60));
-            
-            EditorGUILayout.EndVertical();
+            EditorGUI.indentLevel--;
         }
-        EditorGUILayout.Space(5);
+        EditorGUILayout.Space();
     }
-
-    private void DrawStoryProgressSection()
+    
+    private void DrawStoryProgress()
     {
-        foldouts[1] = EditorGUILayout.Foldout(foldouts[1], "Story Progress", true);
-        if (foldouts[1])
+        showStoryProgress = EditorGUILayout.Foldout(showStoryProgress, "Story Progress", true);
+        if (showStoryProgress)
         {
-            EditorGUILayout.BeginVertical("box");
-            
-            EditorGUILayout.BeginHorizontal();
-            storyContext.storyProgressPercentage = EditorGUILayout.IntSlider("Progress", storyContext.storyProgressPercentage, 0, 100);
-            EditorGUILayout.LabelField($"{storyContext.storyProgressPercentage}%", GUILayout.Width(40));
-            EditorGUILayout.EndHorizontal();
+            EditorGUI.indentLevel++;
             
             // Progress bar
-            Rect progressRect = GUILayoutUtility.GetRect(0, 20, GUILayout.ExpandWidth(true));
-            EditorGUI.ProgressBar(progressRect, storyContext.storyProgressPercentage / 100f, "Story Progress");
+            Rect progressRect = EditorGUILayout.GetControlRect();
+            EditorGUI.ProgressBar(progressRect, storyContext.storyProgressPercentage / 100f, 
+                $"Story Progress: {storyContext.storyProgressPercentage}%");
             
+            storyContext.storyProgressPercentage = EditorGUILayout.IntSlider("Progress Percentage", 
+                storyContext.storyProgressPercentage, 0, 100);
             storyContext.currentChapter = EditorGUILayout.TextField("Current Chapter", storyContext.currentChapter);
             
-            EditorGUILayout.EndVertical();
+            EditorGUI.indentLevel--;
         }
-        EditorGUILayout.Space(5);
+        EditorGUILayout.Space();
     }
-
-    private void DrawDiscoveredCluesSection()
+    
+    private void DrawCluesSection()
     {
-        foldouts[2] = EditorGUILayout.Foldout(foldouts[2], $"Discovered Clues ({storyContext.discoveredClues.Count})", true);
-        if (foldouts[2])
+        showClues = EditorGUILayout.Foldout(showClues, $"Discovered Clues ({storyContext.discoveredClues.Count})", true);
+        if (showClues)
         {
-            EditorGUILayout.BeginVertical("box");
+            EditorGUI.indentLevel++;
             
-            // Filter
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("Filter:", GUILayout.Width(40));
-            clueFilter = EditorGUILayout.TextField(clueFilter);
-            if (GUILayout.Button("Clear", GUILayout.Width(50)))
+            // Add new clue section
+            showAddClue = EditorGUILayout.Foldout(showAddClue, "Add New Clue", true);
+            if (showAddClue)
             {
-                clueFilter = "";
-            }
-            EditorGUILayout.EndHorizontal();
-            
-            // Add new clue
-            EditorGUILayout.BeginHorizontal();
-            newClue = EditorGUILayout.TextField("New Clue:", newClue);
-            if (GUILayout.Button("Add", GUILayout.Width(50)) && !string.IsNullOrEmpty(newClue))
-            {
-                storyContext.AddClue(newClue);
-                newClue = "";
-                GUI.FocusControl(null);
-            }
-            EditorGUILayout.EndHorizontal();
-            
-            EditorGUILayout.Space(5);
-            
-            // Display clues
-            for (int i = storyContext.discoveredClues.Count - 1; i >= 0; i--)
-            {
-                if (string.IsNullOrEmpty(clueFilter) || storyContext.discoveredClues[i].ToLower().Contains(clueFilter.ToLower()))
-                {
-                    EditorGUILayout.BeginHorizontal();
-                    storyContext.discoveredClues[i] = EditorGUILayout.TextField(storyContext.discoveredClues[i]);
-                    if (GUILayout.Button("X", GUILayout.Width(25)))
-                    {
-                        storyContext.discoveredClues.RemoveAt(i);
-                    }
-                    EditorGUILayout.EndHorizontal();
-                }
-            }
-            
-            EditorGUILayout.EndVertical();
-        }
-        EditorGUILayout.Space(5);
-    }
-
-    private void DrawKnownSuspectsSection()
-    {
-        foldouts[3] = EditorGUILayout.Foldout(foldouts[3], $"Known Suspects ({storyContext.knownSuspects.Count})", true);
-        if (foldouts[3])
-        {
-            EditorGUILayout.BeginVertical("box");
-            
-            // Filter
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("Filter:", GUILayout.Width(40));
-            suspectFilter = EditorGUILayout.TextField(suspectFilter);
-            if (GUILayout.Button("Clear", GUILayout.Width(50)))
-            {
-                suspectFilter = "";
-            }
-            EditorGUILayout.EndHorizontal();
-            
-            // Add new suspect
-            EditorGUILayout.BeginHorizontal();
-            newSuspect = EditorGUILayout.TextField("New Suspect:", newSuspect);
-            if (GUILayout.Button("Add", GUILayout.Width(50)) && !string.IsNullOrEmpty(newSuspect))
-            {
-                storyContext.AddSuspect(newSuspect);
-                newSuspect = "";
-                GUI.FocusControl(null);
-            }
-            EditorGUILayout.EndHorizontal();
-            
-            EditorGUILayout.Space(5);
-            
-            // Display suspects
-            for (int i = storyContext.knownSuspects.Count - 1; i >= 0; i--)
-            {
-                if (string.IsNullOrEmpty(suspectFilter) || storyContext.knownSuspects[i].ToLower().Contains(suspectFilter.ToLower()))
-                {
-                    EditorGUILayout.BeginHorizontal();
-                    storyContext.knownSuspects[i] = EditorGUILayout.TextField(storyContext.knownSuspects[i]);
-                    if (GUILayout.Button("X", GUILayout.Width(25)))
-                    {
-                        storyContext.knownSuspects.RemoveAt(i);
-                    }
-                    EditorGUILayout.EndHorizontal();
-                }
-            }
-            
-            EditorGUILayout.EndVertical();
-        }
-        EditorGUILayout.Space(5);
-    }
-
-    private void DrawNPCSecretsSection()
-    {
-        var npcNamesProperty = serializedObject.FindProperty("npcNames");
-        var npcSecretsProperty = serializedObject.FindProperty("npcSecrets");
-        
-        foldouts[4] = EditorGUILayout.Foldout(foldouts[4], $"NPC Secrets ({npcNamesProperty.arraySize})", true);
-        if (foldouts[4])
-        {
-            EditorGUILayout.BeginVertical("box");
-            
-            // Add new NPC secret
-            EditorGUILayout.BeginHorizontal();
-            newNPCName = EditorGUILayout.TextField("NPC Name:", newNPCName);
-            EditorGUILayout.EndHorizontal();
-            
-            EditorGUILayout.BeginHorizontal();
-            newNPCSecret = EditorGUILayout.TextField("Secret:", newNPCSecret);
-            if (GUILayout.Button("Add", GUILayout.Width(50)) && !string.IsNullOrEmpty(newNPCName) && !string.IsNullOrEmpty(newNPCSecret))
-            {
-                storyContext.RevealNPCInfo(newNPCName, newNPCSecret);
-                newNPCName = "";
-                newNPCSecret = "";
-                GUI.FocusControl(null);
-            }
-            EditorGUILayout.EndHorizontal();
-            
-            EditorGUILayout.Space(5);
-            
-            // Display NPC secrets
-            for (int i = npcNamesProperty.arraySize - 1; i >= 0; i--)
-            {
-                if (i < npcSecretsProperty.arraySize)
-                {
-                    EditorGUILayout.BeginVertical("helpbox");
-                    
-                    EditorGUILayout.BeginHorizontal();
-                    EditorGUILayout.LabelField("NPC:", GUILayout.Width(35));
-                    npcNamesProperty.GetArrayElementAtIndex(i).stringValue = EditorGUILayout.TextField(npcNamesProperty.GetArrayElementAtIndex(i).stringValue);
-                    if (GUILayout.Button("X", GUILayout.Width(25)))
-                    {
-                        npcNamesProperty.DeleteArrayElementAtIndex(i);
-                        if (i < npcSecretsProperty.arraySize)
-                        {
-                            npcSecretsProperty.DeleteArrayElementAtIndex(i);
-                        }
-                    }
-                    EditorGUILayout.EndHorizontal();
-                    
-                    EditorGUILayout.LabelField("Secret:");
-                    npcSecretsProperty.GetArrayElementAtIndex(i).stringValue = EditorGUILayout.TextArea(npcSecretsProperty.GetArrayElementAtIndex(i).stringValue, GUILayout.Height(40));
-                    
-                    EditorGUILayout.EndVertical();
-                    EditorGUILayout.Space(2);
-                }
-            }
-            
-            EditorGUILayout.EndVertical();
-        }
-        EditorGUILayout.Space(5);
-    }
-
-    private void DrawImportantEventsSection()
-    {
-        foldouts[5] = EditorGUILayout.Foldout(foldouts[5], $"Important Events ({storyContext.keyEvents.Count})", true);
-        if (foldouts[5])
-        {
-            EditorGUILayout.BeginVertical("box");
-            
-            // Filter
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("Filter:", GUILayout.Width(40));
-            eventFilter = EditorGUILayout.TextField(eventFilter);
-            if (GUILayout.Button("Clear", GUILayout.Width(50)))
-            {
-                eventFilter = "";
-            }
-            EditorGUILayout.EndHorizontal();
-            
-            // Add new event
-            EditorGUILayout.BeginHorizontal();
-            newKeyEvent = EditorGUILayout.TextField("New Event:", newKeyEvent);
-            if (GUILayout.Button("Add", GUILayout.Width(50)) && !string.IsNullOrEmpty(newKeyEvent))
-            {
-                storyContext.AddKeyEvent(newKeyEvent);
-                newKeyEvent = "";
-                GUI.FocusControl(null);
-            }
-            EditorGUILayout.EndHorizontal();
-            
-            EditorGUILayout.Space(5);
-            
-            // Display events (most recent first)
-            for (int i = storyContext.keyEvents.Count - 1; i >= 0; i--)
-            {
-                if (string.IsNullOrEmpty(eventFilter) || storyContext.keyEvents[i].ToLower().Contains(eventFilter.ToLower()))
-                {
-                    EditorGUILayout.BeginHorizontal();
-                    storyContext.keyEvents[i] = EditorGUILayout.TextField(storyContext.keyEvents[i]);
-                    if (GUILayout.Button("X", GUILayout.Width(25)))
-                    {
-                        storyContext.keyEvents.RemoveAt(i);
-                    }
-                    EditorGUILayout.EndHorizontal();
-                }
-            }
-            
-            EditorGUILayout.EndVertical();
-        }
-        EditorGUILayout.Space(5);
-    }
-
-    private void DrawPlayerChoicesSection()
-    {
-        foldouts[6] = EditorGUILayout.Foldout(foldouts[6], $"Player Choices History ({storyContext.playerChoices.Count})", true);
-        if (foldouts[6])
-        {
-            EditorGUILayout.BeginVertical("box");
-            
-            // Add new choice (for testing)
-            EditorGUILayout.BeginHorizontal();
-            newPlayerChoice = EditorGUILayout.TextField("Test Choice:", newPlayerChoice);
-            if (GUILayout.Button("Add", GUILayout.Width(50)) && !string.IsNullOrEmpty(newPlayerChoice))
-            {
-                storyContext.RecordPlayerChoice(newPlayerChoice);
-                newPlayerChoice = "";
-                GUI.FocusControl(null);
-            }
-            EditorGUILayout.EndHorizontal();
-            
-            if (GUILayout.Button("Clear All Choices"))
-            {
-                storyContext.playerChoices.Clear();
-            }
-            
-            EditorGUILayout.Space(5);
-            
-            // Display recent choices (most recent first)
-            for (int i = storyContext.playerChoices.Count - 1; i >= 0; i--)
-            {
+                EditorGUI.indentLevel++;
+                newClueText = EditorGUILayout.TextField("Clue Text", newClueText);
+                newClueSource = EditorGUILayout.TextField("Source", newClueSource);
+                newClueReliability = EditorGUILayout.Slider("Reliability", newClueReliability, 0f, 1f);
+                
                 EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.TextField(storyContext.playerChoices[i]);
-                if (GUILayout.Button("X", GUILayout.Width(25)))
+                if (GUILayout.Button("Add Clue") && !string.IsNullOrEmpty(newClueText))
                 {
-                    storyContext.playerChoices.RemoveAt(i);
+                    storyContext.AddClue(newClueText, newClueSource, newClueReliability);
+                    newClueText = "";
+                    newClueSource = "";
+                    newClueReliability = 0.5f;
+                }
+                if (GUILayout.Button("Clear"))
+                {
+                    newClueText = "";
+                    newClueSource = "";
+                    newClueReliability = 0.5f;
                 }
                 EditorGUILayout.EndHorizontal();
+                EditorGUI.indentLevel--;
             }
             
-            EditorGUILayout.EndVertical();
+            EditorGUILayout.Space();
+            
+            // Display existing clues
+            for (int i = 0; i < storyContext.discoveredClues.Count; i++)
+            {
+                var clue = storyContext.discoveredClues[i];
+                Color bgColor = GetReliabilityColor(clue.reliability);
+                
+                EditorGUILayout.BeginVertical(GetReliabilityStyle(clue.reliability));
+                
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField($"Clue {i + 1}:", EditorStyles.boldLabel, GUILayout.Width(60));
+                if (GUILayout.Button("×", GUILayout.Width(20)))
+                {
+                    storyContext.discoveredClues.RemoveAt(i);
+                    break;
+                }
+                EditorGUILayout.EndHorizontal();
+                
+                clue.clueText = EditorGUILayout.TextField("Text", clue.clueText);
+                clue.source = EditorGUILayout.TextField("Source", clue.source);
+                clue.reliability = EditorGUILayout.Slider("Reliability", clue.reliability, 0f, 1f);
+                
+                if (clue.tags != null && clue.tags.Count > 0)
+                {
+                    EditorGUILayout.LabelField("Tags: " + string.Join(", ", clue.tags), EditorStyles.miniLabel);
+                }
+                
+                EditorGUILayout.EndVertical();
+                EditorGUILayout.Space();
+            }
+            
+            EditorGUI.indentLevel--;
         }
-        EditorGUILayout.Space(5);
+        EditorGUILayout.Space();
     }
-
-    private void DrawContextPreviewSection()
+    
+    private void DrawSuspectsSection()
     {
-        foldouts[7] = EditorGUILayout.Foldout(foldouts[7], "Context Preview", true);
-        if (foldouts[7])
+        showSuspects = EditorGUILayout.Foldout(showSuspects, $"Known Suspects ({storyContext.knownSuspects.Count})", true);
+        if (showSuspects)
         {
-            EditorGUILayout.BeginVertical("box");
+            EditorGUI.indentLevel++;
+            
+            // Add new suspect section
+            showAddSuspect = EditorGUILayout.Foldout(showAddSuspect, "Add New Suspect", true);
+            if (showAddSuspect)
+            {
+                EditorGUI.indentLevel++;
+                newSuspectName = EditorGUILayout.TextField("Suspect Name", newSuspectName);
+                newSuspectDescription = EditorGUILayout.TextField("Description", newSuspectDescription);
+                
+                EditorGUILayout.BeginHorizontal();
+                if (GUILayout.Button("Add Suspect") && !string.IsNullOrEmpty(newSuspectName))
+                {
+                    storyContext.AddSuspect(newSuspectName, newSuspectDescription);
+                    newSuspectName = "";
+                    newSuspectDescription = "";
+                }
+                if (GUILayout.Button("Clear"))
+                {
+                    newSuspectName = "";
+                    newSuspectDescription = "";
+                }
+                EditorGUILayout.EndHorizontal();
+                EditorGUI.indentLevel--;
+            }
+            
+            EditorGUILayout.Space();
+            
+            // Display existing suspects
+            for (int i = 0; i < storyContext.knownSuspects.Count; i++)
+            {
+                var suspect = storyContext.knownSuspects[i];
+                
+                EditorGUILayout.BeginVertical("box");
+                
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField($"Suspect {i + 1}:", EditorStyles.boldLabel, GUILayout.Width(80));
+                if (GUILayout.Button("×", GUILayout.Width(20)))
+                {
+                    storyContext.knownSuspects.RemoveAt(i);
+                    break;
+                }
+                EditorGUILayout.EndHorizontal();
+                
+                suspect.name = EditorGUILayout.TextField("Name", suspect.name);
+                suspect.description = EditorGUILayout.TextField("Description", suspect.description);
+                suspect.suspicionLevel = EditorGUILayout.IntSlider("Suspicion Level", suspect.suspicionLevel, 1, 5);
+                
+                if (suspect.associatedClues != null && suspect.associatedClues.Count > 0)
+                {
+                    EditorGUILayout.LabelField("Associated Clues:", EditorStyles.boldLabel);
+                    foreach (var clue in suspect.associatedClues)
+                    {
+                        EditorGUILayout.LabelField("• " + clue, EditorStyles.miniLabel);
+                    }
+                }
+                
+                if (suspect.alibis != null && suspect.alibis.Count > 0)
+                {
+                    EditorGUILayout.LabelField("Alibis:", EditorStyles.boldLabel);
+                    foreach (var alibi in suspect.alibis)
+                    {
+                        EditorGUILayout.LabelField("• " + alibi, EditorStyles.miniLabel);
+                    }
+                }
+                
+                EditorGUILayout.EndVertical();
+                EditorGUILayout.Space();
+            }
+            
+            EditorGUI.indentLevel--;
+        }
+        EditorGUILayout.Space();
+    }
+    
+    private void DrawContradictionsSection()
+    {
+        int unresolvedCount = storyContext.trackedContradictions.Count(c => !c.isResolved);
+        showContradictions = EditorGUILayout.Foldout(showContradictions, 
+            $"Contradictions ({unresolvedCount} unresolved / {storyContext.trackedContradictions.Count} total)", true);
+        
+        if (showContradictions)
+        {
+            EditorGUI.indentLevel++;
+            
+            for (int i = 0; i < storyContext.trackedContradictions.Count; i++)
+            {
+                var contradiction = storyContext.trackedContradictions[i];
+                Color bgColor = contradiction.isResolved ? Color.green : Color.red;
+                bgColor.a = 0.2f;
+                
+                var style = new GUIStyle("box");
+                style.normal.background = MakeTex(1, 1, bgColor);
+                
+                EditorGUILayout.BeginVertical(style);
+                
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField($"Contradiction {i + 1} - {contradiction.subject}", EditorStyles.boldLabel);
+                if (GUILayout.Button("×", GUILayout.Width(20)))
+                {
+                    storyContext.trackedContradictions.RemoveAt(i);
+                    break;
+                }
+                EditorGUILayout.EndHorizontal();
+                
+                EditorGUILayout.LabelField("Description:", EditorStyles.boldLabel);
+                EditorGUILayout.LabelField(contradiction.description, EditorStyles.wordWrappedLabel);
+                
+                EditorGUILayout.LabelField("Statement 1:", EditorStyles.boldLabel);
+                EditorGUILayout.LabelField(contradiction.statement1, EditorStyles.wordWrappedLabel);
+                
+                EditorGUILayout.LabelField("Statement 2:", EditorStyles.boldLabel);
+                EditorGUILayout.LabelField(contradiction.statement2, EditorStyles.wordWrappedLabel);
+                
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField($"Discovered: {contradiction.discoveryTime}", EditorStyles.miniLabel);
+                EditorGUILayout.LabelField($"Resolved: {(contradiction.isResolved ? "Yes" : "No")}", EditorStyles.miniLabel);
+                EditorGUILayout.EndHorizontal();
+                
+                if (!contradiction.isResolved && GUILayout.Button("Mark as Resolved"))
+                {
+                    storyContext.ResolveContradiction(i, "Manually resolved via editor");
+                }
+                
+                EditorGUILayout.EndVertical();
+                EditorGUILayout.Space();
+            }
+            
+            EditorGUI.indentLevel--;
+        }
+        EditorGUILayout.Space();
+    }
+    
+    private void DrawEvidenceConnectionsSection()
+    {
+        showEvidenceConnections = EditorGUILayout.Foldout(showEvidenceConnections, 
+            $"Evidence Connections ({storyContext.evidenceConnections.Count})", true);
+        
+        if (showEvidenceConnections)
+        {
+            EditorGUI.indentLevel++;
+            
+            foreach (var connection in storyContext.evidenceConnections.OrderByDescending(c => c.connectionStrength))
+            {
+                EditorGUILayout.BeginVertical("box");
+                
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField(connection.evidence1, GUILayout.Width(150));
+                EditorGUILayout.LabelField("↔", GUILayout.Width(20));
+                EditorGUILayout.LabelField(connection.evidence2, GUILayout.Width(150));
+                EditorGUILayout.EndHorizontal();
+                
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField($"Strength: {connection.connectionStrength:F2}", EditorStyles.miniLabel);
+                EditorGUILayout.LabelField($"Discovered: {connection.discoveryTime}", EditorStyles.miniLabel);
+                EditorGUILayout.EndHorizontal();
+                
+                EditorGUILayout.EndVertical();
+            }
+            
+            EditorGUI.indentLevel--;
+        }
+        EditorGUILayout.Space();
+    }
+    
+    private void DrawNPCSecretsSection()
+    {
+        showNPCSecrets = EditorGUILayout.Foldout(showNPCSecrets, 
+            $"NPC Secrets ({storyContext.npcRevealedInfo.Count})", true);
+        
+        if (showNPCSecrets)
+        {
+            EditorGUI.indentLevel++;
+            
+            // Add new NPC info section
+            showAddNPCInfo = EditorGUILayout.Foldout(showAddNPCInfo, "Add New NPC Information", true);
+            if (showAddNPCInfo)
+            {
+                EditorGUI.indentLevel++;
+                newNPCName = EditorGUILayout.TextField("NPC Name", newNPCName);
+                newNPCSecret = EditorGUILayout.TextField("Secret/Info", newNPCSecret);
+                newNPCReliability = EditorGUILayout.Slider("Reliability", newNPCReliability, 0f, 1f);
+                
+                EditorGUILayout.BeginHorizontal();
+                if (GUILayout.Button("Add Info") && !string.IsNullOrEmpty(newNPCName) && !string.IsNullOrEmpty(newNPCSecret))
+                {
+                    storyContext.RevealNPCInfo(newNPCName, newNPCSecret, newNPCReliability);
+                    newNPCName = "";
+                    newNPCSecret = "";
+                    newNPCReliability = 0.5f;
+                }
+                if (GUILayout.Button("Clear"))
+                {
+                    newNPCName = "";
+                    newNPCSecret = "";
+                    newNPCReliability = 0.5f;
+                }
+                EditorGUILayout.EndHorizontal();
+                EditorGUI.indentLevel--;
+            }
+            
+            EditorGUILayout.Space();
+            
+            // Display existing NPC info
+            foreach (var npcInfo in storyContext.npcRevealedInfo)
+            {
+                float reliability = storyContext.GetNPCReliability(npcInfo.Key);
+                
+                EditorGUILayout.BeginVertical(GetReliabilityStyle(reliability));
+                
+                EditorGUILayout.LabelField(npcInfo.Key, EditorStyles.boldLabel);
+                EditorGUILayout.LabelField(npcInfo.Value, EditorStyles.wordWrappedLabel);
+                EditorGUILayout.LabelField($"Reliability: {reliability:F2}", EditorStyles.miniLabel);
+                
+                EditorGUILayout.EndVertical();
+                EditorGUILayout.Space();
+            }
+            
+            EditorGUI.indentLevel--;
+        }
+        EditorGUILayout.Space();
+    }
+    
+    private void DrawKeyEventsSection()
+    {
+        showKeyEvents = EditorGUILayout.Foldout(showKeyEvents, $"Key Events ({storyContext.keyEvents.Count})", true);
+        if (showKeyEvents)
+        {
+            EditorGUI.indentLevel++;
+            
+            foreach (var keyEvent in storyContext.keyEvents)
+            {
+                EditorGUILayout.BeginVertical("box");
+                EditorGUILayout.LabelField(keyEvent, EditorStyles.wordWrappedLabel);
+                EditorGUILayout.EndVertical();
+            }
+            
+            EditorGUI.indentLevel--;
+        }
+        EditorGUILayout.Space();
+    }
+    
+    private void DrawPlayerChoicesSection()
+    {
+        showPlayerChoices = EditorGUILayout.Foldout(showPlayerChoices, $"Player Choices ({storyContext.playerChoices.Count})", true);
+        if (showPlayerChoices)
+        {
+            EditorGUI.indentLevel++;
+            
+            foreach (var choice in storyContext.playerChoices)
+            {
+                EditorGUILayout.BeginVertical("box");
+                EditorGUILayout.LabelField(choice, EditorStyles.wordWrappedLabel);
+                EditorGUILayout.EndVertical();
+            }
+            
+            EditorGUI.indentLevel--;
+        }
+        EditorGUILayout.Space();
+    }
+    
+    private void DrawDebugToolsSection()
+    {
+        showDebugTools = EditorGUILayout.Foldout(showDebugTools, "Debug Tools", true);
+        if (showDebugTools)
+        {
+            EditorGUI.indentLevel++;
             
             EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button("Full Context"))
+            if (GUILayout.Button("Add Test Clue"))
             {
-                string context = storyContext.GetContextString();
-                EditorGUIUtility.systemCopyBuffer = context;
-                Debug.Log("Full Context (copied to clipboard):\n" + context);
+                storyContext.AddClue("Test clue discovered at " + System.DateTime.Now.ToString("HH:mm"), 
+                    "Debug", UnityEngine.Random.Range(0.1f, 1.0f));
             }
-            
-            if (GUILayout.Button("Condensed Context"))
+            if (GUILayout.Button("Add Test Suspect"))
             {
-                string context = storyContext.GetCondensedContextString();
-                EditorGUIUtility.systemCopyBuffer = context;
-                Debug.Log("Condensed Context (copied to clipboard):\n" + context);
+                storyContext.AddSuspect("Test Suspect " + UnityEngine.Random.Range(1, 100), 
+                    "A suspicious individual spotted near the scene");
             }
             EditorGUILayout.EndHorizontal();
             
-            EditorGUILayout.Space(10);
-            
-            // Show condensed preview
-            EditorGUILayout.LabelField("Condensed Preview:", EditorStyles.boldLabel);
-            string preview = storyContext.GetCondensedContextString();
-            EditorGUILayout.TextArea(preview, EditorStyles.helpBox, GUILayout.Height(80));
-            
-            EditorGUILayout.EndVertical();
-        }
-        EditorGUILayout.Space(5);
-    }
-
-    private void DrawUtilitySection()
-    {
-        EditorGUILayout.BeginVertical("box");
-        EditorGUILayout.LabelField("Utilities", EditorStyles.boldLabel);
-        
-        EditorGUILayout.BeginHorizontal();
-        
-        if (GUILayout.Button("Reset All Data"))
-        {
-            if (EditorUtility.DisplayDialog("Reset Story Context", 
-                "Are you sure you want to reset all story data? This cannot be undone.", 
-                "Yes, Reset", "Cancel"))
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button("Add Test Event"))
             {
-                storyContext.ResetStoryContext();
+                storyContext.AddKeyEvent("Test event occurred at " + System.DateTime.Now.ToString("HH:mm"));
             }
+            if (GUILayout.Button("Force Contradiction Check"))
+            {
+                // This would trigger the private method, but we can't access it from here
+                EditorGUILayout.HelpBox("Contradiction checking happens automatically when adding clues", MessageType.Info);
+            }
+            EditorGUILayout.EndHorizontal();
+            
+            EditorGUILayout.Space();
+            
+            if (GUILayout.Button("Generate Context String"))
+            {
+                string context = storyContext.GetContextString();
+                Debug.Log("Story Context:\n" + context);
+                EditorGUILayout.HelpBox("Context string printed to console", MessageType.Info);
+            }
+            
+            EditorGUILayout.Space();
+            
+            if (GUILayout.Button("Reset All Data", GUILayout.Height(30)))
+            {
+                if (EditorUtility.DisplayDialog("Reset Story Context", 
+                    "Are you sure you want to reset all story data? This cannot be undone.", 
+                    "Reset", "Cancel"))
+                {
+                    storyContext.ResetStoryContext();
+                }
+            }
+            
+            EditorGUI.indentLevel--;
         }
+        EditorGUILayout.Space();
+    }
+    
+    private Color GetReliabilityColor(float reliability)
+    {
+        if (reliability >= 0.7f) return highReliabilityColor;
+        if (reliability >= 0.4f) return mediumReliabilityColor;
+        return lowReliabilityColor;
+    }
+    
+    private GUIStyle GetReliabilityStyle(float reliability)
+    {
+        var style = new GUIStyle("box");
+        style.normal.background = MakeTex(1, 1, GetReliabilityColor(reliability));
+        return style;
+    }
+    
+    private Texture2D MakeTex(int width, int height, Color col)
+    {
+        Color[] pix = new Color[width * height];
+        for (int i = 0; i < pix.Length; i++)
+            pix[i] = col;
         
-        if (GUILayout.Button("Save Asset"))
-        {
-            EditorUtility.SetDirty(storyContext);
-            AssetDatabase.SaveAssets();
-            Debug.Log("Story Context saved successfully!");
-        }
-        
-        EditorGUILayout.EndHorizontal();
-        
-        EditorGUILayout.Space(5);
-        
-        // Statistics
-        EditorGUILayout.BeginVertical("helpbox");
-        EditorGUILayout.LabelField("Statistics:", EditorStyles.boldLabel);
-        EditorGUILayout.LabelField($"Total Clues: {storyContext.discoveredClues.Count}");
-        EditorGUILayout.LabelField($"Total Suspects: {storyContext.knownSuspects.Count}");
-        EditorGUILayout.LabelField($"NPC Secrets: {storyContext.npcRevealedInfo.Count}");
-        EditorGUILayout.LabelField($"Key Events: {storyContext.keyEvents.Count}");
-        EditorGUILayout.LabelField($"Player Choices: {storyContext.playerChoices.Count}");
-        EditorGUILayout.EndVertical();
-        
-        EditorGUILayout.EndVertical();
+        Texture2D result = new Texture2D(width, height);
+        result.SetPixels(pix);
+        result.Apply();
+        return result;
     }
 }

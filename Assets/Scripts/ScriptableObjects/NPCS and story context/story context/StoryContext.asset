@@ -16,20 +16,251 @@ MonoBehaviour:
   currentTime: Evening, 3rd Day of the Harvest Festival
   currentObjective: Investigate the disappearance of the Sunstone Amulet. Talk to
     Elara, the Innkeeper.
-  storyProgressPercentage: 25
+  storyProgressPercentage: 0
   currentChapter: 'Chapter 2: Whispers in the Inn'
   discoveredClues:
-  - A strange, unidentifiable silver coin found near the Duke's vault
-  - A ripped piece of an old, faded map showing an unexplored cavern system under
-    the city.
-  - A note with a cryptic symbol, found hidden in the Duke's advisor's office.
+  - clueText: 'Farid mentioned: That''s because it''s a secret, kid. Doesn''t officia...'
+    source: Unknown
+    discoveryTime: 13:27
+    reliability: 0.5
+    relatedSuspects: []
+    tags: []
+  - clueText: "Fatma mentioned: I just\u2026 I keep seeing him, you know? It was
+      me who..."
+    source: Unknown
+    discoveryTime: 13:28
+    reliability: 0.5
+    relatedSuspects: []
+    tags: []
+  - clueText: 'Zaki mentioned: Oh honey, the venom they spat! It was a symphony o...'
+    source: Unknown
+    discoveryTime: 13:31
+    reliability: 0.5
+    relatedSuspects: []
+    tags: []
+  - clueText: 'Zaki mentioned: Darlin'', their voices soared like dueling sopranos...'
+    source: Unknown
+    discoveryTime: 13:32
+    reliability: 0.5
+    relatedSuspects: []
+    tags: []
+  - clueText: 'Youssef mentioned: Oh, uh, yeah! I actually found a keycard on the
+      th...'
+    source: Unknown
+    discoveryTime: 14:03
+    reliability: 0.5
+    relatedSuspects: []
+    tags: []
+  - clueText: 'Youssef mentioned: Oh, yeah, the keycard! I found it near the service...'
+    source: Unknown
+    discoveryTime: 14:34
+    reliability: 0.5
+    relatedSuspects: []
+    tags: []
+  - clueText: 'Youssef mentioned: I found it near the elevators, sir! I was just
+      bri...'
+    source: Unknown
+    discoveryTime: 14:45
+    reliability: 0.5
+    relatedSuspects: []
+    tags: []
+  - clueText: 'Youssef mentioned: Well, it''s just... my first night shift, you know?...'
+    source: Unknown
+    discoveryTime: 14:57
+    reliability: 0.5
+    relatedSuspects: []
+    tags: []
+  - clueText: 'Youssef mentioned: Oh, that''s the one I saw. I found it near the
+      elev...'
+    source: Unknown
+    discoveryTime: 14:57
+    reliability: 0.5
+    relatedSuspects: []
+    tags: []
+  - clueText: 'Youssef mentioned: Well, the janitor, Mr. Jenkins, was hanging around...'
+    source: Unknown
+    discoveryTime: 15:03
+    reliability: 0.5
+    relatedSuspects: []
+    tags: []
+  - clueText: 'Youssef mentioned: N-no, sir, I''m just... new. It''s just the night
+      sh...'
+    source: Unknown
+    discoveryTime: 15:20
+    reliability: 0.5
+    relatedSuspects: []
+    tags: []
+  - clueText: 'Mr. Nadder mentioned: Persuaded? I imagine a generous tip can motivate
+      a...'
+    source: Mr. Nadder
+    discoveryTime: 17:32
+    reliability: 0.4
+    relatedSuspects: []
+    tags: []
   knownSuspects:
-  - Master Thorne, the Duke's advisor
-  - Old Man Hemlock, a reclusive collector
+  - name: 
+    description: 
+    suspicionLevel: 1
+    associatedClues:
+    - 
+    - 'Farid mentioned: That''s because it''s a secret, kid. Doesn''t officia...'
+    - "Fatma mentioned: I just\u2026 I keep seeing him, you know? It was me who..."
+    - 'Zaki mentioned: Oh honey, the venom they spat! It was a symphony o...'
+    - 'Zaki mentioned: Darlin'', their voices soared like dueling sopranos...'
+    - 'Youssef mentioned: Oh, uh, yeah! I actually found a keycard on the th...'
+    - 'Youssef mentioned: Oh, yeah, the keycard! I found it near the service...'
+    - 'Youssef mentioned: I found it near the elevators, sir! I was just bri...'
+    - 'Youssef mentioned: Well, it''s just... my first night shift, you know?...'
+    - 'Youssef mentioned: Oh, that''s the one I saw. I found it near the elev...'
+    - 'Youssef mentioned: Well, the janitor, Mr. Jenkins, was hanging around...'
+    - 'Youssef mentioned: N-no, sir, I''m just... new. It''s just the night sh...'
+    - 'Mr. Nadder mentioned: Persuaded? I imagine a generous tip can motivate a...'
+    alibis: []
+    contradictoryStatements: []
+  - name: 
+    description: 
+    suspicionLevel: 1
+    associatedClues: []
+    alibis: []
+    contradictoryStatements: []
+  evidenceConnections:
+  - evidenceType1: Clue
+    evidence1: 
+    evidenceType2: Suspect
+    evidence2: 
+    connectionStrength: 0.8
+    discoveryTime: 13:27
+  - evidenceType1: Clue
+    evidence1: 'Farid mentioned: That''s because it''s a secret, kid. Doesn''t officia...'
+    evidenceType2: Suspect
+    evidence2: 
+    connectionStrength: 0.8
+    discoveryTime: 13:27
+  - evidenceType1: Clue
+    evidence1: "Fatma mentioned: I just\u2026 I keep seeing him, you know? It was
+      me who..."
+    evidenceType2: Suspect
+    evidence2: 
+    connectionStrength: 0.8
+    discoveryTime: 13:28
+  - evidenceType1: Clue
+    evidence1: 'Zaki mentioned: Oh honey, the venom they spat! It was a symphony
+      o...'
+    evidenceType2: Suspect
+    evidence2: 
+    connectionStrength: 0.8
+    discoveryTime: 13:31
+  - evidenceType1: Clue
+    evidence1: 'Zaki mentioned: Darlin'', their voices soared like dueling sopranos...'
+    evidenceType2: Suspect
+    evidence2: 
+    connectionStrength: 0.8
+    discoveryTime: 13:32
+  - evidenceType1: Clue
+    evidence1: 'Youssef mentioned: Oh, uh, yeah! I actually found a keycard on the
+      th...'
+    evidenceType2: Suspect
+    evidence2: 
+    connectionStrength: 0.8
+    discoveryTime: 14:03
+  - evidenceType1: Clue
+    evidence1: 'Youssef mentioned: Oh, yeah, the keycard! I found it near the service...'
+    evidenceType2: Suspect
+    evidence2: 
+    connectionStrength: 0.8
+    discoveryTime: 14:34
+  - evidenceType1: Clue
+    evidence1: 'Youssef mentioned: I found it near the elevators, sir! I was just
+      bri...'
+    evidenceType2: Suspect
+    evidence2: 
+    connectionStrength: 0.8
+    discoveryTime: 14:45
+  - evidenceType1: Clue
+    evidence1: 'Youssef mentioned: Well, it''s just... my first night shift, you
+      know?...'
+    evidenceType2: Suspect
+    evidence2: 
+    connectionStrength: 0.8
+    discoveryTime: 14:57
+  - evidenceType1: Clue
+    evidence1: 'Youssef mentioned: Oh, that''s the one I saw. I found it near the
+      elev...'
+    evidenceType2: Suspect
+    evidence2: 
+    connectionStrength: 0.8
+    discoveryTime: 14:57
+  - evidenceType1: Clue
+    evidence1: 'Youssef mentioned: Well, the janitor, Mr. Jenkins, was hanging around...'
+    evidenceType2: Suspect
+    evidence2: 
+    connectionStrength: 0.8
+    discoveryTime: 15:03
+  - evidenceType1: Clue
+    evidence1: 'Youssef mentioned: N-no, sir, I''m just... new. It''s just the night
+      sh...'
+    evidenceType2: Suspect
+    evidence2: 
+    connectionStrength: 0.8
+    discoveryTime: 15:20
+  - evidenceType1: Clue
+    evidence1: 'Mr. Nadder mentioned: Persuaded? I imagine a generous tip can motivate
+      a...'
+    evidenceType2: Suspect
+    evidence2: 
+    connectionStrength: 0.8
+    discoveryTime: 17:32
+  trackedContradictions: []
   npcNames:
   - Elara
+  - Lina
+  - Mona
+  - Zaki
+  - Farid
+  - Youssef
+  - Mr. Nadder
+  - Fatma
+  - Mira
+  - Officer Salim
   npcSecrets:
   - Elara suspects Master Thorne is involved. She overheard him talking about a 'collector'.
+  - "I had minimal contact with Amjad. We spoke briefly about hotel logistics a few
+    days prior \u2013 standard procedure, really. Is there something specific you
+    suspect I might have missed?"
+  - "I had minimal contact with Amjad. We spoke briefly about hotel logistics a few
+    days prior \u2013 standard procedure, really. Is there something specific you
+    suspect I might have missed?"
+  - "I had minimal contact with Amjad. We spoke briefly about hotel logistics a few
+    days prior \u2013 standard procedure, really. Is there something specific you
+    suspect I might have missed?"
+  - "I had minimal contact with Amjad. We spoke briefly about hotel logistics a few
+    days prior \u2013 standard procedure, really. Is there something specific you
+    suspect I might have missed?"
+  - "I had minimal contact with Amjad. We spoke briefly about hotel logistics a few
+    days prior \u2013 standard procedure, really. Is there something specific you
+    suspect I might have missed?"
+  - "I had minimal contact with Amjad. We spoke briefly about hotel logistics a few
+    days prior \u2013 standard procedure, really. Is there something specific you
+    suspect I might have missed?"
+  - "I had minimal contact with Amjad. We spoke briefly about hotel logistics a few
+    days prior \u2013 standard procedure, really. Is there something specific you
+    suspect I might have missed?"
+  - "I had minimal contact with Amjad. We spoke briefly about hotel logistics a few
+    days prior \u2013 standard procedure, really. Is there something specific you
+    suspect I might have missed?"
+  - "I had minimal contact with Amjad. We spoke briefly about hotel logistics a few
+    days prior \u2013 standard procedure, really. Is there something specific you
+    suspect I might have missed?"
+  informationReliability:
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
   keyEvents:
   - '[Evening, 3rd Day of the Harvest Festival] The Sunstone Amulet was reported
     missing from the Duke''s vault.'
@@ -37,6 +268,8 @@ MonoBehaviour:
     old library, destroying several historical documents.'
   - '[Evening, 3rd Day of the Harvest Festival] A mysterious masked figure was seen
     lurking near the Duke''s private quarters.'
+  - '[Evening, 3rd Day of the Harvest Festival] Mr. Nadder mentioned: My presence
+    is purely coincidental, I assure you. I was simply explori...'
   playerChoices:
   - '[15:40] Asked the guard about the vault.'
   - '[15:40] Decided to investigate the Duke''s advisor first.'
