@@ -1903,7 +1903,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1569059707}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &288227083
 GameObject:
@@ -5185,11 +5185,11 @@ PrefabInstance:
     - target: {fileID: 3107412535851876840, guid: a6a81b69e3305a5479664a17214a7437, type: 3}
       propertyPath: 'waypoints.Array.data[0]'
       value: 
-      objectReference: {fileID: 2033088336}
+      objectReference: {fileID: 0}
     - target: {fileID: 3107412535851876840, guid: a6a81b69e3305a5479664a17214a7437, type: 3}
       propertyPath: 'waypoints.Array.data[1]'
       value: 
-      objectReference: {fileID: 197286767}
+      objectReference: {fileID: 0}
     - target: {fileID: 3107412535851876840, guid: a6a81b69e3305a5479664a17214a7437, type: 3}
       propertyPath: 'waypoints.Array.data[2]'
       value: 
@@ -5197,7 +5197,7 @@ PrefabInstance:
     - target: {fileID: 3107412535851876840, guid: a6a81b69e3305a5479664a17214a7437, type: 3}
       propertyPath: 'waypoints.Array.data[3]'
       value: 
-      objectReference: {fileID: 1923781745}
+      objectReference: {fileID: 0}
     - target: {fileID: 3107412535851876840, guid: a6a81b69e3305a5479664a17214a7437, type: 3}
       propertyPath: 'waypoints.Array.data[4]'
       value: 
@@ -5205,7 +5205,7 @@ PrefabInstance:
     - target: {fileID: 3107412535851876840, guid: a6a81b69e3305a5479664a17214a7437, type: 3}
       propertyPath: 'waypoints.Array.data[5]'
       value: 
-      objectReference: {fileID: 1923781745}
+      objectReference: {fileID: 0}
     - target: {fileID: 3107412535851876840, guid: a6a81b69e3305a5479664a17214a7437, type: 3}
       propertyPath: 'waypoints.Array.data[6]'
       value: 
@@ -5213,7 +5213,7 @@ PrefabInstance:
     - target: {fileID: 3107412535851876840, guid: a6a81b69e3305a5479664a17214a7437, type: 3}
       propertyPath: 'waypoints.Array.data[7]'
       value: 
-      objectReference: {fileID: 1923781745}
+      objectReference: {fileID: 0}
     - target: {fileID: 8912994710822650200, guid: a6a81b69e3305a5479664a17214a7437, type: 3}
       propertyPath: m_LocalPosition.x
       value: 229.7182
@@ -9892,52 +9892,6 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
---- !u!1 &1634365779
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1634365781}
-  - component: {fileID: 1634365780}
-  m_Layer: 0
-  m_Name: AudioManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!114 &1634365780
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1634365779}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: baaf8a4fe9d18d24e86947964bb12c66, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxSimultaneousAudios: 5
-  audioClipsSO: {fileID: 0}
---- !u!4 &1634365781
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1634365779}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 258.76752, y: -12.464105, z: 71.47632}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1637311967 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4873480505459090121, guid: b1f4d30ff042cbf469fa88230c44129e, type: 3}
@@ -13565,6 +13519,7 @@ SceneRoots:
   - {fileID: 1128686534}
   - {fileID: 149340093}
   - {fileID: 2039694203}
-  - {fileID: 1634365781}
   - {fileID: 1210204102}
   - {fileID: 472313213}
+  - {fileID: 779519908}
+  - {fileID: 286504272}
