@@ -17,7 +17,7 @@ public class PlayerHealth : MonoBehaviour, IDamagable
 
     private void Start()
     {
-        Health = 50f;
+        Health = maxHealth;
         UpdateHealthUI();
     }
 
@@ -41,7 +41,7 @@ public class PlayerHealth : MonoBehaviour, IDamagable
     private void UpdateHealthUI()
     {
         if (healthBarFill != null)
-            healthBarFill.fillAmount = Health / MaxHealth;
+            healthBarFill.transform.localScale = new Vector3(Health / MaxHealth, 1, 1);
     }
 
     private void Die()

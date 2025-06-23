@@ -77,6 +77,7 @@ public class CustomStarterAssetsInputs : MonoBehaviour
     public void PauseInput(bool newPauseState)
     {
         pause = newPauseState;
+        SetCursorState(!pause);
     }
     public void CollectInput(bool newCollectState)
     {
@@ -89,7 +90,7 @@ public class CustomStarterAssetsInputs : MonoBehaviour
 
     private void SetCursorState(bool newState)
     {
-      //  Cursor.lockState = newState ? CursorLockMode.Locked : CursorLockMode.None;
+       Cursor.lockState = newState ? CursorLockMode.Locked : CursorLockMode.None;
     }
 }
 
