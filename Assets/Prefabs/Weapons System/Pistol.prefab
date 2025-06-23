@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4721017312320880296}
   - component: {fileID: 3555954021237828447}
   - component: {fileID: 8288849690720003990}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Chamber
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -95,7 +95,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1515053005939865518}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: MuzzleFlash
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -129,7 +129,7 @@ GameObject:
   - component: {fileID: 1018833504609314846}
   - component: {fileID: 3297190627666802512}
   - component: {fileID: 297119763018059164}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Trigger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -214,7 +214,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5730620487730389425}
   - component: {fileID: 4561508832558822930}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Glock
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -278,9 +278,9 @@ GameObject:
   - component: {fileID: 5662440780416084642}
   - component: {fileID: 3908379585068120891}
   - component: {fileID: 689898657851232070}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Pistol
-  m_TagString: Untagged
+  m_TagString: Weapon
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -377,7 +377,7 @@ MonoBehaviour:
   weaponName: pistol
   isEquipped: 0
   weaponType: 1
-  weaponIcon: {fileID: 21300000, guid: 95e336df69588c546a94202076b9c6a2, type: 3}
+  weaponIcon: {fileID: 21300000, guid: f8af63cd56fd01c4d930ed67cfd609ee, type: 3}
   damage: 10
   ammoInMagazine: 30
   totalAmmo: 120
@@ -402,7 +402,7 @@ GameObject:
   - component: {fileID: 3816287906396780723}
   - component: {fileID: 8254232356303712394}
   - component: {fileID: 7357195613975682494}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -489,7 +489,7 @@ GameObject:
   - component: {fileID: 2447550647475559114}
   - component: {fileID: 5348696451543010387}
   - component: {fileID: 2261593210091215526}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Barrel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -575,7 +575,7 @@ GameObject:
   - component: {fileID: 59147963413475609}
   - component: {fileID: 4337052965501929197}
   - component: {fileID: 1556522007608320343}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Mag
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -665,7 +665,7 @@ GameObject:
   - component: {fileID: 7255627713193342958}
   - component: {fileID: 492888357575029503}
   - component: {fileID: 7396071631722243531}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Slide
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -752,7 +752,7 @@ GameObject:
   - component: {fileID: 3391707390436692823}
   - component: {fileID: 6086667873619843389}
   - component: {fileID: 1822677143697066529}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Bullet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -837,7 +837,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7279661609721949758}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: 'fire point '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -872,7 +872,7 @@ GameObject:
   - component: {fileID: 4890651553117616911}
   - component: {fileID: 8541991046550476436}
   - component: {fileID: 5763586950713808120}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: MuzzleFlash_mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}

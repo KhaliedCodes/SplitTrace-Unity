@@ -13,7 +13,7 @@ public class MeleeWeapon : Weapon
     [SerializeField] float damage;
     [SerializeField] float attackRange;
     [SerializeField] Collider hitbox;
-    [SerializeField] float attackDuration = 0.3f;
+    [SerializeField] public float attackDuration = 0.3f;
     [SerializeField] public int meleeType;
     [SerializeField] MeleeHitbox meleeHitbox;
 
