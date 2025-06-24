@@ -77,7 +77,7 @@ public class WeaponManager : MonoBehaviour
         weaponInputs.WeaponsActions.Pickup.performed += OnPickup;
         weaponInputs.WeaponsActions.Shoot.performed += OnShoot;
         weaponInputs.WeaponsActions.Shoot.performed += ctx => SetAim(true);
-        weaponInputs.WeaponsActions.Shoot.canceled += ctx => SetAim(false);
+        //weaponInputs.WeaponsActions.Shoot.canceled += ctx => SetAim(false);
         weaponInputs.WeaponsActions.Shoot.canceled += ctx => animator.SetBool("Shoot", false);
         weaponInputs.WeaponsActions.Aim.performed += ctx => CameraAim(true);
         weaponInputs.WeaponsActions.Aim.canceled += ctx => CameraAim(false);
@@ -185,13 +185,12 @@ public class WeaponManager : MonoBehaviour
         if (currentWeapon is MeleeWeapon me)
         {
             if (Time.time < lastFireTime + me.attackDuration) return;
-            //playerAnimations.SetAnimation("Attack");
-
-            lastFireTime = Time.time;
 
             animator.SetTrigger("Attack");
             AttackCount = me.meleeType;
             currentWeapon.Use();
+            lastFireTime = Time.time;
+
             //if (animator.GetCurrentAnimatorStateInfo(0).IsTag("MeleeAttack"))
             //    return;
 
@@ -264,13 +263,19 @@ public class WeaponManager : MonoBehaviour
         Weapon sameType = weapon.weaponType == WeaponType.Ranged ? rangedWeapon : meleeWeapon;
         sameType?.GetComponent<PickupableWeapon>()?.Drop(transform.forward);
         pickupable.Pickup(weaponHolder);
-       
+        if(weapon.weaponType == WeaponType.Ranged)
+        {
+            AudioManager.Instance.PlayAudioClip("Weapons", "pickup", false);
+        }
+
+
             RegisterWeapon(weapon);
 
     }
 
     public void DropCurrentWeapon()
     {
+        Debug.Log("Dropping current weapon...");
         if (currentWeapon == null) return;
 
         PickupableWeapon pickup = currentWeapon.GetComponent<PickupableWeapon>();

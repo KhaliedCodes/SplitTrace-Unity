@@ -5,13 +5,12 @@ using UnityEngine;
 public enum MeleeType
 {
     None = 0,
-    Sword = 1,
-    Axe = 2,
+    Axe = 1,
+    Sword = 2,
 }
 public class MeleeWeapon : Weapon
 {
     [SerializeField] float damage;
-    [SerializeField] float attackRange;
     [SerializeField] Collider hitbox;
     [SerializeField] public float attackDuration = 0.3f;
     [SerializeField] public int meleeType;

@@ -8,6 +8,8 @@ public class Bullet : MonoBehaviour
     [SerializeField] Transform vfxBlood;
     [SerializeField] Transform vfxHole;
     [SerializeField] float damage = 10f;
+    private float lifeTimer;
+
     Rigidbody rb;
 
 
@@ -41,10 +43,9 @@ public class Bullet : MonoBehaviour
 
                     Transform bloodVFX = Instantiate(vfxBlood, transform.position, Quaternion.identity);
                     Destroy(bloodVFX.gameObject, 2f);
-                
-            }
-       
+
+            }       
         }
-        //Destroy(gameObject);
+        Destroy(gameObject);
     }
 }
