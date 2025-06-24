@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 6473936357403801599}
   - component: {fileID: -5080231405019305602}
   m_Layer: 3
-  m_Name: StunningBullet
+  m_Name: Plate
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -31,8 +31,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -3.655679, y: 7.957867, z: -4.343065}
-  m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
-  m_ConstrainProportionsScale: 1
+  m_LocalScale: {x: 1, y: 0.02, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -153,4 +153,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DamageAmount: 16.6
   bulletType: 1
-  stunDuration: 5
+  stunDuration: 3

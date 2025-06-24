@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using System.Collections.Generic;
 
-enum EnemyRace
+public enum EnemyRace
 {
     Human,
     Creature
@@ -12,7 +12,7 @@ public class RangedEnemy : MonoBehaviour, IEnemy, IDamagable
 {
     [Header("EnemyType")]
     [SerializeField] private EnemyType enemyType = EnemyType.Normal;
-    [SerializeField] private EnemyRace enemyRace = EnemyRace.Human;
+    [SerializeField] public EnemyRace enemyRace = EnemyRace.Human;
  
     [Header("Stats")]
     [SerializeField] private float health = 100;
@@ -237,6 +237,7 @@ public class RangedEnemy : MonoBehaviour, IEnemy, IDamagable
 
         if (enemyType == EnemyType.Stun && CanStun && Time.time >= _lastStunTime + stunCooldown)
         {
+            animator.SetTrigger("Spell");
             ShootStunProjectile(direction);
             CanStun = false;
             _lastStunTime = Time.time;
