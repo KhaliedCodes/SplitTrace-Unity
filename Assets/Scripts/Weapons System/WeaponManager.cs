@@ -29,6 +29,7 @@ public class WeaponManager : MonoBehaviour
 
     [Header("Animation Rig")]
     [SerializeField] Rig aimRig;
+    [SerializeField] TwoBoneIKConstraint leftHandIK;
     [SerializeField] LayerMask aimLayerMask;
 
     private float aimLayerTargetWeight = 0f;
@@ -75,9 +76,11 @@ public class WeaponManager : MonoBehaviour
         weaponInputs.WeaponsActions.Drop.performed += OnDrop;
         weaponInputs.WeaponsActions.Pickup.performed += OnPickup;
         weaponInputs.WeaponsActions.Shoot.performed += OnShoot;
+        weaponInputs.WeaponsActions.Shoot.performed += ctx => SetAim(true);
+        //weaponInputs.WeaponsActions.Shoot.canceled += ctx => SetAim(false);
         weaponInputs.WeaponsActions.Shoot.canceled += ctx => animator.SetBool("Shoot", false);
-        weaponInputs.WeaponsActions.Aim.performed += ctx => SetAim(true);
-        weaponInputs.WeaponsActions.Aim.canceled += ctx => SetAim(false);
+        weaponInputs.WeaponsActions.Aim.performed += ctx => CameraAim(true);
+        weaponInputs.WeaponsActions.Aim.canceled += ctx => CameraAim(false);
     }
 
     private void Start()
@@ -89,11 +92,12 @@ public class WeaponManager : MonoBehaviour
         playerAnimations = GetComponent<PlayerAnimations>();
         animator = GetComponent<Animator>();
 
+
     }
 
     private void Update()
     {
-        
+       
         aimLayerCurrentWeight = Mathf.Lerp(aimLayerCurrentWeight, aimLayerTargetWeight, Time.deltaTime * aimLayerSmoothSpeed);
         animator.SetLayerWeight(1, aimLayerCurrentWeight);
 
@@ -115,6 +119,8 @@ public class WeaponManager : MonoBehaviour
             //Debug.Log($"mouseWorldPosition"+ mouseWorldPosition);
 
             mouseWorldPosition = ray.origin + ray.direction * 100f;
+
+            aimTarget.position = mouseWorldPosition; 
         }
 
       
@@ -133,13 +139,41 @@ public class WeaponManager : MonoBehaviour
             aimRig.weight = 0f; 
 
         }
+        var rangedLayout = rangedIconUI.GetComponent<LayoutElement>();
+        var meleeLayout = meleeIconUI.GetComponent<LayoutElement>();
+        if (currentWeapon is RangedWeapon rw)
+        {
+            // Enlarge ranged icon
+            rangedLayout.preferredWidth = 150f; // example: big
+            rangedLayout.preferredHeight = 100f;
+            meleeLayout.preferredWidth = 50f;   // example: normal
+            meleeLayout.preferredHeight = 50f;
+        }
+        else if (currentWeapon is MeleeWeapon me)
+        {
+            // Enlarge melee icon
+            meleeLayout.preferredWidth = 150f;
+            meleeLayout.preferredHeight = 100f;
+            rangedLayout.preferredWidth = 50f;
+            rangedLayout.preferredHeight = 50f;
+        }
+        else
+        {
+            // Reset both to normal size
+            rangedLayout.preferredWidth = 50f;
+            rangedLayout.preferredHeight = 50f;
+            meleeLayout.preferredWidth = 50f;
+            meleeLayout.preferredHeight = 50f;
+        }
 
+       
     }
 
 
 
     private void OnReload(InputAction.CallbackContext context)
     {
+        
         currentWeapon?.Reload();
         AmmoUI();
     }
@@ -150,17 +184,16 @@ public class WeaponManager : MonoBehaviour
 
         if (currentWeapon is MeleeWeapon me)
         {
-            //if (Time.time < lastFireTime + weapon.attackDuration) return;
-            ////playerAnimations.SetAnimation("Attack");
-
-            //lastFireTime = Time.time;
-
-            if (animator.GetCurrentAnimatorStateInfo(0).IsTag("MeleeAttack"))
-                return;
+            if (Time.time < lastFireTime + me.attackDuration) return;
 
             animator.SetTrigger("Attack");
             AttackCount = me.meleeType;
             currentWeapon.Use();
+            lastFireTime = Time.time;
+
+            //if (animator.GetCurrentAnimatorStateInfo(0).IsTag("MeleeAttack"))
+            //    return;
+
         }
         else if (currentWeapon is RangedWeapon)
         {
@@ -197,9 +230,13 @@ public class WeaponManager : MonoBehaviour
     }
     private void OnPickup(InputAction.CallbackContext context)
     {
-        TryPickupNearbyWeapon();
+        if (!IsAiming)
+        {
+            TryPickupNearbyWeapon();
 
-        WeaponTut.OnTutorialStart("Weapon");
+            WeaponTut.OnTutorialStart("Weapon");
+        }
+            
 
     }
 
@@ -226,12 +263,19 @@ public class WeaponManager : MonoBehaviour
         Weapon sameType = weapon.weaponType == WeaponType.Ranged ? rangedWeapon : meleeWeapon;
         sameType?.GetComponent<PickupableWeapon>()?.Drop(transform.forward);
         pickupable.Pickup(weaponHolder);
-        RegisterWeapon(weapon);
+        if(weapon.weaponType == WeaponType.Ranged)
+        {
+            AudioManager.Instance.PlayAudioClip("Weapons", "pickup", false);
+        }
+
+
+            RegisterWeapon(weapon);
 
     }
 
     public void DropCurrentWeapon()
     {
+        Debug.Log("Dropping current weapon...");
         if (currentWeapon == null) return;
 
         PickupableWeapon pickup = currentWeapon.GetComponent<PickupableWeapon>();
@@ -301,6 +345,7 @@ public class WeaponManager : MonoBehaviour
         {
             currentWeapon.Unequip();
             currentWeapon = null;
+            AmmoUI();
         }
     }
 
@@ -329,7 +374,7 @@ public class WeaponManager : MonoBehaviour
         if (currentWeapon is RangedWeapon rw)
         {
             ammoText.enabled = true;
-            ammoText.text = $"Current Ammo: {rw.ammoInMagazine} / {rw.totalAmmo + managerTotalAmmo}";
+            ammoText.text = $"{rw.ammoInMagazine} / {rw.totalAmmo + managerTotalAmmo}";
             defultCrosshairUI.SetActive(!IsAiming);
  
         }
@@ -349,23 +394,40 @@ public class WeaponManager : MonoBehaviour
         {
             IsAiming = isAiming;
             
-            aimCamera.Priority = isAiming ? 20 : 5;
+           
             defultCrosshairUI.SetActive(!isAiming);
             aimCrosshairUI.SetActive(isAiming);
 
             aimLayerTargetWeight = isAiming ? 1f : 0f;
             animator.SetBool("IsAiming", isAiming);
             animator.SetInteger("RangedType", (int)((RangedWeapon)currentWeapon).rangedType);
-         
-      
+
+            if (rw.rangedType == 2)
+            {
+                leftHandIK.weight = 1f;
+            }
+            else
+            {
+                leftHandIK.weight = 0f;
+            }
         }
         else
         {
             //defultCrosshairUI.SetActive(false);
             animator.SetBool("IsAiming", false);
             animator.SetInteger("RangedType", 0);
+            leftHandIK.weight = 0f;
         }
 
+    }
+
+    private void CameraAim(bool isAim)
+    {
+        if (HasRangedEquipped(out RangedWeapon rw))
+        {
+            aimCamera.Priority = isAim ? 20 : 5;
+            SetAim(isAim);
+        }
     }
 
     private void UpdateAnimatorRangedType()

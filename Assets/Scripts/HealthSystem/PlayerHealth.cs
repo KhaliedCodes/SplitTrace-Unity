@@ -1,5 +1,7 @@
+using System.Collections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 public class PlayerHealth : MonoBehaviour, IDamagable
@@ -15,9 +17,10 @@ public class PlayerHealth : MonoBehaviour, IDamagable
     public int _HealthItemsAmount { get => HealthItemsAmount;}
     public float MaxHealth { get => maxHealth; set => maxHealth = value; }
 
+    bool isDead = false;
     private void Start()
     {
-        Health = 50f;
+        Health = maxHealth;
         UpdateHealthUI();
     }
 
@@ -25,7 +28,7 @@ public class PlayerHealth : MonoBehaviour, IDamagable
     {
         Health = Mathf.Max(0, Health - damage);
         UpdateHealthUI();
-        if (Health <= 0)
+        if (Health <= 0 && !isDead)
         {
             Die();
         }
@@ -41,13 +44,19 @@ public class PlayerHealth : MonoBehaviour, IDamagable
     private void UpdateHealthUI()
     {
         if (healthBarFill != null)
-            healthBarFill.fillAmount = Health / MaxHealth;
+            healthBarFill.transform.localScale = new Vector3(Health / MaxHealth, 1, 1);
     }
 
     private void Die()
     {
+        isDead = true;
         Debug.Log("Player died.");
-        // TODO: Handle death animation, game over screen, etc.
+        GetComponent<PlayerInput>().enabled = false;
+        
+        WeaponManager.Instance.DropCurrentWeapon();
+
+        WeaponManager.Instance.animator.SetTrigger("Die");
+        StartCoroutine(LoadManinMenu());
     }
 
     public void UpdateNumberOfHealthItem(int i)
@@ -82,4 +91,9 @@ public class PlayerHealth : MonoBehaviour, IDamagable
         healthCounterText.text = HealthItemsAmount.ToString();
     }
    
+    IEnumerator LoadManinMenu()
+    {
+        yield return new WaitForSeconds(5f);
+        UnityEngine.SceneManagement.SceneManager.LoadScene(0);
+    }
 }
