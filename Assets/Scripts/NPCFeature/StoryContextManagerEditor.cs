@@ -1,4 +1,5 @@
-using UnityEngine;
+#if UNITY_EDITORu
+sing UnityEngine;
 using UnityEditor;
 using System.Linq;
 
@@ -548,3 +549,4 @@ public class StoryContextManagerEditor : Editor
         return result;
     }
 }
+#endif
