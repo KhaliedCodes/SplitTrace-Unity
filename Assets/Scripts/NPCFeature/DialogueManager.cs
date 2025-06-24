@@ -41,12 +41,6 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private DialogueTextStyle choiceButtonHoverStyle;
     [SerializeField] private float choiceButtonFontSizeMin = 22f;
     [SerializeField] private float choiceButtonFontSizeMax = 24f;
-    [SerializeField] private bool useChoiceButtonAnimations = false;
-    [Header("Choice Button Animation Settings")]
-    [SerializeField] private bool enableChoiceButtonTextAnimation = false;
-    [SerializeField] private TextAnimationType choiceButtonAnimationType = TextAnimationType.Pulse;
-    [SerializeField] private float choiceButtonAnimationSpeed = 2f; 
-    [SerializeField] private float choiceButtonAnimationIntensity = 0.5f;
 
     
     private PlayerController playerController;
@@ -170,30 +164,8 @@ public class DialogueManager : MonoBehaviour
         };
     }
 
-    private void ApplyAnimationSettingsToChoiceButtons()
-    {
-        if (choiceButtonTextStyle != null)
-        {
-            choiceButtonTextStyle.enableTextAnimation = enableChoiceButtonTextAnimation;
-            choiceButtonTextStyle.animationType = choiceButtonAnimationType;
-            choiceButtonTextStyle.animationSpeed = choiceButtonAnimationSpeed;
-            choiceButtonTextStyle.animationIntensity = choiceButtonAnimationIntensity;
-        }
-    }
+    
 
-    private void OnValidate()
-    {
-        // Font size validation
-        choiceButtonFontSizeMax = Mathf.Max(choiceButtonFontSizeMax, choiceButtonFontSizeMin);
-        choiceButtonFontSizeMin = Mathf.Max(choiceButtonFontSizeMin, 8f);
-        choiceButtonFontSizeMax = Mathf.Max(choiceButtonFontSizeMax, 8f);
-
-        // Apply animation settings when values change in inspector
-        if (Application.isPlaying)
-        {
-            ApplyAnimationSettingsToChoiceButtons();
-        }
-    }
 
     private void Start()
     {
@@ -201,8 +173,6 @@ public class DialogueManager : MonoBehaviour
         endConversationButton?.onClick.AddListener(EndDialogue);
         FindPlayerController();
         InitializeChoiceButtons();
-
-        ApplyAnimationSettingsToChoiceButtons();
         ApplyTextStyling(dialogueText, npcTextStyle);
         ApplyTextStyling(npcNameText, npcTextStyle);
     }
@@ -222,11 +192,6 @@ public class DialogueManager : MonoBehaviour
         {
             UpdateTextAnimations();
         }
-        
-        if (useChoiceButtonAnimations)
-        {
-            UpdateChoiceButtonAnimations();
-        }
     }
 
     private void UpdateTextAnimations()
@@ -234,24 +199,6 @@ public class DialogueManager : MonoBehaviour
         if (dialogueText != null && npcTextStyle.enableTextAnimation)
         {
             ApplyTextAnimation(dialogueText, npcTextStyle);
-        }
-    }
-
-    private void UpdateChoiceButtonAnimations()
-    {
-        if (choiceButtonTextStyle.enableTextAnimation)
-        {
-            foreach (Button button in choiceButtons)
-            {
-                if (button.gameObject.activeSelf)
-                {
-                    TextMeshProUGUI buttonText = button.GetComponentInChildren<TextMeshProUGUI>();
-                    if (buttonText != null)
-                    {
-                        ApplyTextAnimation(buttonText, choiceButtonTextStyle);
-                    }
-                }
-            }
         }
     }
 

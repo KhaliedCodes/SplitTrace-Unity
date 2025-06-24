@@ -9158,7 +9158,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _modelName: gemini-2.0-flash
-  _apiKey: AIzaSyBlrcA4jL8e8ZBNBdp7haF7-KRLOBzbOXY
+  _apiKey: AIzaSyDuVvcSmjYZDQ2c5ADKIS0SfhNKZMumphQ
   _responseMimeType: 1
   _enableChatHistory: 1
   _maxHistory: 5
@@ -13580,6 +13580,18 @@ PrefabInstance:
     - target: {fileID: 8228606382155103260, guid: 530a7987444f38d4289a1d9e4f2aa51b, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 164
+      objectReference: {fileID: 0}
+    - target: {fileID: 8379144803337153838, guid: 530a7987444f38d4289a1d9e4f2aa51b, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8379144803337153838, guid: 530a7987444f38d4289a1d9e4f2aa51b, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8379144803337153838, guid: 530a7987444f38d4289a1d9e4f2aa51b, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
