@@ -12,7 +12,6 @@ public class GeminiAccessor : MonoBehaviour
 
     private NPCPersonality npcPersonality;
 
-
     public event Action<string, string> OnResponseProcessed;
     public event Action<List<string>> OnChoicesReceived;
 
@@ -106,9 +105,10 @@ public class GeminiAccessor : MonoBehaviour
         // Example: Player mentions finding evidence
         if (lowerInput.Contains("found") && (lowerInput.Contains("evidence") || lowerInput.Contains("clue")))
         {
-            // You could implement more sophisticated parsing here
-            // For now, this is a placeholder for potential story updates
-            Debug.Log($"Player mentioned finding evidence: {input}");
+            // Extract potential clue information
+            string potentialClue = $"{npcPersonality.npcName} mentioned: {input.Substring(0, Mathf.Min(50, input.Length))}...";
+            storyContext.AddClue(potentialClue, "Player");
+            Debug.Log($"Story Update: New clue added from player input");
         }
     }
 
@@ -138,18 +138,26 @@ public class GeminiAccessor : MonoBehaviour
         if (storyContext == null || npcPersonality == null) return;
         
         string lowerResponse = response.ToLower();
+        float reliability = npcPersonality.reliability;
         
+        // Record what this NPC has revealed
+        if (response.Length > 20) // Only record substantial information
+        {
+            storyContext.RevealNPCInfo(npcPersonality.npcName, response, reliability);
+        }
+
         // Example triggers for story updates - customize these based on your story
         string[] clueKeywords = { "evidence", "clue", "discovered", "found", "hidden", "secret" };
         string[] suspectKeywords = { "suspect", "guilty", "accused", "blame", "culprit" };
+        string[] eventKeywords = { "event", "happened", "occurred", "incident", "situation" };
         
         foreach (string keyword in clueKeywords)
         {
             if (lowerResponse.Contains(keyword))
             {
-                // Extract potential clue information (this is simplified - you might want more sophisticated parsing)
+                // Extract potential clue information
                 string potentialClue = $"{npcPersonality.npcName} mentioned: {response.Substring(0, Mathf.Min(50, response.Length))}...";
-                storyContext.AddClue(potentialClue);
+                storyContext.AddClue(potentialClue, npcPersonality.npcName, reliability);
                 Debug.Log($"Story Update: New clue added from {npcPersonality.npcName}");
                 break;
             }
@@ -159,17 +167,48 @@ public class GeminiAccessor : MonoBehaviour
         {
             if (lowerResponse.Contains(keyword))
             {
-                // You could implement name extraction here
-                Debug.Log($"Story Update: {npcPersonality.npcName} mentioned a suspect");
+                // Extract potential suspect information
+                string potentialSuspect = ExtractSuspectName(response);
+                if (!string.IsNullOrEmpty(potentialSuspect))
+                {
+                    storyContext.AddSuspect(potentialSuspect, $"{npcPersonality.npcName} implicated this person");
+                    Debug.Log($"Story Update: New suspect added from {npcPersonality.npcName}");
+                }
                 break;
             }
         }
         
-        // Record what this NPC has revealed
-        if (response.Length > 20) // Only record substantial information
+        foreach (string keyword in eventKeywords)
         {
-            storyContext.RevealNPCInfo(npcPersonality.npcName, response);
+            if (lowerResponse.Contains(keyword))
+            {
+                // Extract potential event information
+                string potentialEvent = $"{npcPersonality.npcName} mentioned: {response.Substring(0, Mathf.Min(70, response.Length))}...";
+                storyContext.AddKeyEvent(potentialEvent);
+                Debug.Log($"Story Update: New key event added from {npcPersonality.npcName}");
+                break;
+            }
         }
+    }
+
+    private string ExtractSuspectName(string response)
+    {
+        // Simple name extraction - you should implement more sophisticated NLP here
+        string[] nameKeywords = { "mr.", "mrs.", "ms.", "dr." };
+        string[] words = response.Split(' ');
+        
+        for (int i = 0; i < words.Length; i++)
+        {
+            if (Array.Exists(nameKeywords, keyword => words[i].StartsWith(keyword, StringComparison.OrdinalIgnoreCase)))
+            {
+                if (i + 1 < words.Length)
+                {
+                    return $"{words[i]} {words[i+1]}";
+                }
+            }
+        }
+        
+        return null;
     }
 
     private void ProcessChoicesResponse(string response)
@@ -208,11 +247,17 @@ public class GeminiAccessor : MonoBehaviour
         // Add context-aware choices if story context is available
         if (storyContext != null)
         {
+            // Add clue-related choice if any clues exist
             if (storyContext.discoveredClues.Count > 0)
                 defaultChoices.Insert(1, "I found some evidence...");
                 
+            // Add suspect-related choice if any suspects exist
             if (storyContext.knownSuspects.Count > 0)
                 defaultChoices.Insert(1, "What do you know about the suspects?");
+                
+            // Add contradiction-related choice if any contradictions exist
+            if (storyContext.GetUnresolvedContradictions().Count > 0)
+                defaultChoices.Insert(1, "I found some contradictions...");
         }
         
         return defaultChoices;

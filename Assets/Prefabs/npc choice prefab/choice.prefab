@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 6889658814420797851}
   - component: {fileID: 112514295779610534}
   - component: {fileID: 5827046492840834168}
-  - component: {fileID: 5431894290372112374}
   - component: {fileID: 1376798093968359872}
   m_Layer: 5
   m_Name: choice
@@ -39,7 +38,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 10, y: 10}
+  m_SizeDelta: {x: 77.0933, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6889658814420797851
 CanvasRenderer:
@@ -100,11 +99,11 @@ MonoBehaviour:
     m_SelectOnRight: {fileID: 0}
   m_Transition: 1
   m_Colors:
-    m_NormalColor: {r: 1, g: 1, b: 1, a: 0}
+    m_NormalColor: {r: 0.6603774, g: 0.21493416, b: 0.21493416, a: 0}
     m_HighlightedColor: {r: 0.9528302, g: 0, b: 0, a: 0}
     m_PressedColor: {r: 0, g: 0.28395557, b: 1, a: 1}
     m_SelectedColor: {r: 0.034105167, g: 0.9528302, b: 0, a: 0}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5254902}
+    m_DisabledColor: {r: 0.07079922, g: 0.119798094, b: 0.3490566, a: 0.5254902}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
@@ -123,22 +122,6 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &5431894290372112374
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8792802871826758852}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 60ceafaab9ac7c04aa654ce4640fe0e2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  text: {fileID: 1836210856662620566}
-  normalColor: {r: 0, g: 0, b: 0, a: 1}
-  hoverColor: {r: 0.29699183, g: 0.29699183, b: 0.8867924, a: 1}
-  selectedColor: {r: 0, g: 0.6981132, b: 0.091919236, a: 1}
 --- !u!114 &1376798093968359872
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -191,10 +174,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 5445836618385574442}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -0.00010681, y: 0}
+  m_SizeDelta: {x: 77.093, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4702079427723198223
 CanvasRenderer:
@@ -226,8 +209,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Button
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 417bcfb9c5f8a784d95b0dde0db9c6c5, type: 2}
+  m_sharedMaterial: {fileID: 1962323969129969698, guid: 417bcfb9c5f8a784d95b0dde0db9c6c5, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -251,11 +234,11 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 18
+  m_fontSize: 24
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1
-  m_fontSizeMin: 18
+  m_fontSizeMin: 24
   m_fontSizeMax: 72
   m_fontStyle: 0
   m_HorizontalAlignment: 1
