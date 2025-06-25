@@ -407,6 +407,15 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 628c0c98c8dd93446aad5ef82f5d8d24, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2039792481069085059}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 628c0c98c8dd93446aad5ef82f5d8d24, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7704507327847270773}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 628c0c98c8dd93446aad5ef82f5d8d24, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6873880707583346998}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 628c0c98c8dd93446aad5ef82f5d8d24, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4499131191906359777}
   m_SourcePrefab: {fileID: 100100000, guid: 628c0c98c8dd93446aad5ef82f5d8d24, type: 3}
 --- !u!4 &373882014059088418 stripped
 Transform:
@@ -586,6 +595,61 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   geminiAPI: {fileID: 5161621926564859833}
+--- !u!114 &7704507327847270773
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1043598271975919768}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c07d5f7b3dca5494db1db9ace46b79fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _modelName: gemini-2.0-flash
+  _apiKey: AIzaSyBlrcA4jL8e8ZBNBdp7haF7-KRLOBzbOXY
+  _responseMimeType: 1
+  _enableChatHistory: 1
+  _maxHistory: 5
+  _chatHistory: []
+--- !u!114 &6873880707583346998
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1043598271975919768}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97683af030d3d11499738b853b12f9db, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  personality: {fileID: 11400000, guid: b2fab6d81f523714493b148e27657a36, type: 2}
+  interactionRadius: 2
+  hostilityTracker:
+    canBecomeEnemy: 1
+    hostilityThreshold: 3
+    aggressiveResponseMultiplier: 1.5
+    threateningResponseMultiplier: 2
+    playerAggressionMultiplier: 1
+    currentHostility: 0
+    hostileInteractionCount: 0
+    hasBeenMarkedAsEnemy: 0
+  hostileAnimatorController: {fileID: 9100000, guid: fb7c9a2e5987dfd449e716414fe354e2, type: 2}
+--- !u!114 &4499131191906359777
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1043598271975919768}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5228b2e02ce0c1a44bcb50da065e9ce8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  geminiAPI: {fileID: 7704507327847270773}
 --- !u!95 &6039440768737448024 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: 628c0c98c8dd93446aad5ef82f5d8d24, type: 3}
