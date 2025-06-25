@@ -30,7 +30,8 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
+  stringTagMap:
+    RenderType: Opaque
   disabledShaderPasses:
   - MOTIONVECTORS
   m_LockedProperties: 
@@ -46,11 +47,11 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Ambientmap:
-        m_Texture: {fileID: 2800000, guid: 4bd8f239a38ce9644999c8859553a0d8, type: 3}
+        m_Texture: {fileID: 2800000, guid: 440e42cf3956a1443a3c8872e2bd64b5, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTexture:
-        m_Texture: {fileID: 2800000, guid: fe2fcf98a6e803a45bd4e91d12de7616, type: 3}
+        m_Texture: {fileID: 2800000, guid: cdfc405c46935af4298135c3a1405ae3, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MaskEmission:
@@ -58,11 +59,11 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicMap:
-        m_Texture: {fileID: 2800000, guid: 313833d679b9b4e4faf89fbf266f997f, type: 3}
+        m_Texture: {fileID: 2800000, guid: a4093153f355dd3408eff5b24b43e92b, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _NormalMap:
-        m_Texture: {fileID: 2800000, guid: 782ee34804ba30b4ca048cda1578979c, type: 3}
+        m_Texture: {fileID: 2800000, guid: f77bac24f54469d49b9c92b93b704c32, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Normal_map:
@@ -91,21 +92,35 @@ Material:
     - Rim_Power: 0
     - Toon_Ramp_Offset: 0.469
     - Toon_Ramp_Smoothness: 0.235
-    - _Ambient: 0.5
-    - _BrightnessRim: 2.45
-    - _HighlightSharpness: 0.1
-    - _HighlightThickness: 0.507
+    - _AlphaClip: 0
+    - _AlphaToMask: 0
+    - _Ambient: 1
+    - _Blend: 0
+    - _BlendModePreserveSpecular: 0
+    - _BrightnessRim: 4.23
+    - _CastShadows: 1
+    - _Cull: 2
+    - _DstBlend: 0
+    - _HighlightSharpness: 0.875
+    - _HighlightThickness: 0.719
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _RimPower: 0.1
-    - _Roughness: 0
+    - _ReceiveShadows: 1
+    - _RimPower: 1.32
+    - _Roughness: 0.061
+    - _SrcBlend: 1
+    - _Surface: 0
     - _ToonRampOffset: 0.6
     - _ToonRampOffsetPoint: 0.7
-    - _ToonRampSmoothness: 0.07
+    - _ToonRampSmoothness: 0.128
     - _Toon_Ramp_Offset_Point: 0.581
+    - _WorkflowMode: 1
+    - _ZTest: 4
+    - _ZWrite: 1
+    - _ZWriteControl: 0
     m_Colors:
     - Toon_Ramp_Tint: {r: 0.6509805, g: 0, b: 1, a: 1}
     - _Color: {r: 1, g: 0.9290661, b: 0.8132075, a: 1}
-    - _ToonRampTint: {r: 0.4163083, g: 0.019607842, b: 1, a: 1}
+    - _ToonRampTint: {r: 0.14449488, g: 0.07714482, b: 0.7433963, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
