@@ -126,10 +126,10 @@ public class RangedEnemy : MonoBehaviour, IEnemy, IDamagable
             {
                 CanStun = true;
             }
-            //if(_currentState is AttackState )
-            //{
-            //    LookAtPlayer();
-            //}
+            if (_currentState is AttackState && enemyRace ==EnemyRace.Creature)
+            {
+                LookAtPlayer();
+            }
         }
     }
 
