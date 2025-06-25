@@ -4249,6 +4249,11 @@ MonoBehaviour:
   tutorialPanel: {fileID: 1618063734}
   tutorialText: {fileID: 1997759165}
   TutCollider: {fileID: 759692141}
+  pauseMenuPanel: {fileID: 0}
+  CollectPanel: {fileID: 0}
+  _healthBar: {fileID: 0}
+  _healthCount: {fileID: 0}
+  CamBrain: {fileID: 0}
 --- !u!1 &432670923
 GameObject:
   m_ObjectHideFlags: 0
@@ -13103,9 +13108,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   personality: {fileID: 11400000, guid: b0201de81c302b445bf59d95490b64ad, type: 2}
-  interactionTrigger: {fileID: 1471629828}
   interactionRadius: 2
-  playerPrefab: {fileID: 0}
+  hostilityTracker:
+    canBecomeEnemy: 1
+    hostilityThreshold: 3
+    aggressiveResponseMultiplier: 1.5
+    threateningResponseMultiplier: 2
+    playerAggressionMultiplier: 1
+    currentHostility: 0
+    hostileInteractionCount: 0
+    hasBeenMarkedAsEnemy: 0
+  hostileAnimatorController: {fileID: 0}
 --- !u!114 &1471629824
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14669,6 +14682,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 1788652223441760819, guid: fc847424d564964438bd610711defbbd, type: 3}
+      propertyPath: enemyType
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1788652223441760819, guid: fc847424d564964438bd610711defbbd, type: 3}
       propertyPath: waypoints.Array.size
       value: 4
       objectReference: {fileID: 0}
@@ -15451,6 +15468,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eccf799f00e9fde48803e69bf2b0949e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  enemyType: 0
+  enemyRace: 0
   health: 100
   Maxhealth: 100
   moveSpeed: 2.5
@@ -15464,7 +15483,11 @@ MonoBehaviour:
   player: {fileID: 0}
   navMeshAgent: {fileID: 1765383555}
   animator: {fileID: 1765383556}
+  gunPoint: {fileID: 0}
   projectilePrefab: {fileID: 4954223955266911571, guid: 0ee78e782619af24ebe8546ea38f1908, type: 3}
+  StunprojectilePrefab: {fileID: 0}
+  CanStun: 0
+  stunCooldown: 5
   waypoints:
   - {fileID: 637271281}
   - {fileID: 1479253200}
@@ -15472,9 +15495,11 @@ MonoBehaviour:
   - {fileID: 449026312}
   waypointStopTime: 2
   _currentWaypointIndex: 0
+  _isProvoked: 0
   _detectionChecker: {fileID: 0}
   _attackChecker: {fileID: 0}
   RayCastY: 0
+  fieldOfViewAngle: 90
   _lastKnownPlayerPosition: {x: 0, y: 0, z: 0}
 --- !u!54 &1765383553
 Rigidbody:
@@ -18137,6 +18162,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 16ea271e147472742ac0e7916b48445e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  enemyType: 0
   health: 3
   Maxhealth: 100
   moveSpeed: 3.5
@@ -18144,6 +18170,8 @@ MonoBehaviour:
   detectionRange: 5.48
   attackRange: 2
   attackCooldown: 2
+  StunDuration: 5
+  ScreamCooldown: 20
   player: {fileID: 0}
   navMeshAgent: {fileID: 2025894112}
   animator: {fileID: 2025894114}
@@ -18154,8 +18182,10 @@ MonoBehaviour:
   - {fileID: 1372923944}
   waypointStopTime: 2
   _currentWaypointIndex: 0
+  _isProvoked: 0
   _detectionChecker: {fileID: 0}
   _attackChecker: {fileID: 0}
+  StunArea: {fileID: 0}
 --- !u!95 &2025894114
 Animator:
   serializedVersion: 7
