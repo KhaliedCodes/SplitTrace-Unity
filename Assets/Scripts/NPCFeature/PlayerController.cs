@@ -36,7 +36,8 @@ public class PlayerController : MonoBehaviour
         interactionCollider.radius = interactionRadius;
         interactionCollider.isTrigger = true;
         interactionCollider.center = Vector3.up * 0.5f;
-        
+
+
         interactionPrompt?.SetActive(false);
     }
 
