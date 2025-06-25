@@ -65,7 +65,7 @@ public class ClownJuggler : MonoBehaviour
 
             ball.transform.position = position;
 
-            ball.transform.rotation = Quaternion.Euler(0, -90, 90);
+            ball.transform.rotation = Quaternion.Euler(0, 0, 90);
             elapsed += Time.deltaTime;
             yield return null;
         }

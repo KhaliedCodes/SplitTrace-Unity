@@ -48,8 +48,8 @@ GameObject:
   - component: {fileID: 1758067261188963677}
   - component: {fileID: 8289511397689533474}
   m_Layer: 0
-  m_Name: WaiterFbx
-  m_TagString: Untagged
+  m_Name: ShadowWaiter
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -202,8 +202,8 @@ MonoBehaviour:
   navMeshAgent: {fileID: 3220318195127404260}
   animator: {fileID: 3779554786997241433}
   gunPoint: {fileID: 6005131882263826173}
-  projectilePrefab: {fileID: 4954223955266911571, guid: 0ee78e782619af24ebe8546ea38f1908, type: 3}
-  StunprojectilePrefab: {fileID: 4954223955266911571, guid: b11f9c10f28423146bfc140ce263613f, type: 3}
+  projectilePrefab: {fileID: 2032147993982061109, guid: d39fb51e8c02c7840bad5207e53887b7, type: 3}
+  StunprojectilePrefab: {fileID: 1465040137266680400, guid: 1dc00f19f6028394a8051f669a292ebf, type: 3}
   CanStun: 0
   stunCooldown: 10
   waypoints:
@@ -231,7 +231,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 11a9704096e5f954c8227489cf6d60db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ballPrefab: {fileID: 4954223955266911571, guid: a0fc465f3780e8a4b92103f35daea526, type: 3}
+  ballPrefab: {fileID: 2032147993982061109, guid: dc2e3a03de87c4c4e9179c0cb5fa295e, type: 3}
   jugglePoints:
   - {fileID: 3355858490303720993}
   - {fileID: 2135880452732577607}
