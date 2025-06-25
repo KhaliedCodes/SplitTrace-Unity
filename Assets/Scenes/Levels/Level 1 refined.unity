@@ -1245,6 +1245,10 @@ PrefabInstance:
       value: ScreamEnemy Variant
       objectReference: {fileID: 0}
     - target: {fileID: 3107412535851876840, guid: a6a81b69e3305a5479664a17214a7437, type: 3}
+      propertyPath: attackDamage
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3107412535851876840, guid: a6a81b69e3305a5479664a17214a7437, type: 3}
       propertyPath: 'waypoints.Array.data[0]'
       value: 
       objectReference: {fileID: 1606461103}
@@ -1996,6 +2000,63 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1001 &1905693828
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 266355646369351474, guid: 7168fcae49bad5f4296fa03f1b2f145b, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 237.20009
+      objectReference: {fileID: 0}
+    - target: {fileID: 266355646369351474, guid: 7168fcae49bad5f4296fa03f1b2f145b, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.948
+      objectReference: {fileID: 0}
+    - target: {fileID: 266355646369351474, guid: 7168fcae49bad5f4296fa03f1b2f145b, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 51.91266
+      objectReference: {fileID: 0}
+    - target: {fileID: 266355646369351474, guid: 7168fcae49bad5f4296fa03f1b2f145b, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 266355646369351474, guid: 7168fcae49bad5f4296fa03f1b2f145b, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 266355646369351474, guid: 7168fcae49bad5f4296fa03f1b2f145b, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 266355646369351474, guid: 7168fcae49bad5f4296fa03f1b2f145b, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 266355646369351474, guid: 7168fcae49bad5f4296fa03f1b2f145b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 266355646369351474, guid: 7168fcae49bad5f4296fa03f1b2f145b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 266355646369351474, guid: 7168fcae49bad5f4296fa03f1b2f145b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 800965230170006243, guid: 7168fcae49bad5f4296fa03f1b2f145b, type: 3}
+      propertyPath: m_Name
+      value: Baton
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 7168fcae49bad5f4296fa03f1b2f145b, type: 3}
 --- !u!4 &1917839351 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2505212952566029032, guid: 7c0ee33379337bd4e902b5853762832b, type: 3}
@@ -2164,3 +2225,4 @@ SceneRoots:
   - {fileID: 1037918033}
   - {fileID: 1545119593}
   - {fileID: 919174835}
+  - {fileID: 1905693828}
