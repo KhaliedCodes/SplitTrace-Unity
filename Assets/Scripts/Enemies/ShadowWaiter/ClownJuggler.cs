@@ -7,20 +7,27 @@ public class ClownJuggler : MonoBehaviour
     [Header("Juggling Settings")]
     [SerializeField] private GameObject ballPrefab;
     [SerializeField] private Transform[] jugglePoints;
-    [SerializeField] private float juggleSpeed = 1.5f;   // time a hop takes
-    [SerializeField] private float arcHeight = 1.0f;   // max height of the parabola
+    [SerializeField] private float juggleSpeed = 1.5f; // Seconds a hop takes
+    [SerializeField] private float arcHeight = 1.0f;  // Max height of the parabola
 
     private readonly List<GameObject> balls = new();
 
     private void Start()
     {
-        // spawn one ball at each point and give it its own looping coroutine
+        // Spawn one ball (or plate) at each point and give it its own looping coroutine
         for (int i = 0; i < jugglePoints.Length; i++)
         {
-            GameObject ball = Instantiate(ballPrefab, jugglePoints[i].position, Quaternion.identity);
+            GameObject ball = Instantiate(ballPrefab,
+                                          jugglePoints[i].position,
+                                          Quaternion.identity);
+
+            // Parent to this GameObject so everything stays nicely grouped in the hierarchy
+            // `true` keeps the object's current world position.
+            ball.transform.SetParent(transform, true);
+
             balls.Add(ball);
 
-            // start the “grand tour”: this ball begins at index i, so its next target is i+1
+            // Start the “grand tour”: this ball begins at index i, so its next target is i + 1
             StartCoroutine(BallTour(ball, i));
         }
     }
@@ -35,10 +42,10 @@ public class ClownJuggler : MonoBehaviour
         while (true)
         {
             int nextIndex = (currentIndex + 1) % pointCount;
-            Vector3 target = jugglePoints[nextIndex].position;
+            Vector3 nextTarget = jugglePoints[nextIndex].position;
 
             // Hop over to the next point
-            yield return MoveBall(ball, target);
+            yield return MoveBall(ball, nextTarget);
 
             // Prepare for the next hop
             currentIndex = nextIndex;
@@ -46,7 +53,7 @@ public class ClownJuggler : MonoBehaviour
     }
 
     /// <summary>
-    /// Moves one ball to a target position along a nice arc, then returns.
+    /// Moves one ball to a target position along a nice arc.
     /// </summary>
     private IEnumerator MoveBall(GameObject ball, Vector3 targetPosition)
     {
@@ -57,20 +64,24 @@ public class ClownJuggler : MonoBehaviour
         {
             float t = elapsed / juggleSpeed;
 
-            // horizontal interpolation
-            Vector3 position = Vector3.Lerp(start, targetPosition, t);
+            // Horizontal interpolation
+            Vector3 pos = Vector3.Lerp(start, targetPosition, t);
 
-            // vertical parabola y += 4h·t·(1-t)
-            position.y += 4f * arcHeight * t * (1f - t);
+            // Vertical parabola: y += 4h·t·(1 − t)
+            pos.y += 4f * arcHeight * t * (1f - t);
 
-            ball.transform.position = position;
+            ball.transform.position = pos;
 
-            ball.transform.rotation = Quaternion.Euler(0, 0, 90);
+            // Rotate the plate 90° around the Z-axis.
+            // Remove or modify this line if you're using spherical balls.
+            ball.transform.rotation = Quaternion.Euler(0f, 0f, 90f);
+
             elapsed += Time.deltaTime;
             yield return null;
         }
 
-        ball.transform.position = targetPosition; // snap exactly to point
+        // Snap exactly to the destination point
+        ball.transform.position = targetPosition;
     }
 }
 
