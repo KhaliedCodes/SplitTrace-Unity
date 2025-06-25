@@ -8,7 +8,7 @@ public class ClueObject : MonoBehaviour
     private Material originalMaterial;
 
     [Header("Clue Data")]
-    public ClueData clueData;
+    public ItemData clueData;
 
     [Header("UI References")]
     [SerializeField] private ItemDescriptionUI itemUI;  // Shows full description

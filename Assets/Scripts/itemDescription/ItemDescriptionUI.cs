@@ -14,7 +14,7 @@ public class ItemDescriptionUI : MonoBehaviour
     {
         Hide();
     }
-    public void Show(ClueData clue)
+    public void Show(ItemData clue)
     {
         if (clue == null) return;
 
