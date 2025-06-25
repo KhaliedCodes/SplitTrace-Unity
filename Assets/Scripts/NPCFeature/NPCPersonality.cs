@@ -1,3 +1,4 @@
+// NPCPersonality.cs
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -15,6 +16,9 @@ public class NPCPersonality : ScriptableObject
     [Range(0, 1)] public float intelligence = 0.5f;
     [Range(0, 1)] public float patience = 0.5f;
     [Range(0, 1)] public float openness = 0.5f;
+    
+    [Tooltip("How reliable or trustworthy this NPC's information generally is.")]
+    [Range(0, 1)] public float reliability = 1.0f; // Added reliability property
 
     [Header("Knowledge & Background")]
     [TextArea(3, 5)] public string backgroundStory;
@@ -58,9 +62,9 @@ public class NPCPersonality : ScriptableObject
         if (usesSlang) styleInstructions += " Occasionally use casual slang terms.";
 
         string personalityTraits = $"You are {(friendliness > 0.7f ? "very friendly" : friendliness < 0.3f ? "reserved" : "moderately friendly")}, " +
-                                  $"{(intelligence > 0.7f ? "highly intelligent" : intelligence < 0.3f ? "simple-minded" : "reasonably intelligent")}, " +
-                                  $"{(patience > 0.7f ? "extremely patient" : patience < 0.3f ? "easily irritated" : "generally patient")}, and " +
-                                  $"{(openness > 0.7f ? "very open to new ideas" : openness < 0.3f ? "traditional in your views" : "somewhat open-minded")}.";
+                                    $"{(intelligence > 0.7f ? "highly intelligent" : intelligence < 0.3f ? "simple-minded" : "reasonably intelligent")}, " +
+                                    $"{(patience > 0.7f ? "extremely patient" : patience < 0.3f ? "easily irritated" : "generally patient")}, and " +
+                                    $"{(openness > 0.7f ? "very open to new ideas" : openness < 0.3f ? "traditional in your views" : "somewhat open-minded")}.";
 
         string knowledgeString = "";
         if (knowledgeTopics.Count > 0)
@@ -72,14 +76,14 @@ public class NPCPersonality : ScriptableObject
         string storyAwarenessInstructions = GenerateStoryAwarenessInstructions();
 
         string fullPrompt = $"You are {npcName}, {characterDescription}. " +
-                           $"{personalityTraits} " +
-                           $"{(!string.IsNullOrEmpty(backgroundStory) ? backgroundStory : "")} " +
-                           $"{knowledgeString} " +
-                           $"{storyAwarenessInstructions} " +
-                           $"{lengthInstruction} " +
-                           $"{styleInstructions} " +
-                           $"{(!string.IsNullOrEmpty(uniqueQuirks) ? uniqueQuirks : "")} " +
-                           $"{emotionInstructions}";
+                            $"{personalityTraits} " +
+                            $"{(!string.IsNullOrEmpty(backgroundStory) ? backgroundStory : "")} " +
+                            $"{knowledgeString} " +
+                            $"{storyAwarenessInstructions} " +
+                            $"{lengthInstruction} " +
+                            $"{styleInstructions} " +
+                            $"{(!string.IsNullOrEmpty(uniqueQuirks) ? uniqueQuirks : "")} " +
+                            $"{emotionInstructions}";
 
         // If custom system prompt is provided, use it instead
         if (!string.IsNullOrEmpty(customSystemPrompt))
@@ -132,6 +136,12 @@ public class NPCPersonality : ScriptableObject
             instructions += $" Pay special attention if the player mentions: {string.Join(", ", storyTriggerWords)}. These topics might prompt you to share more information.";
         }
 
+        // Reliability instruction (optional, you might handle this purely in code logic)
+        // if (reliability < 1.0f)
+        // {
+        //     instructions += $" Your information might not always be entirely accurate or complete due to your {reliability * 100}% reliability.";
+        // }
+
         return instructions;
     }
 
@@ -153,35 +163,35 @@ public class NPCPersonality : ScriptableObject
     public string GetContextualInformation(StoryContextManager storyContext)
     {
         if (storyContext == null) return "";
-        
+
         string info = "";
-        
+
         // Check if any discovered clues relate to this NPC's knowledge
-        foreach (string clue in storyContext.discoveredClues)
+        foreach (ClueData clueData in storyContext.discoveredClues)
         {
             foreach (string evidence in knownEvidence)
             {
-                if (clue.ToLower().Contains(evidence.ToLower()) || evidence.ToLower().Contains(clue.ToLower()))
+                if (clueData.clueText.ToLower().Contains(evidence.ToLower()) || evidence.ToLower().Contains(clueData.clueText.ToLower()))
                 {
                     info += $"I see you've found {evidence}. ";
                     break;
                 }
             }
         }
-        
+
         // Check if any suspects relate to this NPC's information
-        foreach (string suspect in storyContext.knownSuspects)
+        foreach (SuspectData suspectData in storyContext.knownSuspects)
         {
             foreach (string suspectInfo in suspectInformation)
             {
-                if (suspectInfo.ToLower().Contains(suspect.ToLower()))
+                if (suspectInfo.ToLower().Contains(suspectData.name.ToLower()))
                 {
-                    info += $"About {suspect}... {suspectInfo} ";
+                    info += $"About {suspectData.name}... {suspectInfo} ";
                     break;
                 }
             }
         }
-        
+
         return info.Trim();
     }
 }

@@ -8,6 +8,8 @@ public class Bullet : MonoBehaviour
     [SerializeField] Transform vfxBlood;
     [SerializeField] Transform vfxHole;
     [SerializeField] float damage = 10f;
+    private float lifeTimer;
+
     Rigidbody rb;
 
 
@@ -26,25 +28,24 @@ public class Bullet : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        IDamagable target = other.GetComponent<IDamagable>();
-        Debug.Log("Hit the enemy");
-        if (target != null)
+        Debug.Log("the name is : " + other.name);
+        if (other.tag == "Enemy")
         {
 
-            Debug.Log("the tag is : " + other.tag);
+            IDamagable target = other.GetComponent<IDamagable>();
+            
             Debug.Log(other.tag == "Enemy");
 
-            if (other.tag == "Enemy")
+            if (target != null)
             {
                 Debug.Log("Hit Enemy: " + other.name + " with damage: ");
                 target.TakeDamage(damage);
 
-                    Transform bloodVFX = Instantiate(vfxBlood, transform.position, Quaternion.identity);
-                    Destroy(bloodVFX.gameObject, 2f);
-                
+                Transform bloodVFX = Instantiate(vfxBlood, transform.position, Quaternion.identity);
+                Destroy(bloodVFX.gameObject, 2f);
+
             }
-       
         }
-        //Destroy(gameObject);
+        Destroy(gameObject);
     }
 }

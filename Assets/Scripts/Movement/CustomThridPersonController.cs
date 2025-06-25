@@ -269,185 +269,94 @@ public class CustomThridPersonController : MonoBehaviour
 
     private void Move()
     {
-        // set target speed based on move speed, sprint speed and if sprint is pressed
+        // 1️⃣ Compute the desired target speed:
         float targetSpeed = _input.sprint ? SprintSpeed : MoveSpeed;
 
-        // a simplistic acceleration and deceleration designed to be easy to remove, replace, or iterate upon
-
-        // note: Vector2's == operator uses approximation so is not floating point error prone, and is cheaper than magnitude
-        // if there is no input, set the target speed to 0
+        // If no input → speed = 0
         if (_input.move == Vector2.zero) targetSpeed = 0.0f;
 
-        // a reference to the players current horizontal velocity
+        // 2️⃣ Smooth the _speed ONCE — for both movement & animation:
         float currentHorizontalSpeed = new Vector3(_controller.velocity.x, 0.0f, _controller.velocity.z).magnitude;
 
         float speedOffset = 0.1f;
-        float inputMagnitude = _input.analogMovement ? _input.move.magnitude : 1f;
 
-        // accelerate or decelerate to target speed
-        if (currentHorizontalSpeed < targetSpeed - speedOffset ||
-            currentHorizontalSpeed > targetSpeed + speedOffset)
+        if (currentHorizontalSpeed < targetSpeed - speedOffset || currentHorizontalSpeed > targetSpeed + speedOffset)
         {
-            // creates curved result rather than a linear one giving a more organic speed change
-            // note T in Lerp is clamped, so we don't need to clamp our speed
-            _speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed * inputMagnitude,
-                Time.deltaTime * SpeedChangeRate);
-
-            // round speed to 3 decimal places
-            _speed = Mathf.Round(_speed * 1000f) / 1000f;
+            _speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed, Time.deltaTime * SpeedChangeRate);
+            _speed = Mathf.Round(_speed * 1000f) / 1000f; // optional rounding for cleaner value
         }
         else
         {
             _speed = targetSpeed;
         }
 
-        _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * SpeedChangeRate);
-        if (_animationBlend < 0.01f) _animationBlend = 0f;
-
-        // normalise input direction
+        // 3️⃣ Calculate input direction:
         Vector3 inputDirection = new Vector3(_input.move.x, 0.0f, _input.move.y).normalized;
 
-
-        // note: Vector2's != operator uses approximation so is not floating point error prone, and is cheaper than magnitude
-        // if there is a move input rotate player when the player is moving
-
-        //if (WeaponManager.Instance != null && WeaponManager.Instance.IsAiming)
-        //{
-        //    // 👇 Directly face camera forward
-        //    float cameraY = _mainCamera.transform.eulerAngles.y ;
-        //    float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, cameraY, ref _rotationVelocity, RotationSmoothTime);
-        //    transform.rotation = Quaternion.Euler(5.0f, rotation, 0.0f);
-        //}
-
+        // 4️⃣ Handle rotation:
         if (_input.move != Vector2.zero)
         {
-            // Different handling depending on whether locked onto an enemy or not
-            Vector3 targetDirection;
-
-            // rotate to face input direction relative to camera position         
             if (lockOnToEnemy && enemyTarget != null)
             {
-                // When locked on to an enemy, ALWAYS face the enemy regardless of movement direction
                 Vector3 lookDirection = enemyTarget.position - transform.position;
-                lookDirection.y = 0f; // Ignore vertical difference
+                lookDirection.y = 0f;
                 Quaternion targetRotation = Quaternion.LookRotation(lookDirection);
                 transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10f);
-
-                // Create a movement direction that's perpendicular to the look direction when moving left/right
-                Vector3 forward = transform.forward;    // Points at the enemy since we've rotated to face them
-                Vector3 right = transform.right;        // Perpendicular to forward (strafe direction)
-
-                // Combine the inputs to create a movement vector relative to where the player is facing
-                // For standard Unity input settings:
-                // x = horizontal = left/right
-                // y = vertical = forward/back
-                targetDirection = right * _input.move.x + forward * _input.move.y;
-
-                // Normalize the direction to ensure consistent speed in all directions
-                if (targetDirection.magnitude > 0.1f)
-                {
-                    targetDirection.Normalize();
-                }
             }
             else
             {
-                // Normal movement (not locked on)
-                _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg +
-                                  _mainCamera.transform.eulerAngles.y;
-                float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity,
-                    RotationSmoothTime);
+                _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg + _mainCamera.transform.eulerAngles.y;
+                float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity, RotationSmoothTime);
 
                 if (_rotateOnMove)
                 {
                     transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
                 }
-
-                // Move in the direction we're facing
-                targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
             }
+        }
 
-            // Apply gravity
-            if (Grounded)
-            {
-                // reset the fall timeout timer
-                _fallTimeoutDelta = FallTimeout;
+        // 5️⃣ Calculate final movement direction:
+        Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
 
-                // update animator if using character
-                if (_hasAnimator)
-                {
-                    _animator.SetBool(_animIDJump, false);
-                    _animator.SetBool(_animIDFreeFall, false);
-                }
+        // 6️⃣ Handle vertical movement (gravity):
+        if (Grounded)
+        {
+            _fallTimeoutDelta = FallTimeout;
 
-                // stop our velocity dropping infinitely when grounded
-                if (_verticalVelocity < 0.0f)
-                {
-                    _verticalVelocity = -2f;
-                }
-            }
-            else
-            {
-                // fall timeout
-                if (_fallTimeoutDelta >= 0.0f)
-                {
-                    _fallTimeoutDelta -= Time.deltaTime;
-                }
-                else
-                {
-                    // update animator if using character
-                    if (_hasAnimator)
-                    {
-                        _animator.SetBool(_animIDFreeFall, true);
-                    }
-                }
-            }
+            if (_verticalVelocity < 0.0f) _verticalVelocity = -2f;
 
-            // apply gravity over time if under terminal (multiply by delta time twice to linearly speed up over time)
-            if (_verticalVelocity < _terminalVelocity)
-            {
-                _verticalVelocity += Gravity * Time.deltaTime;
-            }
-
-            // move the player
-            _controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) +
-                             new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
-
-            // update animator if using character
             if (_hasAnimator)
             {
-                _animator.SetFloat(_animIDSpeed, _animationBlend);
-                _animator.SetFloat(_animIDMotionSpeed, inputMagnitude);
+                _animator.SetBool(_animIDJump, false);
+                _animator.SetBool(_animIDFreeFall, false);
             }
         }
         else
         {
-            // Handle vertical movement/gravity when not moving horizontally
-            if (Grounded)
-            {
-                if (_verticalVelocity < 0.0f)
-                {
-                    _verticalVelocity = -2f;
-                }
-            }
-            else
-            {
-                if (_verticalVelocity < _terminalVelocity)
-                {
-                    _verticalVelocity += Gravity * Time.deltaTime;
-                }
+            if (_fallTimeoutDelta >= 0.0f)
+                _fallTimeoutDelta -= Time.deltaTime;
+            else if (_hasAnimator)
+                _animator.SetBool(_animIDFreeFall, true);
 
-                // Only apply vertical velocity when not moving horizontally
-                _controller.Move(new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
-            }
+            if (_verticalVelocity < _terminalVelocity)
+                _verticalVelocity += Gravity * Time.deltaTime;
+        }
 
-            // Update animator
-            if (_hasAnimator)
-            {
-                _animator.SetFloat(_animIDSpeed, 0);
-                _animator.SetFloat(_animIDMotionSpeed, 1);
-            }
+        // 7️⃣ Apply movement:
+        Vector3 move = targetDirection.normalized * (_speed * Time.deltaTime) +
+                       Vector3.up * _verticalVelocity * Time.deltaTime;
+
+        _controller.Move(move);
+
+        // 8️⃣ Update Animator (CLEAN):
+        // 👉 Use Animator built-in damp time — no need for extra _animationBlend
+        if (_hasAnimator)
+        {
+            _animator.SetFloat(_animIDSpeed, _speed, 0.1f, Time.deltaTime); // << smooth blend tree
+            _animator.SetFloat(_animIDMotionSpeed, _input.analogMovement ? _input.move.magnitude : 1f);
         }
     }
+
 
 
     private static float ClampAngle(float lfAngle, float lfMin, float lfMax)

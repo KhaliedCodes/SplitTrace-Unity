@@ -298,9 +298,9 @@ GameObject:
   - component: {fileID: 6648087148467906208}
   - component: {fileID: 6986735462272102564}
   - component: {fileID: 8273865880884753458}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Soutgun
-  m_TagString: Untagged
+  m_TagString: Weapon
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -313,7 +313,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8501050441265758193}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.6643582, y: -0.42147645, z: 0.40285048, w: 0.46765077}
+  m_LocalRotation: {x: -0.6643587, y: -0.42147553, z: 0.40285254, w: 0.4676493}
   m_LocalPosition: {x: 3.403, y: 3.531, z: -1.592}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -336,7 +336,7 @@ MonoBehaviour:
   weaponName: shotgun
   isEquipped: 0
   weaponType: 1
-  weaponIcon: {fileID: 0}
+  weaponIcon: {fileID: 21300000, guid: 37138bdf7482d76449a2e6f50ec354d1, type: 3}
   damage: 10
   ammoInMagazine: 30
   totalAmmo: 120

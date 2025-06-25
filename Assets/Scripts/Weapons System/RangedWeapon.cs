@@ -73,10 +73,16 @@ public class RangedWeapon : Weapon
         if (totalAmmo > 0)
         {
             int ammoNeeded = magazineCapacity - ammoInMagazine;
+            if (ammoNeeded > 0)
+            {
+                AudioManager.Instance.PlayAudioClip("Weapons", "reload", false);
+                Debug.Log("Reloaded! Ammo in magazine: ");
+            }
             if (totalAmmo >= ammoNeeded)
             {
                 ammoInMagazine += ammoNeeded;
                 totalAmmo -= ammoNeeded;
+              
             }
             else
             {
