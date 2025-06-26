@@ -59,6 +59,21 @@ public class PlayerController : MonoBehaviour
             UpdateCurrentInteractable();
         }
     }
+    private void OnTriggerStay(Collider other)
+    {
+         // Only process if this is coming from our interaction collider
+        if (interactionCollider == null || other.bounds.Intersects(interactionCollider.bounds) == false)
+            return;
+
+        if (((1 << other.gameObject.layer) & interactionLayer) == 0) return;
+
+        NPCController npc = other.GetComponent<NPCController>();
+        if (npc != null && !nearbyNPCs.Contains(npc))
+        {
+            nearbyNPCs.Add(npc);
+            UpdateCurrentInteractable();
+        }
+    }
 
     private void OnTriggerExit(Collider other)
     {
