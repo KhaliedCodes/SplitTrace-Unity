@@ -60,9 +60,10 @@ enum EnemyType
         public int _currentWaypointIndex = 0;
         public bool _isProvoked = false;
 
+  
 
     // Private Vars
-        private float _lastAttackTime;
+    private float _lastAttackTime;
         private float _lastScreamTime;
         private bool _hasScreamed;
         private IEnemyStates _currentState;
@@ -73,7 +74,10 @@ enum EnemyType
         private bool _playerInAttackRange;
         private Vector3 _lastKnownPlayerPosition;
 
-        private void Awake()
+    [SerializeField] private float fieldOfViewAngle = 90f;
+    [SerializeField] float RayCastY;
+
+    private void Awake()
         {
             _detectionChecker = GetComponentInChildren<DetectionChecker>();
             _attackChecker = GetComponentInChildren<StartAttackChecker>();
@@ -109,7 +113,7 @@ enum EnemyType
                 // Handle scream logic for stun enemies
                 if (enemyType == EnemyType.Stun)
                 {
-                    if (!_hasScreamed && IsPlayerInDetectionRange && CanScream()&&HasLineOfSight())
+                    if (!_hasScreamed && IsPlayerInDetectionRange && CanScream() && HasLineOfSight())
                     {
                         ChangeState(new PrepScreamState());
                         _hasScreamed = true;
@@ -140,25 +144,51 @@ enum EnemyType
             _currentState?.EnterState(this);
         }
 
-        public bool HasLineOfSight()
+    //public bool HasLineOfSight()
+    //{
+    //    if (Player == null) return false;
+
+    //    Vector3 direction = (Player.transform.position - transform.position).normalized;
+    //    float distance = Vector3.Distance(transform.position, Player.transform.position);
+
+    //    if (Physics.Raycast(transform.position + Vector3.up * 1.5f, direction, out RaycastHit hit, distance))
+    //    {
+    //        if (hit.collider.CompareTag("Player"))
+    //        {
+    //            _lastKnownPlayerPosition = Player.transform.position;
+    //            return true;
+    //        }
+    //    }
+
+    //    return false;
+    //}
+
+    public bool HasLineOfSight()
+    {
+
+        if (!player) return false;
+
+        Vector3 origin = transform.position + Vector3.up * RayCastY;
+        Vector3 direction = (player.transform.position + new Vector3(0, 1, 0) - origin).normalized;
+        float distance = Vector3.Distance(origin, player.transform.position);
+
+        float angle = Vector3.Angle(transform.forward, direction);
+        if (angle > fieldOfViewAngle * 0.5f) return false;
+
+        if (Physics.Raycast(origin, direction, out RaycastHit hit, distance))
         {
-            if (Player == null) return false;
-
-            Vector3 direction = (Player.transform.position - transform.position).normalized;
-            float distance = Vector3.Distance(transform.position, Player.transform.position);
-
-            if (Physics.Raycast(transform.position + Vector3.up * 1.5f, direction, out RaycastHit hit, distance))
+            if (hit.collider.gameObject == player)
             {
-            if (hit.collider.CompareTag("Player"))
-            {
-                _lastKnownPlayerPosition = Player.transform.position;
+                _lastKnownPlayerPosition = player.transform.position;
                 return true;
-                }
             }
-            return false;
         }
 
-        public bool CanAttack() => Time.time > _lastAttackTime + attackCooldown;
+        return false;
+    }
+
+
+    public bool CanAttack() => Time.time > _lastAttackTime + attackCooldown;
         public bool CanScream() => Time.time > _lastScreamTime + ScreamCooldown;
         public void StartScreamAfterDelay(float delay)
         {
