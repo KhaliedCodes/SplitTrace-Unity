@@ -17,7 +17,7 @@ public class PlayerHealth : MonoBehaviour, IDamagable
     public int _HealthItemsAmount { get => HealthItemsAmount;}
     public float MaxHealth { get => maxHealth; set => maxHealth = value; }
 
-    bool isDead = false;
+     bool isDead = false;
     private void Start()
     {
         Health = maxHealth;
@@ -57,6 +57,8 @@ public class PlayerHealth : MonoBehaviour, IDamagable
 
         WeaponManager.Instance.animator.SetTrigger("Die");
         StartCoroutine(LoadManinMenu());
+        GetComponent<CharacterController>().enabled = false;
+        GetComponent<SphereCollider>().enabled = false;
     }
 
     public void UpdateNumberOfHealthItem(int i)

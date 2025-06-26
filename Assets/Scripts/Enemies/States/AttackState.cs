@@ -72,7 +72,6 @@ public class AttackState : IEnemyStates
             }
         }
 
-
     }
 
     public void ExitState(IEnemy enemy)

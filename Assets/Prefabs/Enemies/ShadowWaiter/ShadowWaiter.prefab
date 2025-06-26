@@ -895,7 +895,7 @@ GameObject:
   - component: {fileID: 5090852130188721992}
   m_Layer: 0
   m_Name: fabric
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1342,9 +1342,9 @@ GameObject:
   - component: {fileID: 1639781086774661712}
   - component: {fileID: 4117823657478961206}
   - component: {fileID: 324276697622320162}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: AttackColliderChecker
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1475,7 +1475,7 @@ GameObject:
   - component: {fileID: 7986492567049054032}
   m_Layer: 0
   m_Name: PlateAnimPoints
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2047,7 +2047,7 @@ GameObject:
   - component: {fileID: 2432924964499740702}
   m_Layer: 0
   m_Name: skin
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2551,9 +2551,9 @@ GameObject:
   - component: {fileID: 3276763098585634649}
   - component: {fileID: 162538114832506719}
   - component: {fileID: 227362914267036351}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: DetectionCollider
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2778,7 +2778,7 @@ GameObject:
   - component: {fileID: 6005131882263826173}
   m_Layer: 0
   m_Name: GunPoint
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2810,7 +2810,7 @@ GameObject:
   - component: {fileID: 7623521451450593653}
   m_Layer: 0
   m_Name: eye
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3931,7 +3931,7 @@ GameObject:
   - component: {fileID: 1883291795224191405}
   m_Layer: 0
   m_Name: root
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4309,7 +4309,7 @@ GameObject:
   - component: {fileID: 1140505262198815316}
   m_Layer: 0
   m_Name: iris
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4530,7 +4530,7 @@ GameObject:
   - component: {fileID: 407047180216600151}
   m_Layer: 0
   m_Name: Accessories
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4718,6 +4718,10 @@ PrefabInstance:
     - target: {fileID: 5191577731178325697, guid: 133f8070a14815b4eb24c88055f81f8b, type: 3}
       propertyPath: m_Name
       value: pCylinder10
+      objectReference: {fileID: 0}
+    - target: {fileID: 5191577731178325697, guid: 133f8070a14815b4eb24c88055f81f8b, type: 3}
+      propertyPath: m_TagString
+      value: Enemy
       objectReference: {fileID: 0}
     - target: {fileID: 8598142096242334955, guid: 133f8070a14815b4eb24c88055f81f8b, type: 3}
       propertyPath: m_RootBone

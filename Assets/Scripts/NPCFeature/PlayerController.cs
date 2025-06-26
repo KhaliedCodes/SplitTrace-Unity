@@ -40,6 +40,7 @@ public class PlayerController : MonoBehaviour
         interactionCollider.radius = interactionRadius;
         interactionCollider.isTrigger = true;
         interactionCollider.center = Vector3.up * 0.5f;
+        interactionCollider.includeLayers = LayerMask.GetMask("Ignore Raycast");
 
 
         interactionPrompt?.SetActive(false);
