@@ -9,6 +9,9 @@ public class Stairs : MonoBehaviour
         {
             switch (LevelIndex)
             {
+                case 0:
+                    GameSceneManager.Instance.LoadMainMenu();
+                    break;
 
                 case 2:
                     GameSceneManager.Instance.LoadLobby();

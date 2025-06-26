@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.UI;
 using TMPro;
+using System.Collections;
 
 public class MurderMysteryManager : MonoBehaviour
 {
@@ -187,7 +188,7 @@ public class MurderMysteryManager : MonoBehaviour
         
         // Show UI and setup interaction
         killerSelectionUI.SetActive(true);
-        Time.timeScale = 0f; // Pause the game
+        // Time.timeScale = 0f; // Pause the game
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
         
@@ -218,11 +219,14 @@ public class MurderMysteryManager : MonoBehaviour
         if (congratulationsPanel != null)
         {
             congratulationsPanel.SetActive(true);
-            
-            UnityEngine.UI.Text congratsText = congratulationsPanel.GetComponentInChildren<UnityEngine.UI.Text>();
+            // Invoke(nameof(GoBackToMainMenu), 3f);
+            StartCoroutine(GoBackToMainMenu());
+            TextMeshPro congratsText = congratulationsPanel.GetComponentInChildren<TextMeshPro>();
             if (congratsText != null)
             {
                 congratsText.text = $"Congratulations! You correctly identified {killerNPC.NPCName} as the killer!";
+                // StartCoroutine(GoBackToMainMenu());
+                
             }
         }
     }
@@ -232,24 +236,35 @@ public class MurderMysteryManager : MonoBehaviour
         if (wrongChoicePanel != null)
         {
             wrongChoicePanel.SetActive(true);
-            
-            UnityEngine.UI.Text wrongText = wrongChoicePanel.GetComponentInChildren<UnityEngine.UI.Text>();
+            // Invoke(nameof(GoBackToMainMenu), 3f);
+            StartCoroutine(GoBackToMainMenu());
+            TextMeshPro wrongText = wrongChoicePanel.GetComponentInChildren<TextMeshPro>();
             if (wrongText != null)
             {
                 wrongText.text = $"Wrong choice! {selectedNPC.NPCName} was not the killer. The real killer was {killerNPC.NPCName}.";
+                
+                 // Go back to main menu after 3 seconds
             }
         }
+    }
+
+
+    IEnumerator GoBackToMainMenu()
+    {
+        AudioManager.Instance.PlayAudioClip("Music", "loss");
+        yield return new WaitForSeconds(4f); // Wait for 3 seconds before going back to main menu
+        GameSceneManager.Instance.LoadMainMenu();
     }
     
     public void CloseResultPanel()
     {
         Time.timeScale = 1f;
-        
+
         if (congratulationsPanel != null)
             congratulationsPanel.SetActive(false);
         if (wrongChoicePanel != null)
             wrongChoicePanel.SetActive(false);
-            
+
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
