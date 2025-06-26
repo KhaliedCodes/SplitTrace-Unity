@@ -17,13 +17,10 @@ public class PresentationDoors : MonoBehaviour
 
     private void Update()
     {
-        // Either the physical Return/Enter key …
         bool pressedReturnKey = Input.GetKeyDown(KeyCode.Return);
 
-        // … or Unity’s default “Submit” button (mapped to Return/Enter & game-pad A, etc.).
-        bool pressedSubmit = Input.GetButtonDown("Submit");
 
-        if (!hasOpened && (pressedReturnKey || pressedSubmit))
+        if (!hasOpened && (pressedReturnKey))
         {
             doorLeftAnimator.enabled = true;
             doorRightAnimator.enabled = true;
