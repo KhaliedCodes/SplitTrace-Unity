@@ -52,11 +52,22 @@ PrefabInstance:
       propertyPath: m_Name
       value: ShooterEnemy (2) Variant
       objectReference: {fileID: 0}
+    - target: {fileID: 3163862257307173138, guid: f36fce48bf5d6e5458849ba2dda02641, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4499131191906359777, guid: f36fce48bf5d6e5458849ba2dda02641, type: 3}
+      propertyPath: geminiAPI
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 6039440768737448024, guid: f36fce48bf5d6e5458849ba2dda02641, type: 3}
       propertyPath: m_Avatar
       value: 
       objectReference: {fileID: 9000000, guid: 5f3f642ab6d721f4392cfd14da953b52, type: 3}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 2039792481069085059, guid: f36fce48bf5d6e5458849ba2dda02641, type: 3}
+    - {fileID: 7704507327847270773, guid: f36fce48bf5d6e5458849ba2dda02641, type: 3}
+    - {fileID: 6873880707583346998, guid: f36fce48bf5d6e5458849ba2dda02641, type: 3}
     m_RemovedGameObjects:
     - {fileID: 4749539580792157436, guid: f36fce48bf5d6e5458849ba2dda02641, type: 3}
     - {fileID: 2745767359454382047, guid: f36fce48bf5d6e5458849ba2dda02641, type: 3}

@@ -15,6 +15,9 @@ public class PlayerController : MonoBehaviour
     private CharacterController characterController;
     private CustomThridPersonController thirdPersonController;
     private CustomStarterAssetsInputs starterAssetsInputs;
+    private WeaponManager weaponManager;
+    
+
     private PlayerInput playerInput;
     private SphereCollider interactionCollider;
     
@@ -30,6 +33,7 @@ public class PlayerController : MonoBehaviour
         characterController = GetComponent<CharacterController>();
         thirdPersonController = GetComponent<CustomThridPersonController>();
         starterAssetsInputs = GetComponent<CustomStarterAssetsInputs>();
+        weaponManager = GetComponent<WeaponManager>();
         playerInput = GetComponent<PlayerInput>();
         
         interactionCollider = gameObject.AddComponent<SphereCollider>();
@@ -187,15 +191,16 @@ public class PlayerController : MonoBehaviour
         thirdPersonController.enabled = false;
         starterAssetsInputs.enabled = false;
         playerInput.enabled = false;
+        weaponManager.weaponInputs.Disable();
     }
 
     public void EnableControls()
     {
         thirdPersonController.enabled = true;
         starterAssetsInputs.enabled = true;
+        weaponManager.weaponInputs.Enable();
         playerInput.enabled = true;
         isInDialogue = false;
-        
         // Refresh interactable after dialogue ends
         UpdateCurrentInteractable();
     }
