@@ -1132,6 +1132,42 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: -12.433
       objectReference: {fileID: 0}
+    - target: {fileID: 6994029636348667754, guid: 530a7987444f38d4289a1d9e4f2aa51b, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6994029636348667754, guid: 530a7987444f38d4289a1d9e4f2aa51b, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6994029636348667754, guid: 530a7987444f38d4289a1d9e4f2aa51b, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -9.763
+      objectReference: {fileID: 0}
+    - target: {fileID: 6994029636348667754, guid: 530a7987444f38d4289a1d9e4f2aa51b, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6994029636348667754, guid: 530a7987444f38d4289a1d9e4f2aa51b, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6994029636348667754, guid: 530a7987444f38d4289a1d9e4f2aa51b, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8379144803337153838, guid: 530a7987444f38d4289a1d9e4f2aa51b, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8379144803337153838, guid: 530a7987444f38d4289a1d9e4f2aa51b, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8379144803337153838, guid: 530a7987444f38d4289a1d9e4f2aa51b, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2083,6 +2119,58 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 863455554}
     m_Modifications:
+    - target: {fileID: 3907320226847084612, guid: 29330c0d8f0a42e4e9ee84d3bc833ddf, type: 3}
+      propertyPath: player
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3907320226847084612, guid: 29330c0d8f0a42e4e9ee84d3bc833ddf, type: 3}
+      propertyPath: CanStun
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3907320226847084612, guid: 29330c0d8f0a42e4e9ee84d3bc833ddf, type: 3}
+      propertyPath: RayCastY
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3907320226847084612, guid: 29330c0d8f0a42e4e9ee84d3bc833ddf, type: 3}
+      propertyPath: RayCastStart
+      value: 
+      objectReference: {fileID: 748085067}
+    - target: {fileID: 3907320226847084612, guid: 29330c0d8f0a42e4e9ee84d3bc833ddf, type: 3}
+      propertyPath: stunCooldown
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 3907320226847084612, guid: 29330c0d8f0a42e4e9ee84d3bc833ddf, type: 3}
+      propertyPath: attackCooldown
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3907320226847084612, guid: 29330c0d8f0a42e4e9ee84d3bc833ddf, type: 3}
+      propertyPath: detectionRange
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 3907320226847084612, guid: 29330c0d8f0a42e4e9ee84d3bc833ddf, type: 3}
+      propertyPath: projectilePrefab
+      value: 
+      objectReference: {fileID: 4954223955266911571, guid: 0ee78e782619af24ebe8546ea38f1908, type: 3}
+    - target: {fileID: 3907320226847084612, guid: 29330c0d8f0a42e4e9ee84d3bc833ddf, type: 3}
+      propertyPath: StunprojectilePrefab
+      value: 
+      objectReference: {fileID: 4954223955266911571, guid: c171b83b161650f4785fb5a33c6d790e, type: 3}
+    - target: {fileID: 3907320226847084612, guid: 29330c0d8f0a42e4e9ee84d3bc833ddf, type: 3}
+      propertyPath: 'waypoints.Array.data[0]'
+      value: 
+      objectReference: {fileID: 1915122865}
+    - target: {fileID: 3907320226847084612, guid: 29330c0d8f0a42e4e9ee84d3bc833ddf, type: 3}
+      propertyPath: 'waypoints.Array.data[1]'
+      value: 
+      objectReference: {fileID: 1341917008}
+    - target: {fileID: 3907320226847084612, guid: 29330c0d8f0a42e4e9ee84d3bc833ddf, type: 3}
+      propertyPath: 'waypoints.Array.data[2]'
+      value: 
+      objectReference: {fileID: 405248309}
+    - target: {fileID: 3907320226847084612, guid: 29330c0d8f0a42e4e9ee84d3bc833ddf, type: 3}
+      propertyPath: 'waypoints.Array.data[3]'
+      value: 
+      objectReference: {fileID: 1474374160}
     - target: {fileID: -8679921383154817045, guid: 628c0c98c8dd93446aad5ef82f5d8d24, type: 3}
       propertyPath: m_LocalPosition.x
       value: -13.2
@@ -2143,58 +2231,6 @@ PrefabInstance:
       propertyPath: m_Controller
       value: 
       objectReference: {fileID: 9100000, guid: fb7c9a2e5987dfd449e716414fe354e2, type: 2}
-    - target: {fileID: 3907320226847084612, guid: 29330c0d8f0a42e4e9ee84d3bc833ddf, type: 3}
-      propertyPath: player
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 3907320226847084612, guid: 29330c0d8f0a42e4e9ee84d3bc833ddf, type: 3}
-      propertyPath: CanStun
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3907320226847084612, guid: 29330c0d8f0a42e4e9ee84d3bc833ddf, type: 3}
-      propertyPath: RayCastY
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3907320226847084612, guid: 29330c0d8f0a42e4e9ee84d3bc833ddf, type: 3}
-      propertyPath: RayCastStart
-      value: 
-      objectReference: {fileID: 748085067}
-    - target: {fileID: 3907320226847084612, guid: 29330c0d8f0a42e4e9ee84d3bc833ddf, type: 3}
-      propertyPath: stunCooldown
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 3907320226847084612, guid: 29330c0d8f0a42e4e9ee84d3bc833ddf, type: 3}
-      propertyPath: attackCooldown
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3907320226847084612, guid: 29330c0d8f0a42e4e9ee84d3bc833ddf, type: 3}
-      propertyPath: detectionRange
-      value: 20
-      objectReference: {fileID: 0}
-    - target: {fileID: 3907320226847084612, guid: 29330c0d8f0a42e4e9ee84d3bc833ddf, type: 3}
-      propertyPath: projectilePrefab
-      value: 
-      objectReference: {fileID: 4954223955266911571, guid: 0ee78e782619af24ebe8546ea38f1908, type: 3}
-    - target: {fileID: 3907320226847084612, guid: 29330c0d8f0a42e4e9ee84d3bc833ddf, type: 3}
-      propertyPath: StunprojectilePrefab
-      value: 
-      objectReference: {fileID: 4954223955266911571, guid: c171b83b161650f4785fb5a33c6d790e, type: 3}
-    - target: {fileID: 3907320226847084612, guid: 29330c0d8f0a42e4e9ee84d3bc833ddf, type: 3}
-      propertyPath: 'waypoints.Array.data[0]'
-      value: 
-      objectReference: {fileID: 1915122865}
-    - target: {fileID: 3907320226847084612, guid: 29330c0d8f0a42e4e9ee84d3bc833ddf, type: 3}
-      propertyPath: 'waypoints.Array.data[1]'
-      value: 
-      objectReference: {fileID: 1341917008}
-    - target: {fileID: 3907320226847084612, guid: 29330c0d8f0a42e4e9ee84d3bc833ddf, type: 3}
-      propertyPath: 'waypoints.Array.data[2]'
-      value: 
-      objectReference: {fileID: 405248309}
-    - target: {fileID: 3907320226847084612, guid: 29330c0d8f0a42e4e9ee84d3bc833ddf, type: 3}
-      propertyPath: 'waypoints.Array.data[3]'
-      value: 
-      objectReference: {fileID: 1474374160}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -3402,6 +3438,11 @@ MonoBehaviour:
   tutorialPanel: {fileID: 1270340182}
   tutorialText: {fileID: 1270340181}
   TutCollider: {fileID: 1270340180}
+  pauseMenuPanel: {fileID: 0}
+  CollectPanel: {fileID: 0}
+  _healthBar: {fileID: 0}
+  _healthCount: {fileID: 0}
+  CamBrain: {fileID: 0}
 --- !u!1 &705304007
 GameObject:
   m_ObjectHideFlags: 0

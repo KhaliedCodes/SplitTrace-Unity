@@ -131,6 +131,7 @@ public class UiManager : MonoBehaviour
     }
     public void BackToMainMenu()
     {
+        Time.timeScale = 1f;
         SceneManager.LoadScene("MainMenuGold");
     }
     public void ExitGame()

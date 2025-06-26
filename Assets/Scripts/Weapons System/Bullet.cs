@@ -28,7 +28,6 @@ public class Bullet : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log("the name is : " + other.name);
         if (other.tag == "Enemy")
         {
 
