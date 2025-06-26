@@ -938,7 +938,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -3890470340091513358, guid: 0d956f491d0228e4290d76181206319b, type: 3}
+  - {fileID: 2100000, guid: 46efd5547130cbf4699b211ad1181e2d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2090,7 +2090,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -3739014210693375924, guid: 0d956f491d0228e4290d76181206319b, type: 3}
+  - {fileID: 2100000, guid: 1d241efd3f2921745957d5af398cc3d9, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2853,7 +2853,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -1172255487589523207, guid: 0d956f491d0228e4290d76181206319b, type: 3}
+  - {fileID: 2100000, guid: 7b0d99ad980550a4b8eafa072b3b644c, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -4352,7 +4352,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 8310441862476122749, guid: 0d956f491d0228e4290d76181206319b, type: 3}
+  - {fileID: 2100000, guid: 9f75887a4a6979c4c8b845b675b13485, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -4573,7 +4573,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -4597337278086412078, guid: 0d956f491d0228e4290d76181206319b, type: 3}
+  - {fileID: 2100000, guid: 76d4a358cd0f36f4ca4c1daa9eb99387, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -5123,6 +5123,10 @@ PrefabInstance:
       propertyPath: 'm_Bones.Array.data[99]'
       value: 
       objectReference: {fileID: 3676396741867796578}
+    - target: {fileID: 8598142096242334955, guid: 133f8070a14815b4eb24c88055f81f8b, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 1831732e35269924f96bae7aabaf0828, type: 2}
     - target: {fileID: 9075130885744134320, guid: 133f8070a14815b4eb24c88055f81f8b, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0
