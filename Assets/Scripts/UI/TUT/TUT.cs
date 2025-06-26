@@ -66,7 +66,6 @@ public class TUT : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log("OnTriggerEnter: " + other.name); 
         if (other.CompareTag ("Enemy") )
         {
             OnTutorialStart("Enemy");

@@ -255,8 +255,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2042ece693777d2488e6e9e6a92e8ee9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tutorialPanel: {fileID: 1121082052}
-  tutorialText: {fileID: 1054468423}
+  tutorialPanel: {fileID: 0}
+  tutorialText: {fileID: 0}
   TutCollider: {fileID: 1413672507}
   pauseMenuPanel: {fileID: 1735515232}
   CollectPanel: {fileID: 884221252}
@@ -524,6 +524,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 247132061}
+  - component: {fileID: 247132062}
   m_Layer: 0
   m_Name: Managers
   m_TagString: Untagged
@@ -549,6 +550,19 @@ Transform:
   - {fileID: 832335938}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &247132062
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 247132060}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8d6609b9e7a0c149938d09ce0ecb0b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MusicName: lvl1
 --- !u!1 &257827388
 GameObject:
   m_ObjectHideFlags: 0
@@ -3542,7 +3556,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1043598271975919768, guid: f36fce48bf5d6e5458849ba2dda02641, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3215754788677322305, guid: f36fce48bf5d6e5458849ba2dda02641, type: 3}
       propertyPath: m_Layer
@@ -5359,8 +5373,12 @@ PrefabInstance:
       value: 2147483647
       objectReference: {fileID: 0}
     - target: {fileID: 2480901993368958250, guid: 0ce4684699d378a40ac10081f737ff75, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2480901993368958250, guid: 0ce4684699d378a40ac10081f737ff75, type: 3}
       propertyPath: m_StaticEditorFlags
-      value: 2147483647
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2488089021510542315, guid: 0ce4684699d378a40ac10081f737ff75, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
@@ -7050,6 +7068,10 @@ PrefabInstance:
       propertyPath: m_StaticEditorFlags
       value: 2147483647
       objectReference: {fileID: 0}
+    - target: {fileID: 6413679555971884382, guid: 0ce4684699d378a40ac10081f737ff75, type: 3}
+      propertyPath: m_IncludeLayers.m_Bits
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 6451544855293858580, guid: 0ce4684699d378a40ac10081f737ff75, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 2147483647
@@ -8396,3 +8418,4 @@ SceneRoots:
   - {fileID: 1545119593}
   - {fileID: 919174835}
   - {fileID: 839327464}
+  - {fileID: 1905693828}
