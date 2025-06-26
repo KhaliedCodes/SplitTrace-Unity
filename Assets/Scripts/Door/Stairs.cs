@@ -2,12 +2,24 @@ using UnityEngine;
 
 public class Stairs : MonoBehaviour
 {
-
+    [SerializeField] private int LevelIndex;
     void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
-            GameSceneManager.Instance.LoadLobby();
+            switch (LevelIndex)
+            {
+
+                case 2:
+                    GameSceneManager.Instance.LoadLobby();
+                    break;
+
+                case (3):
+
+                    GameSceneManager.Instance.Load3rdLevel();
+                    break;
+                
+            }
         }
     }
 }

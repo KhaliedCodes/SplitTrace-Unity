@@ -27,6 +27,13 @@ public class GameSceneManager : MonoBehaviour
         UnityEngine.SceneManagement.SceneManager.LoadScene(0);
         Time.timeScale = 1f; // Reset time scale to normal
     }
+
+    public void Load3rdLevel()
+    {
+        // Load the lobby scene
+        UnityEngine.SceneManagement.SceneManager.LoadScene(3);
+        Time.timeScale = 1f; // Reset time scale to normal
+    }
     public void Exit()
     {
         // Load the lobby scene
