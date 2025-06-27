@@ -26,6 +26,8 @@ public class PlayerHealth : MonoBehaviour, IDamagable
 
     public void TakeDamage(float damage)
     {
+        DamageScreenUI.Instance.ShowDamageEffect();
+        AudioManager.Instance.PlayAudioClip("Character", "hurt", false);
         Health = Mathf.Max(0, Health - damage);
         UpdateHealthUI();
         if (Health <= 0 && !isDead)

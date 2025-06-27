@@ -92,7 +92,7 @@ public class WeaponManager : MonoBehaviour
         playerAnimations = GetComponent<PlayerAnimations>();
         animator = GetComponent<Animator>();
 
-
+        AudioManager.Instance.PlayOneShotAtPosition("BackgroundMusic", "cool_gazz", new Vector3(0,0,0));
     }
 
     private void Update()
