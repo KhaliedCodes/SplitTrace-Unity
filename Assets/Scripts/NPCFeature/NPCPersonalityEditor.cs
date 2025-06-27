@@ -39,6 +39,10 @@ public class NPCPersonalityEditor : Editor
             personality.intelligence = EditorGUILayout.Slider("Intelligence", personality.intelligence, 0, 1);
             personality.patience = EditorGUILayout.Slider("Patience", personality.patience, 0, 1);
             personality.openness = EditorGUILayout.Slider("Openness", personality.openness, 0, 1);
+            // --- ADDED: Reliability Slider ---
+            personality.reliability = EditorGUILayout.Slider("Reliability", personality.reliability, 0, 1);
+            EditorGUILayout.HelpBox("How reliable this NPC's information is (0 = unreliable, 1 = perfectly reliable).", MessageType.Info);
+            // ---------------------------------
             EditorGUI.indentLevel--;
         }
 

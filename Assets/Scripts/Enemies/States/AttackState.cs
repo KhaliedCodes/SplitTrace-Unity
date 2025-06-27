@@ -42,7 +42,7 @@ public class AttackState : IEnemyStates
         {
             enemy.NavMeshAgent.isStopped = false;
             enemy.NavMeshAgent.SetDestination(enemy.Player.transform.position); // Chase again
-            enemy.Animator.SetFloat("speed", 1);
+                enemy.Animator.SetFloat("speed", 1);
         }
 
         if (enemy.CanAttack())
@@ -60,7 +60,7 @@ public class AttackState : IEnemyStates
         }
         else
         {
-             enemy.Animator.SetBool("attack", false);
+                enemy.Animator.SetBool("attack", false);
         }
 
         // this is to ensure the enemy stops moving when player in near place according to the NavMesh Stopping Distance
@@ -71,7 +71,6 @@ public class AttackState : IEnemyStates
                 enemy.Animator.SetFloat("speed", 0f);
             }
         }
-
 
     }
 
@@ -84,14 +83,15 @@ public class AttackState : IEnemyStates
         }
         if (enemy is RangedEnemy)
         {
-            enemy.Animator.SetBool("Shoot", false);
+            RangedEnemy rangedEnemy = enemy as RangedEnemy;
+            if (rangedEnemy.enemyRace == EnemyRace.Creature)
+            {
+                enemy.Animator.SetBool("attack", true);
+            }
+            else
+            {
+                enemy.Animator.SetBool("Shoot", false);
+            }
         }
-        //ResetAttackLayerWeight(enemy);
     }
-
-    //private void ResetAttackLayerWeight(IEnemy enemy)
-    //{
-    //    //  enemy.Animator.SetLayerWeight(AttackLayerIndex, 0f);
-   
-    //}
 }

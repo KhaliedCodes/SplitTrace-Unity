@@ -95,7 +95,7 @@ namespace SlimUI.ModernMenu{
 
             if (AudioManager.Instance != null)
             {
-                AudioManager.Instance.PlayAudioClip("MainMenuTheme", "ThemeSong", true);
+                AudioManager.Instance.PlayAudioClip("Music", "MainMenu", true);
             }
         }
 
@@ -276,7 +276,7 @@ namespace SlimUI.ModernMenu{
 
 		// Load Bar synching animation
 		IEnumerator LoadAsynchronously(string sceneName){ // scene name is just the name of the current scene being loaded
-			AsyncOperation operation = SceneManager.LoadSceneAsync(sceneName);
+			AsyncOperation operation = SceneManager.LoadSceneAsync(1);
 			operation.allowSceneActivation = false;
 			mainCanvas.SetActive(false);
 			loadingMenu.SetActive(true);

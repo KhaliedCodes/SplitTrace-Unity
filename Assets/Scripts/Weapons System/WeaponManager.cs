@@ -43,7 +43,7 @@ public class WeaponManager : MonoBehaviour
     private Weapon currentWeapon;
     private RangedWeapon rangedWeapon;
     private MeleeWeapon meleeWeapon;
-    private WeaponsInputSystem weaponInputs;
+    public WeaponsInputSystem weaponInputs;     // made it public for easier access in other scripts
     private PlayerAnimations playerAnimations;
 
      public Animator animator;
