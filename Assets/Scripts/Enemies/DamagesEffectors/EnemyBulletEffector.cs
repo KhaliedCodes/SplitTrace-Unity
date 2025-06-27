@@ -14,7 +14,7 @@ public class EnemyBulletEffector : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log($"Bullet hit: {other.gameObject.name}");
+     //   Debug.Log($"Bullet hit: {other.gameObject.name}");
 
         if (other.CompareTag("Player"))
         {

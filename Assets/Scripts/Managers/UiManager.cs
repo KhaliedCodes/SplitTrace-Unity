@@ -94,7 +94,7 @@ public class UiManager : MonoBehaviour
     [ContextMenu("Reset Tutorial Flags")]
     public void ResetTutorials()
     {
-        Debug.Log("Prefs Reset");
+      //  Debug.Log("Prefs Reset");
         PlayerPrefs.DeleteAll();
         PlayerPrefs.Save();
     }

@@ -30,7 +30,7 @@ public class GeminiAccessor : MonoBehaviour
         if (StoryContextHolder.Instance != null)
         {
             storyContext = StoryContextHolder.Instance.GetStoryContext();
-            Debug.Log($"GeminiAccessor on {gameObject.name} got story context from StoryContextHolder");
+          //  Debug.Log($"GeminiAccessor on {gameObject.name} got story context from StoryContextHolder");
         }
         else
         {
@@ -38,7 +38,7 @@ public class GeminiAccessor : MonoBehaviour
             if (contextHolder != null)
             {
                 storyContext = contextHolder.GetStoryContext();
-                Debug.Log($"GeminiAccessor on {gameObject.name} found StoryContextHolder in scene");
+              //  Debug.Log($"GeminiAccessor on {gameObject.name} found StoryContextHolder in scene");
             }
             else
             {
@@ -66,7 +66,7 @@ public class GeminiAccessor : MonoBehaviour
     public void SetStoryContext(StoryContextManager context)
     {
         storyContext = context;
-        Debug.Log($"GeminiAccessor on {gameObject.name} story context updated");
+       // Debug.Log($"GeminiAccessor on {gameObject.name} story context updated");
         
         // Refresh system instructions with new context
         if (npcPersonality != null)
@@ -108,7 +108,7 @@ public class GeminiAccessor : MonoBehaviour
             // Extract potential clue information
             string potentialClue = $"{npcPersonality.npcName} mentioned: {input.Substring(0, Mathf.Min(50, input.Length))}...";
             storyContext.AddClue(potentialClue, "Player");
-            Debug.Log($"Story Update: New clue added from player input");
+          //  Debug.Log($"Story Update: New clue added from player input");
         }
     }
 
@@ -158,7 +158,7 @@ public class GeminiAccessor : MonoBehaviour
                 // Extract potential clue information
                 string potentialClue = $"{npcPersonality.npcName} mentioned: {response.Substring(0, Mathf.Min(50, response.Length))}...";
                 storyContext.AddClue(potentialClue, npcPersonality.npcName, reliability);
-                Debug.Log($"Story Update: New clue added from {npcPersonality.npcName}");
+              //  Debug.Log($"Story Update: New clue added from {npcPersonality.npcName}");
                 break;
             }
         }
@@ -172,7 +172,7 @@ public class GeminiAccessor : MonoBehaviour
                 if (!string.IsNullOrEmpty(potentialSuspect))
                 {
                     storyContext.AddSuspect(potentialSuspect, $"{npcPersonality.npcName} implicated this person");
-                    Debug.Log($"Story Update: New suspect added from {npcPersonality.npcName}");
+                  //  Debug.Log($"Story Update: New suspect added from {npcPersonality.npcName}");
                 }
                 break;
             }
@@ -185,7 +185,7 @@ public class GeminiAccessor : MonoBehaviour
                 // Extract potential event information
                 string potentialEvent = $"{npcPersonality.npcName} mentioned: {response.Substring(0, Mathf.Min(70, response.Length))}...";
                 storyContext.AddKeyEvent(potentialEvent);
-                Debug.Log($"Story Update: New key event added from {npcPersonality.npcName}");
+                //Debug.Log($"Story Update: New key event added from {npcPersonality.npcName}");
                 break;
             }
         }
@@ -229,7 +229,7 @@ public class GeminiAccessor : MonoBehaviour
         }
         catch (Exception e)
         {
-            Debug.LogError($"Choice parsing error: {e.Message}");
+          //  Debug.LogError($"Choice parsing error: {e.Message}");
             OnChoicesReceived?.Invoke(GetDefaultChoices());
         }
     }

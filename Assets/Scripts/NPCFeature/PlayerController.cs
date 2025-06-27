@@ -120,12 +120,12 @@ public class PlayerController : MonoBehaviour
             if (currentInteractable != null)
             {
                 ShowInteractionPrompt(true, currentInteractable.NPCName);
-                Debug.Log($"Current interactable set to: {currentInteractable.NPCName}");
+               // Debug.Log($"Current interactable set to: {currentInteractable.NPCName}");
             }
             else
             {
                 ShowInteractionPrompt(false);
-                Debug.Log("No current interactable");
+                //Debug.Log("No current interactable");
             }
         }
     }
@@ -147,13 +147,13 @@ public class PlayerController : MonoBehaviour
             float distanceToNPC = Vector3.Distance(transform.position, currentInteractable.transform.position);
             if (distanceToNPC <= interactionRadius)
             {
-                Debug.Log($"Starting interaction with: {currentInteractable.NPCName}");
+               // Debug.Log($"Starting interaction with: {currentInteractable.NPCName}");
                 DisableControls();
                 currentInteractable.StartInteraction();
             }
             else
             {
-                Debug.Log($"Too far from {currentInteractable.NPCName} to interact. Distance: {distanceToNPC:F2}, Required: {interactionRadius}");
+               // Debug.Log($"Too far from {currentInteractable.NPCName} to interact. Distance: {distanceToNPC:F2}, Required: {interactionRadius}");
             }
         }
     }
@@ -180,17 +180,17 @@ public class PlayerController : MonoBehaviour
                 if (distance <= interactionRadius)
                 {
                     currentInteractable = interactable;
-                    Debug.Log($"Manually set current interactable to: {interactable.NPCName}");
+                  //  Debug.Log($"Manually set current interactable to: {interactable.NPCName}");
                 }
                 else
                 {
-                    Debug.Log($"Cannot set interactable - {interactable.NPCName} is too far away. Distance: {distance:F2}");
+                  //  Debug.Log($"Cannot set interactable - {interactable.NPCName} is too far away. Distance: {distance:F2}");
                 }
             }
             else
             {
                 currentInteractable = null;
-                Debug.Log("Cleared current interactable");
+            //    Debug.Log("Cleared current interactable");
             }
         }
     }
@@ -202,7 +202,7 @@ public class PlayerController : MonoBehaviour
             currentInteractable = null;
             nearbyNPCs.Clear();
             ShowInteractionPrompt(false);
-            Debug.Log("Cleared current interactable");
+          //  Debug.Log("Cleared current interactable");
         }
     }
 

@@ -50,7 +50,7 @@ public class PlayerHealth : MonoBehaviour, IDamagable
     private void Die()
     {
         isDead = true;
-        Debug.Log("Player died.");
+       // Debug.Log("Player died.");
         GetComponent<PlayerInput>().enabled = false;
         
         WeaponManager.Instance.DropCurrentWeapon();
@@ -80,13 +80,13 @@ public class PlayerHealth : MonoBehaviour, IDamagable
                 HealthItemsAmount -= 1;
                 UpdateHealthUI();
                 //UpdateHealthCounterUI();
-                Debug.Log("You Heal yourself");
+             //   Debug.Log("You Heal yourself");
 
             }
-            Debug.Log("you don`t have Health Item");
+           // Debug.Log("you don`t have Health Item");
         }
         else {
-            Debug.Log("Health is Full");
+           // Debug.Log("Health is Full");
         }
 
     }
