@@ -452,5 +452,10 @@ public class WeaponManager : MonoBehaviour
         set => animator.SetInteger(hashAttackCount, value);
     }
 
+    public void PlayMeleeSound()
+    {
+        Debug.Log("Swinging melee weapon...");
+        AudioManager.Instance.PlayAudioClip("Weapons", $"{meleeWeapon.weaponName}", false);
+    }
 
 }

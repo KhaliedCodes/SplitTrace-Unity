@@ -22,5 +22,7 @@ public abstract class Weapon : MonoBehaviour
 
     public abstract void Use(Vector3 aim = default);
     public abstract void Reload();
+  
+
 
 }

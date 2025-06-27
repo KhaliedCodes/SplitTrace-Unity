@@ -21,12 +21,9 @@ public class MeleeWeapon : Weapon
     private void Awake()
     {
         weaponType = WeaponType.Melee;
-        if (hitbox != null) hitbox.enabled = false;
+        if (hitbox != null) hitbox.enabled = false;  
     }
-    private void Start()
-    {
 
-    }
 
     public override void Use(Vector3 a)
     {
@@ -35,8 +32,7 @@ public class MeleeWeapon : Weapon
     }
     IEnumerator PerformAttack()
     {
-        Debug.Log("Swinging melee weapon...");
-        AudioManager.Instance.PlayAudioClip("Weapons", $"{weaponName}", false);
+
         hitbox.enabled = true;
         meleeHitbox.init(damage);
         yield return new WaitForSeconds(attackDuration);

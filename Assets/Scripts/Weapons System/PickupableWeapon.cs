@@ -6,7 +6,6 @@ public class PickupableWeapon : MonoBehaviour
     private Rigidbody rb;
     public BoxCollider boxCollider;
     private Weapon weapon;
-
     public bool IsEquipped { get; private set; } = false;
 
     private void Awake()
@@ -26,7 +25,6 @@ public class PickupableWeapon : MonoBehaviour
         transform.SetParent(holder);
         transform.localPosition = Vector3.zero;
         transform.localRotation = Quaternion.identity;
-
         gameObject.SetActive(true);
     }
 
