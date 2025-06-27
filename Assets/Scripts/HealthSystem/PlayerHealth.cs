@@ -65,7 +65,8 @@ public class PlayerHealth : MonoBehaviour, IDamagable
     {
         //Update health number Who player have
         HealthItemsAmount += i;
-        UpdateHealthCounterUI();
+        IncreaseHealth();
+        //UpdateHealthCounterUI();
 
     }
 
@@ -78,7 +79,7 @@ public class PlayerHealth : MonoBehaviour, IDamagable
                 Health += HealAmount;
                 HealthItemsAmount -= 1;
                 UpdateHealthUI();
-                UpdateHealthCounterUI();
+                //UpdateHealthCounterUI();
                 Debug.Log("You Heal yourself");
 
             }
@@ -89,9 +90,9 @@ public class PlayerHealth : MonoBehaviour, IDamagable
         }
 
     }
-    public void UpdateHealthCounterUI() {
-        healthCounterText.text = HealthItemsAmount.ToString();
-    }
+    //public void UpdateHealthCounterUI() {
+    //    healthCounterText.text = HealthItemsAmount.ToString();
+    //}
    
     IEnumerator LoadManinMenu()
     {
