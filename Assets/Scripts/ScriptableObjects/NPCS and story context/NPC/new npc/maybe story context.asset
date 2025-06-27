@@ -1,0 +1,78 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6cf34663668ffbf4da9a6ca7e5101184, type: 3}
+  m_Name: maybe story context
+  m_EditorClassIdentifier: 
+  currentLocation: The Grand Majestic Hotel
+  currentTime: 11:30 PM
+  currentObjective: Investigate the murder of Jonathan Blackwood and identify the
+    killer
+  storyProgressPercentage: 0
+  currentChapter: Chapter 1
+  discoveredClues: []
+  knownSuspects:
+  - name: Sarah Mitchell
+    description: Head Receptionist
+    suspicionLevel: 1
+    associatedClues: []
+    alibis: []
+    contradictoryStatements: []
+  - name: Elena Vasquez
+    description: Night Receptionist
+    suspicionLevel: 1
+    associatedClues: []
+    alibis: []
+    contradictoryStatements: []
+  - name: Dr. Elizabeth Harrison
+    description: Hotel Guest, Room 315
+    suspicionLevel: 1
+    associatedClues: []
+    alibis: []
+    contradictoryStatements: []
+  - name: Tom Bradley
+    description: Hotel Guest, Room 318
+    suspicionLevel: 1
+    associatedClues: []
+    alibis: []
+    contradictoryStatements: []
+  - name: Marcus Torres
+    description: Hotel Janitor
+    suspicionLevel: 1
+    associatedClues: []
+    alibis: []
+    contradictoryStatements: []
+  - name: Maria Santos
+    description: Head Maid
+    suspicionLevel: 1
+    associatedClues: []
+    alibis: []
+    contradictoryStatements: []
+  - name: Lisa Chen
+    description: Junior Maid
+    suspicionLevel: 1
+    associatedClues: []
+    alibis: []
+    contradictoryStatements: []
+  - name: Officer David Williams
+    description: First Responding Officer
+    suspicionLevel: 1
+    associatedClues: []
+    alibis: []
+    contradictoryStatements: []
+  evidenceConnections: []
+  trackedContradictions: []
+  npcNames: []
+  npcSecrets: []
+  informationReliability: []
+  keyEvents:
+  - '[11:30 PM] Test event occurred at 23:01'
+  playerChoices: []

@@ -1,6 +1,5 @@
 using Cinemachine;
 using TMPro;
-using UnityEditor.Search;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -131,7 +130,8 @@ public class UiManager : MonoBehaviour
     }
     public void BackToMainMenu()
     {
-        SceneManager.LoadScene("MainMenuGold");
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(0);
     }
     public void ExitGame()
     {

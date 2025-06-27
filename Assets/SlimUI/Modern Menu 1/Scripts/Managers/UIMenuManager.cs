@@ -95,7 +95,7 @@ namespace SlimUI.ModernMenu{
 
             if (AudioManager.Instance != null)
             {
-                AudioManager.Instance.PlayAudioClip("MainMenuTheme", "ThemeSong", true);
+                AudioManager.Instance.PlayAudioClip("Music", "MainMenu", true);
             }
         }
 

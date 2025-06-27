@@ -1,13 +1,18 @@
 using UnityEngine;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using UnityEngine.AI;
+using System.Collections;
 
 public class NPCController : MonoBehaviour
 {
     [Header("NPC Configuration")]
     [SerializeField] private NPCPersonality personality;
     [SerializeField] private float interactionRadius = 2f;
+
+    [Header("Look At Configuration")]
+    [SerializeField] private float lookAtSpeed = 2f;
+    [SerializeField] private bool smoothLookAt = true;
+    [SerializeField] private bool onlyRotateY = true; // Only rotate on Y-axis to prevent tilting
 
     [Header("Enemy Conversion")]
     [SerializeField] private HostilityTracker hostilityTracker;
@@ -27,6 +32,11 @@ public class NPCController : MonoBehaviour
     private Rigidbody npcRigidbody;
     private bool isInteracting;
     private bool waitingForChoices = false;
+
+    // Look at variables
+    private bool isLookingAtPlayer = false;
+    private Quaternion originalRotation;
+    private Transform playerTransform;
 
     public string NPCName => personality?.npcName ?? "NPC";
 
@@ -94,20 +104,94 @@ public class NPCController : MonoBehaviour
             Debug.LogWarning($"[{NPCName}] No NavMeshAgent found. This NPC will not navigate the environment.");
         }
 
+        // Store original rotation for later restoration
+        originalRotation = transform.rotation;
     }
+
     private void Start()
     {
         npcRigidbody.isKinematic = true; // Prevent physics interactions during dialogue
         npcNavMeshAgent.enabled = false; // Disable navigation during dialogue
-       
     }
-    private void Update() 
+
+    private void Update()
     {
+        // Handle looking at player
+        if (isLookingAtPlayer && playerTransform != null)
+        {
+            LookAtPlayer();
+        }
+
         // Optional: Display hostility status in debug mode
         if (Debug.isDebugBuild && Input.GetKeyDown(KeyCode.H))
         {
             Debug.Log($"[{NPCName}] {hostilityTracker.GetHostilityStatus()}");
         }
+    }
+
+    private void LookAtPlayer()
+    {
+        Vector3 directionToPlayer = playerTransform.position - transform.position;
+
+        if (onlyRotateY)
+        {
+            // Only rotate on Y-axis to prevent the NPC from tilting up/down
+            directionToPlayer.y = 0;
+        }
+
+        if (directionToPlayer.sqrMagnitude > 0.001f) // Avoid issues with zero vector
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(directionToPlayer);
+
+            if (smoothLookAt)
+            {
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, lookAtSpeed * Time.deltaTime);
+            }
+            else
+            {
+                transform.rotation = targetRotation;
+            }
+        }
+    }
+
+    private void StartLookingAtPlayer()
+    {
+        if (nearbyPlayer != null)
+        {
+            playerTransform = nearbyPlayer.transform;
+            isLookingAtPlayer = true;
+        }
+    }
+
+    private void StopLookingAtPlayer()
+    {
+        isLookingAtPlayer = false;
+
+        if (smoothLookAt)
+        {
+            StartCoroutine(ReturnToOriginalRotation());
+        }
+        else
+        {
+            transform.rotation = originalRotation;
+        }
+    }
+
+    private IEnumerator ReturnToOriginalRotation()
+    {
+        Quaternion startRotation = transform.rotation;
+        float elapsedTime = 0f;
+        float rotationDuration = 1f / lookAtSpeed;
+
+        while (elapsedTime < rotationDuration)
+        {
+            elapsedTime += Time.deltaTime;
+            float t = elapsedTime / rotationDuration;
+            transform.rotation = Quaternion.Slerp(startRotation, originalRotation, t);
+            yield return null;
+        }
+
+        transform.rotation = originalRotation;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -123,7 +207,7 @@ public class NPCController : MonoBehaviour
     {
         if (other.GetComponent<PlayerController>() == nearbyPlayer)
         {
-            if (nearbyPlayer != null) 
+            if (nearbyPlayer != null)
             {
                 nearbyPlayer.ClearCurrentInteractable();
             }
@@ -147,6 +231,17 @@ public class NPCController : MonoBehaviour
         }
 
         isInteracting = true;
+        
+
+        //Register this interaction with the murder mystery manager
+        if (MurderMysteryManager.Instance != null)
+        {
+            MurderMysteryManager.Instance.RegisterNPCInteraction(this);
+        }
+
+        // Start looking at player when dialogue begins
+        StartLookingAtPlayer();
+
         dialogueManager.StartDialogue(this, personality?.initialGreeting ?? "Hello there!");
         npcAnimator?.SetBool("inDialogue", true);
     }
@@ -158,13 +253,13 @@ public class NPCController : MonoBehaviour
             dialogueManager?.DisplayNPCDialogue("I'm done talking to you!");
             return;
         }
-        
+
         // Still analyze player input, but with less impact (optional)
         // hostilityTracker.AnalyzePlayerText(choiceText);
-        
+
         waitingForChoices = false;
         geminiAccessor.SendPlayerInput(choiceText);
-        
+
         // Note: Enemy conversion will be checked when AI responds, not here
     }
 
@@ -180,23 +275,23 @@ public class NPCController : MonoBehaviour
     private void HandleAIResponse(string responseText, string emotion)
     {
         if (string.IsNullOrEmpty(responseText)) return;
-        
+
         // CRITICAL: Analyze AI response for aggressive content BEFORE displaying
         hostilityTracker.AnalyzeAIResponse(responseText);
-        
+
         // Check if this aggressive response pushed the NPC over the edge
         if (CheckForEnemyConversion())
         {
             // If NPC just became hostile due to AI aggression, show conversion message
             return; // ConvertToEnemy() handles the response display
         }
-        
+
         // If not converted to enemy, display the response normally
         // (but the hostility has still been tracked)
         dialogueManager.DisplayNPCDialogue($"{responseText} {{\"emotion\":\"{emotion}\"}}");
-        
+
         // Optional: Show hostility warning if getting close to threshold
-        if (hostilityTracker.CurrentHostility > hostilityTracker.hostilityThreshold * 0.8f && 
+        if (hostilityTracker.CurrentHostility > hostilityTracker.hostilityThreshold * 0.8f &&
             !hostilityTracker.IsEnemy)
         {
             Debug.Log($"[WARNING] {NPCName} is getting very hostile! ({hostilityTracker.CurrentHostility:F1}/{hostilityTracker.hostilityThreshold})");
@@ -206,42 +301,42 @@ public class NPCController : MonoBehaviour
     private void HandleChoicesReceived(List<string> choices)
     {
         waitingForChoices = false;
-        
+
         // Filter out aggressive choices if NPC is getting hostile
         if (hostilityTracker.CurrentHostility > hostilityTracker.hostilityThreshold * 0.7f)
         {
             choices = FilterAggressiveChoices(choices);
         }
-        
+
         dialogueManager?.DisplayChoices(choices);
     }
 
     private List<string> FilterAggressiveChoices(List<string> originalChoices)
     {
         List<string> filteredChoices = new List<string>();
-        
+
         foreach (string choice in originalChoices)
         {
             // Use the hostility tracker to check if choice would be aggressive
             // Create a temporary copy to test without affecting the real tracker
-            bool isAggressive = choice.ToLower().Contains("attack") || 
-                              choice.ToLower().Contains("fight") || 
+            bool isAggressive = choice.ToLower().Contains("attack") ||
+                              choice.ToLower().Contains("fight") ||
                               choice.ToLower().Contains("threaten") ||
                               choice.ToLower().Contains("kill");
-            
+
             if (!isAggressive)
             {
                 filteredChoices.Add(choice);
             }
         }
-        
+
         // Always provide at least one peaceful option
         if (filteredChoices.Count == 0)
         {
             filteredChoices.Add("Maybe we should calm down...");
             filteredChoices.Add("I think there's been a misunderstanding.");
         }
-        
+
         return filteredChoices;
     }
 
@@ -254,6 +349,7 @@ public class NPCController : MonoBehaviour
         }
         return false;
     }
+
     private void ConvertToEnemy()
     {
         Debug.Log($"[ENEMY CONVERSION] {NPCName} has become hostile due to aggressive AI responses!");
@@ -261,11 +357,11 @@ public class NPCController : MonoBehaviour
         // Generate context-appropriate hostile response
         string[] conversionMessages =
         {
-        $"The way {NPCName} just spoke shows their true hostile nature!",
-        $"{NPCName}'s aggressive response reveals they are not to be trusted!",
-        $"That hostile outburst from {NPCName} shows they've become an enemy!",
-        $"{NPCName} has shown their true colors with that aggressive response!"
-    };
+            $"The way {NPCName} just spoke shows their true hostile nature!",
+            $"{NPCName}'s aggressive response reveals they are not to be trusted!",
+            $"That hostile outburst from {NPCName} shows they've become an enemy!",
+            $"{NPCName} has shown their true colors with that aggressive response!"
+        };
 
         string message = conversionMessages[Random.Range(0, conversionMessages.Length)];
         dialogueManager?.DisplayNPCDialogue($"{message} {{\"emotion\":\"angry\"}}");
@@ -294,7 +390,8 @@ public class NPCController : MonoBehaviour
         npcNavMeshAgent.enabled = true; // Enable navigation for hostile NPC
         interactionTrigger.enabled = false; // Disable interaction trigger to prevent further dialogue
         gameObject.tag = "Enemy"; // Change tag to "Enemy" for gameplay purposes
-}
+    }
+
     private void EndHostileDialogue()
     {
         dialogueManager?.EndDialogue();
@@ -304,19 +401,26 @@ public class NPCController : MonoBehaviour
     {
         isInteracting = false;
         waitingForChoices = false;
+
+        // Stop looking at player when dialogue ends
+        StopLookingAtPlayer();
+
         // Don't clear chat history if NPC is hostile - they should remember
         if (!hostilityTracker.IsEnemy)
         {
             geminiAccessor?.ClearChatHistory();
         }
-         npcAnimator?.SetBool("inDialogue", false);
+        npcAnimator?.SetBool("inDialogue", false);
     }
 
     public void EndInteraction()
     {
         isInteracting = false;
         waitingForChoices = false;
-        
+
+        // Stop looking at player when interaction ends
+        StopLookingAtPlayer();
+
         // Don't clear chat history if NPC is hostile - they should remember
         if (!hostilityTracker.IsEnemy)
         {
